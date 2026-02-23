@@ -42,12 +42,17 @@ with st.sidebar:
     st.image("https://www.exotel.com/wp-content/themes/flavor-jeera/assets/images/logo.svg", width=150)
     st.title("⚙️ Settings")
 
-    api_key = st.text_input(
-        "Anthropic API Key",
-        type="password",
-        value=os.environ.get("ANTHROPIC_API_KEY", ""),
-        help="Get yours at console.anthropic.com",
-    )
+    # Read API key from Streamlit secrets (server-side, never exposed in UI)
+    _secret_key = st.secrets.get("ANTHROPIC_API_KEY", "") if hasattr(st, "secrets") else ""
+    if _secret_key:
+        api_key = _secret_key
+        st.success("✅ API key configured", icon="🔑")
+    else:
+        api_key = st.text_input(
+            "Anthropic API Key",
+            type="password",
+            help="Get yours at console.anthropic.com",
+        )
 
     model_choice = st.selectbox(
         "Model",
