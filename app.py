@@ -39,7 +39,7 @@ st.set_page_config(
 # ─────────────────────────────────────────────
 
 with st.sidebar:
-    st.image("logo.png", width=150)
+    st.markdown("### 🟢 **exotel**")
     st.title("⚙️ Settings")
 
     # Read API key from Streamlit secrets (server-side, never exposed in UI)
