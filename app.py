@@ -39,7 +39,7 @@ st.set_page_config(
 # ─────────────────────────────────────────────
 
 with st.sidebar:
-    st.image("https://www.exotel.com/wp-content/themes/flavor-jeera/assets/images/logo.svg", width=150)
+    st.image("logo.png", width=150)
     st.title("⚙️ Settings")
 
     # Read API key from Streamlit secrets (server-side, never exposed in UI)
@@ -132,6 +132,19 @@ with col2:
                 st.text(text[:150] + "...")
                 st.markdown("---")
 
+# ─────────────────────────────────────────────
+# CUSTOM EVAL PARAMETERS (chatbox)
+# ─────────────────────────────────────────────
+
+st.markdown("---")
+st.subheader("4. Custom Evaluation Notes (optional)")
+custom_eval_notes = st.text_area(
+    "Add extra evaluation criteria or instructions",
+    height=100,
+    placeholder="e.g. 'Prefer candidates with startup experience', 'Must have Kubernetes knowledge', 'Bonus for open-source contributions'...",
+    help="These notes will be included in the AI evaluation prompt to customize scoring",
+)
+
 st.markdown("---")
 
 
@@ -139,9 +152,11 @@ st.markdown("---")
 # EVALUATION ENGINE
 # ─────────────────────────────────────────────
 
-def evaluate_single_resume(client, model, framework_key, jd_text, filename, resume_text):
+def evaluate_single_resume(client, model, framework_key, jd_text, filename, resume_text, custom_notes=""):
     """Evaluate a single resume via Claude API. Returns parsed result dict."""
     prompt = build_evaluation_prompt(framework_key, jd_text, resume_text, filename)
+    if custom_notes:
+        prompt += f"\n\nADDITIONAL EVALUATION INSTRUCTIONS FROM HIRING MANAGER:\n{custom_notes}"
     fw = FRAMEWORKS[framework_key]
 
     for attempt in range(MAX_RETRIES + 1):
@@ -253,7 +268,8 @@ if st.button(
         future_to_file = {
             executor.submit(
                 evaluate_single_resume,
-                client, model_choice, framework_name, jd_text, fname, text
+                client, model_choice, framework_name, jd_text, fname, text,
+                custom_eval_notes
             ): fname
             for fname, text in resumes.items()
         }
