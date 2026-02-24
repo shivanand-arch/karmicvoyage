@@ -5,7 +5,7 @@ Powered by Claude API with Exotel's evaluation frameworks baked in.
 """
 
 import os
-import json
+import jsons
 import time
 import concurrent.future
 import streamlit as st
