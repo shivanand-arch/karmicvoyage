@@ -7,7 +7,7 @@ Powered by Claude API with Exotel's evaluation frameworks baked in.
 import os
 import json
 import time
-import concurrent.futures
+import concurrent.future
 import streamlit as st
 import anthropic
 
@@ -44,7 +44,7 @@ if not st.user.is_logged_in:
     st.markdown("---")
     st.info("This tool is restricted to **Exotel employees**. Please sign in with your **@exotel.com** Google account.")
     if st.button("🔐 Sign in with Google", type="primary", use_container_width=True):
-        st.login("google")
+        st.login()
     st.caption("Powered by Claude API · Internal use only")
     st.stop()
 
