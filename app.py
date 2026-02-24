@@ -35,11 +35,38 @@ st.set_page_config(
 
 
 # ─────────────────────────────────────────────
+# AUTHENTICATION — only @exotel.com allowed
+# ─────────────────────────────────────────────
+
+if not st.user.is_logged_in:
+    st.markdown("### 🟢 **exotel**")
+    st.title("📋 Resume Screener")
+    st.markdown("---")
+    st.info("This tool is restricted to **Exotel employees**. Please sign in with your **@exotel.com** Google account.")
+    if st.button("🔐 Sign in with Google", type="primary", use_container_width=True):
+        st.login("google")
+    st.caption("Powered by Claude API · Internal use only")
+    st.stop()
+
+# Verify email domain
+_user_email = st.user.email or ""
+if not _user_email.endswith("@exotel.com"):
+    st.error(f"⛔ Access restricted to @exotel.com employees.\n\nYou signed in as **{_user_email}**")
+    if st.button("Sign out"):
+        st.logout()
+    st.stop()
+
+
+# ─────────────────────────────────────────────
 # SIDEBAR: API KEY + SETTINGS
 # ─────────────────────────────────────────────
 
 with st.sidebar:
     st.markdown("### 🟢 **exotel**")
+    st.caption(f"👤 {st.user.email}")
+    if st.button("Logout", use_container_width=True):
+        st.logout()
+    st.markdown("---")
     st.title("⚙️ Settings")
 
     # Read API key from Streamlit secrets (server-side, never exposed in UI)
