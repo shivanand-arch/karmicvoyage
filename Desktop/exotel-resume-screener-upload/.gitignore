@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Environment & secrets
+.env
+.streamlit/secrets.toml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Output files (generated at runtime)
+*.xlsx
+*.json
+!.env.example
+
+# Uploaded resumes (sensitive)
+uploads/
