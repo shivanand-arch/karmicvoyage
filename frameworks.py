@@ -147,6 +147,145 @@ Target: managed 4-6 engineers, still technically credible, architecture involvem
 Red flags: pure delivery/project managers, no engineering depth, managed very large teams (15+ directly — suggests beyond hands-on level).
 GenAI product uses Python, LangChain, LangGraph, RAG pipelines, agent workflows, LLM orchestration.""",
     },
+
+    # ── CX: SMB CSM ───────────────────────────
+    "CX — SMB CSM": {
+        "description": "SMB Customer Success Manager — high-volume portfolio ownership",
+        "dimensions": {
+            "portfolio_scale": "Portfolio scale — has the candidate managed 50+ accounts? Look for: SMB portfolios, high-volume account ownership, pooled/segmented customer bases. Deprioritize: only enterprise (5-10 accounts), no multi-account evidence.",
+            "segmentation_structure": "Segmentation & structured thinking — customer tiering (top/mid/long-tail), engagement playbooks, prioritization frameworks, scalable engagement models. Weak: attempting 1:1 for all accounts, no structured approach.",
+            "scalability_automation": "Scalability & automation mindset — email campaigns, lifecycle workflows, self-serve enablement (FAQs, guides), automation workflows, scalable customer journeys. Weak: purely manual account handling.",
+            "retention_adoption": "Retention & adoption ownership — product adoption metrics, churn reduction, onboarding/activation ownership. Look for: 'reduced churn by X%', 'increased product usage'. Red flag: no mention of retention or adoption.",
+            "expansion": "Expansion (upsell/cross-sell/renewals) — revenue influence within accounts, identifying growth opportunities, renewal ownership. Weak: no commercial awareness.",
+            "technical_curiosity": "API & product understanding — basic API understanding, SaaS platform experience, ability to explain product workflows. Weak: no exposure to technical products.",
+            "communication_execution": "Communication & execution — clear outcome-driven communication, handling multiple stakeholders, structured thinking, ownership mindset.",
+        },
+        "weights": {
+            "portfolio_scale": 0.25,
+            "segmentation_structure": 0.20,
+            "scalability_automation": 0.10,
+            "retention_adoption": 0.20,
+            "expansion": 0.10,
+            "technical_curiosity": 0.05,
+            "communication_execution": 0.10,
+        },
+        "context": """Exotel SMB CSM is a high-volume, high-ownership role — NOT a relationship-only role.
+The SMB CSM owns ~700-800 accounts, drives product adoption/retention/expansion at scale, segments accounts and prioritizes effectively, uses structured engagement and automation.
+Requires structured thinking, prioritization, and scalable execution — not just relationship management.
+Experience: CSM 2-5 YOE (50+ accounts), Senior CSM 5-8 YOE (100+, strong KPI ownership, segmentation).
+Red flags: no multi-account ownership, pure support/onboarding-only role, only enterprise experience (low volume), no metrics, no expansion or retention ownership.""",
+    },
+
+    # ── CX: MID-MARKET CSM ────────────────────
+    "CX — Mid-Market CSM": {
+        "description": "Mid-Market Customer Success Manager — balanced scale and depth",
+        "dimensions": {
+            "portfolio_complexity": "Portfolio size & complexity — managed 20-100 accounts with recurring engagement, balanced multiple accounts. Enterprise experience (5-10 accounts) is acceptable if structured ownership is demonstrated. Weak: only SMB high-volume (500+, no depth), no clear account ownership.",
+            "account_management": "Account management & structured thinking — account plans/playbooks, regular cadence (QBRs, reviews), defined success metrics per account. Weak: reactive customer handling, no structured approach.",
+            "retention_adoption": "Retention & adoption ownership — product adoption, churn mitigation, onboarding/lifecycle management. Look for: improved usage/engagement, reduced churn. Weak: no measurable impact.",
+            "expansion": "Expansion ownership — upsell/cross-sell contribution, renewal ownership, revenue growth within accounts, identifying expansion opportunities. Weak: no commercial involvement.",
+            "stakeholder_management": "Stakeholder management — multi-threaded engagement, working with business + operational stakeholders, managing decision-makers. Weak: single point of contact only.",
+            "technical_product": "Technical/product understanding — SaaS/product understanding, basic API awareness, mapping product to use cases. Weak: no technical curiosity.",
+            "problem_solving": "Problem-solving & execution — driving outcomes, resolving customer issues end-to-end, cross-functional collaboration.",
+        },
+        "weights": {
+            "portfolio_complexity": 0.20,
+            "account_management": 0.20,
+            "retention_adoption": 0.20,
+            "expansion": 0.15,
+            "stakeholder_management": 0.10,
+            "technical_product": 0.05,
+            "problem_solving": 0.10,
+        },
+        "context": """Exotel Mid-Market CSM is a balanced role between scale and depth.
+Owns ~20-100 accounts, drives adoption/retention/expansion, engages multiple stakeholders per account, requires structured account planning.
+Enterprise experience (5-10 accounts) is NOT a dealbreaker if candidate demonstrates: structured account management, retention/expansion ownership, ability to handle multiple accounts.
+Experience: CSM 2-6 YOE (20-100 accounts, adoption/retention), Senior CSM 6-10 YOE (larger portfolios, strong KPIs, stakeholder influence).
+Red flags: no account ownership, pure support roles, only SMB volume without structure, no metrics, no expansion involvement.""",
+    },
+
+    # ── CX: ENTERPRISE CSM ────────────────────
+    "CX — Enterprise CSM": {
+        "description": "Enterprise Customer Success Manager — high-impact strategic ownership",
+        "dimensions": {
+            "account_value": "Account value & complexity — managed 5-20 enterprise accounts, high ARR ownership, named enterprise accounts, long-term engagement. Weak: only SMB high-volume, no complexity or stakeholder depth.",
+            "strategic_management": "Strategic account management — account plans, QBRs/EBRs, defined success metrics, business outcome alignment, strategic roadmap discussions. Weak: reactive engagement, no structured planning.",
+            "renewals_retention": "Renewals & retention ownership — renewal ownership, multi-year retention, managing contract cycles. Look for: 'managed renewals worth $X', '95%+ retention'. Weak: no renewal ownership.",
+            "expansion": "Expansion (upsell/cross-sell) — large upsell/cross-sell deals, expansion strategy, revenue growth within accounts. Weak: no revenue influence.",
+            "stakeholder_cxo": "CXO-level stakeholder management — engagement with CTO/Product Heads/Business Leaders, multi-threaded relationships, influence across functions. Weak: single-threaded relationships.",
+            "consultative_approach": "Problem-solving & consultative approach — understanding customer business goals, mapping product to outcomes, business problem-solving, use-case driven engagement.",
+            "technical_understanding": "Technical/product understanding — APIs and integrations, technical workflows, comfort with product/engineering teams. Weak: no technical exposure.",
+        },
+        "weights": {
+            "account_value": 0.20,
+            "strategic_management": 0.20,
+            "renewals_retention": 0.20,
+            "expansion": 0.15,
+            "stakeholder_cxo": 0.10,
+            "consultative_approach": 0.10,
+            "technical_understanding": 0.05,
+        },
+        "context": """Exotel Enterprise CSM is a high-impact, strategic ownership role — closer to consultative sales + program management, NOT support or SMB CS.
+Owns ~5-20 high-value accounts, drives long-term retention and large renewals, influences expansion, engages CXOs/Product/Business leaders, navigates complex stakeholder environments, acts as strategic advisor.
+Experience: CSM 3-6 YOE (enterprise account ownership, renewal/retention, stakeholder management), Senior CSM 6-9 YOE (larger/strategic accounts, CXO influence, strong expansion).
+Red flags: no enterprise account ownership, pure support or SMB-only roles, no renewal ownership, no expansion involvement, weak stakeholder depth, no strategic thinking.""",
+    },
+
+    # ── SUPPORT: L1 PRODUCT SUPPORT ───────────
+    "Support — L1 Product Support Engineer": {
+        "description": "L1 Product Support Engineer — technical troubleshooting & customer handling",
+        "dimensions": {
+            "linux_fundamentals": "Linux fundamentals — commands (grep, awk, ps, top), log analysis, file system navigation, process-level understanding. This is a primary filter — no Linux exposure is a hard disqualifier.",
+            "networking_fundamentals": "Networking fundamentals — DNS, DHCP, OSI model, TCP/IP basics, basic connectivity troubleshooting. If networking is limited but Linux + DB are strong, candidate can still be Potential Fit.",
+            "database_querying": "Database querying — experience with any relational DB (PostgreSQL, MySQL, MariaDB, Oracle), SQL queries (joins, filters, aggregations), query-based debugging. No database knowledge is a hard disqualifier.",
+            "debugging_approach": "Debugging approach — step-by-step troubleshooting, logical thinking, ability to isolate issues. Look for: 'checked logs and identified...', 'resolved issue by...'. Weak: vague or generic explanations.",
+            "customer_communication": "Customer handling & communication — clarity of communication, ability to explain technical issues simply, client/stakeholder interaction. For freshers, strong communication can compensate for lack of experience.",
+            "ownership": "Ownership — end-to-end issue handling, closure responsibility, independent work. Weak: only assisting roles.",
+            "learning_ability": "Learning ability — curiosity, projects/internships, hands-on exposure. Important especially for freshers.",
+        },
+        "weights": {
+            "linux_fundamentals": 0.25,
+            "networking_fundamentals": 0.10,
+            "database_querying": 0.20,
+            "debugging_approach": 0.20,
+            "customer_communication": 0.10,
+            "ownership": 0.10,
+            "learning_ability": 0.05,
+        },
+        "context": """Exotel L1 Support is NOT a ticket-routing role. The L1 Product Support Engineer troubleshoots issues across Linux, networking, and databases on production systems impacting real-time communication.
+Owns issues end-to-end within defined scope, communicates clearly with customers and internal teams, operates in an SLA-driven environment.
+Experience: Freshers (strong fundamentals + communication + learning mindset), 1-3 YOE (real troubleshooting, production systems, basic customer handling).
+Hard disqualifiers: no Linux exposure, no database querying ability.
+Soft red flags: no debugging examples, generic resume, poor communication signals.""",
+    },
+
+    # ── SUPPORT: L3 PRODUCT SUPPORT LEAD ──────
+    "Support — L3 Product Support Lead": {
+        "description": "L3 Product Support Lead — senior ownership, RCA, escalation handling",
+        "dimensions": {
+            "linux_advanced": "Advanced Linux expertise — load average analysis, system bottleneck analysis, advanced grep/awk usage, deep log analysis, performance debugging.",
+            "database_advanced": "Advanced database debugging — experience with relational DBs (PostgreSQL, MySQL, MariaDB, Oracle), connection pool issues, replication lag debugging, query optimization, indexing.",
+            "networking": "Networking depth — DNS, TCP/IP, latency/debugging issues, network-related RCA.",
+            "rca_ownership": "RCA ownership — end-to-end root cause analysis, cross-system debugging, preventive solutions, long-term fixes. No RCA ownership is a hard disqualifier.",
+            "escalation_handling": "Escalation handling — high-severity incidents, customer escalations, communication under pressure.",
+            "mentorship_leadership": "Mentorship & team contribution — mentoring junior engineers, knowledge sharing, creating playbooks/runbooks.",
+            "cross_functional": "Ownership & collaboration — driving issues end-to-end, working with engineering/product, accountability beyond scope.",
+        },
+        "weights": {
+            "linux_advanced": 0.20,
+            "database_advanced": 0.20,
+            "networking": 0.10,
+            "rca_ownership": 0.20,
+            "escalation_handling": 0.10,
+            "mentorship_leadership": 0.10,
+            "cross_functional": 0.10,
+        },
+        "context": """Exotel L3 Support Lead is a senior ownership role requiring deep technical expertise + ownership + leadership + customer handling.
+Handles complex production issues, performs end-to-end RCA, manages customer escalations, mentors L1/L2 engineers, works across systems (Linux, DB, networking, application), drives resolution across teams.
+Experience: 5+ years with advanced troubleshooting, RCA ownership, escalation handling, mentorship.
+Hard disqualifiers: no RCA ownership, no advanced technical depth.
+Soft red flags: no mentoring experience, only repetitive support work, only ticket handling without depth.""",
+    },
 }
 
 
