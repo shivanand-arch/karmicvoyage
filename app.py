@@ -23,7 +23,6 @@ from excel_generator import generate_excel
 # CONFIG
 # ─────────────────────────────────────────────
 
-MODEL = "claude-sonnet-4-5-20250929"  # or claude-opus-4-5-20251101 for higher quality
 MAX_CONCURRENT = 5  # parallel API calls
 MAX_RETRIES = 2
 
@@ -35,55 +34,23 @@ st.set_page_config(
 
 
 # ─────────────────────────────────────────────
-# AUTHENTICATION — only @exotel.com allowed
-# ─────────────────────────────────────────────
-
-if not st.user.is_logged_in:
-    st.markdown("### 🟢 **exotel**")
-    st.title("📋 Resume Screener")
-    st.markdown("---")
-    st.info("This tool is restricted to **Exotel employees**. Please sign in with your **@exotel.com** Google account.")
-    if st.button("🔐 Sign in with Google", type="primary", use_container_width=True):
-        st.login()
-    st.caption("Powered by Claude API · Internal use only")
-    st.stop()
-
-# Verify email domain
-_user_email = st.user.email or ""
-if not _user_email.endswith("@exotel.com"):
-    st.error(f"⛔ Access restricted to @exotel.com employees.\n\nYou signed in as **{_user_email}**")
-    if st.button("Sign out"):
-        st.logout()
-    st.stop()
-
-
-# ─────────────────────────────────────────────
 # SIDEBAR: API KEY + SETTINGS
 # ─────────────────────────────────────────────
 
 with st.sidebar:
-    st.markdown("### 🟢 **exotel**")
-    st.caption(f"👤 {st.user.email}")
-    if st.button("Logout", use_container_width=True):
-        st.logout()
-    st.markdown("---")
+    st.image("https://www.exotel.com/wp-content/themes/flavor-jeera/assets/images/logo.svg", width=150)
     st.title("⚙️ Settings")
 
-    # Read API key from Streamlit secrets (server-side, never exposed in UI)
-    _secret_key = st.secrets.get("ANTHROPIC_API_KEY", "") if hasattr(st, "secrets") else ""
-    if _secret_key:
-        api_key = _secret_key
-        st.success("✅ API key configured", icon="🔑")
-    else:
-        api_key = st.text_input(
-            "Anthropic API Key",
-            type="password",
-            help="Get yours at console.anthropic.com",
-        )
+    api_key = st.text_input(
+        "Anthropic API Key",
+        type="password",
+        value=os.environ.get("ANTHROPIC_API_KEY", ""),
+        help="Get yours at console.anthropic.com",
+    )
 
     model_choice = st.selectbox(
         "Model",
-        ["claude-sonnet-4-5-20250929", "claude-opus-4-5-20251101"],
+        ["claude-sonnet-4-6", "claude-opus-4-6"],
         index=0,
         help="Opus = higher quality but slower & more expensive. Sonnet = recommended for most uses.",
     )
@@ -107,6 +74,9 @@ with st.sidebar:
 
 st.title("📋 Exotel Resume Screener")
 st.caption("Upload a JD + resume ZIP → Get AI-powered ranked Excel output")
+
+resumes = {}
+failed_extract = []
 
 col1, col2 = st.columns(2)
 
@@ -148,29 +118,22 @@ with col2:
 
     if resume_zip:
         with st.spinner("Extracting resumes..."):
-            resumes, failed = extract_resumes_from_zip(resume_zip)
+            resumes, failed_extract = extract_resumes_from_zip(resume_zip)
         st.success(f"✅ Extracted {len(resumes)} resumes")
-        if failed:
-            st.warning(f"⚠️ {len(failed)} files could not be read: {', '.join(failed[:5])}")
+        if failed_extract:
+            st.warning(
+                f"⚠️ {len(failed_extract)} files could not be read: "
+                f"{', '.join(failed_extract[:5])}"
+            )
 
         with st.expander(f"Preview extracted resumes ({len(resumes)})"):
+            st.caption(
+                "First ~3,500 characters of each resume are sent to the model for scoring."
+            )
             for fname, text in list(resumes.items())[:5]:
                 st.markdown(f"**{fname}** ({len(text)} chars)")
                 st.text(text[:150] + "...")
                 st.markdown("---")
-
-# ─────────────────────────────────────────────
-# CUSTOM EVAL PARAMETERS (chatbox)
-# ─────────────────────────────────────────────
-
-st.markdown("---")
-st.subheader("4. Custom Evaluation Notes (optional)")
-custom_eval_notes = st.text_area(
-    "Add extra evaluation criteria or instructions",
-    height=100,
-    placeholder="e.g. 'Prefer candidates with startup experience', 'Must have Kubernetes knowledge', 'Bonus for open-source contributions'...",
-    help="These notes will be included in the AI evaluation prompt to customize scoring",
-)
 
 st.markdown("---")
 
@@ -179,19 +142,20 @@ st.markdown("---")
 # EVALUATION ENGINE
 # ─────────────────────────────────────────────
 
-def evaluate_single_resume(client, model, framework_key, jd_text, filename, resume_text, custom_notes=""):
-    """Evaluate a single resume via Claude API. Returns parsed result dict."""
+def evaluate_single_resume(api_key, model, framework_key, jd_text, filename, resume_text):
+    """Evaluate a single resume via Claude API. Returns parsed result dict.
+    Creates its own Anthropic client per call for thread safety.
+    """
+    client = anthropic.Anthropic(api_key=api_key)
     prompt = build_evaluation_prompt(framework_key, jd_text, resume_text, filename)
-    if custom_notes:
-        prompt += f"\n\nADDITIONAL EVALUATION INSTRUCTIONS FROM HIRING MANAGER:\n{custom_notes}"
     fw = FRAMEWORKS[framework_key]
 
     for attempt in range(MAX_RETRIES + 1):
         try:
             response = client.messages.create(
                 model=model,
-                max_tokens=1500,
-                temperature=0.1,
+                max_tokens=2000,
+                temperature=0.0,
                 messages=[{"role": "user", "content": prompt}],
             )
             text = response.content[0].text.strip()
@@ -251,21 +215,10 @@ def evaluate_single_resume(client, model, framework_key, jd_text, filename, resu
 # RUN EVALUATION
 # ─────────────────────────────────────────────
 
-can_run = (
-    api_key
-    and jd_text
-    and resume_zip
-    and "resumes" in dir()
-    and len(resumes) > 0
-)
-
-# Check if we have resumes loaded
-has_resumes = resume_zip is not None and "resumes" in dir() and len(locals().get("resumes", {})) > 0
-
 if st.button(
     "🚀 Evaluate & Rank Resumes",
     type="primary",
-    disabled=not (api_key and jd_text and has_resumes),
+    disabled=not (api_key and jd_text and resume_zip and len(resumes) > 0),
     use_container_width=True,
 ):
     if not api_key:
@@ -274,16 +227,13 @@ if st.button(
     if not jd_text:
         st.error("Please provide a Job Description")
         st.stop()
-    if not has_resumes:
+    if not len(resumes) > 0:
         st.error("Please upload a resume ZIP file")
         st.stop()
-
-    client = anthropic.Anthropic(api_key=api_key)
 
     st.subheader("Evaluating...")
     progress_bar = st.progress(0)
     status_text = st.empty()
-    results_container = st.empty()
 
     all_results = []
     total = len(resumes)
@@ -295,8 +245,7 @@ if st.button(
         future_to_file = {
             executor.submit(
                 evaluate_single_resume,
-                client, model_choice, framework_name, jd_text, fname, text,
-                custom_eval_notes
+                api_key, model_choice, framework_name, jd_text, fname, text
             ): fname
             for fname, text in resumes.items()
         }
@@ -340,7 +289,7 @@ if st.button(
 
     # Quick stats
     from collections import Counter
-    verdicts = Counter(r["verdict"] for r in all_results)
+    verdicts = Counter(r.get("verdict", "No") for r in all_results)
 
     stat_cols = st.columns(4)
     stat_cols[0].metric("Strong Yes", verdicts.get("Strong Yes", 0))

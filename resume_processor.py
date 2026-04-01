@@ -3,13 +3,16 @@ Resume text extraction from PDFs, DOCX, and TXT files.
 Handles image-based PDFs with OCR fallback.
 """
 
+import logging
 import os
-import io
-import zipfile
+import shutil
 import tempfile
+import zipfile
 from pathlib import Path
 
 import pdfplumber
+
+logger = logging.getLogger(__name__)
 
 try:
     import docx
@@ -34,6 +37,7 @@ def extract_text_from_pdf(file_path: str, max_chars: int = 4000) -> str:
                 page_text = page.extract_text() or ""
                 text += page_text + "\n"
     except Exception as e:
+        logger.warning(f"Failed to extract text from {file_path}: {e}")
         text = ""
 
     # If pdfplumber got very little text, try OCR
@@ -41,8 +45,8 @@ def extract_text_from_pdf(file_path: str, max_chars: int = 4000) -> str:
         try:
             images = convert_from_path(file_path, dpi=200)
             text = "\n".join(pytesseract.image_to_string(img) for img in images)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug("OCR fallback failed for %s: %s", file_path, e)
 
     return text[:max_chars]
 
@@ -55,7 +59,8 @@ def extract_text_from_docx(file_path: str, max_chars: int = 4000) -> str:
         doc = docx.Document(file_path)
         text = "\n".join(para.text for para in doc.paragraphs)
         return text[:max_chars]
-    except Exception:
+    except Exception as e:
+        logger.warning(f"Failed to extract text from {file_path}: {e}")
         return ""
 
 
@@ -64,7 +69,8 @@ def extract_text_from_txt(file_path: str, max_chars: int = 4000) -> str:
     try:
         with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
             return f.read()[:max_chars]
-    except Exception:
+    except Exception as e:
+        logger.warning(f"Failed to extract text from {file_path}: {e}")
         return ""
 
 
@@ -81,10 +87,36 @@ def extract_text(file_path: str, max_chars: int = 4000) -> str:
         return ""
 
 
+def _safe_extractall(zf: zipfile.ZipFile, dest_dir: str) -> None:
+    """Extract ZIP members only under dest_dir (mitigates zip slip)."""
+    dest_root = os.path.realpath(dest_dir)
+    os.makedirs(dest_root, exist_ok=True)
+    for member in zf.infolist():
+        name = (member.filename or "").replace("\\", "/")
+        if not name or name.endswith("/"):
+            continue
+        if name.startswith("/") or any(p == ".." for p in name.split("/")):
+            logger.warning("Skipping unsafe ZIP member: %s", member.filename)
+            continue
+        dest_path = os.path.realpath(os.path.join(dest_root, *name.split("/")))
+        try:
+            if os.path.commonpath([dest_root, dest_path]) != dest_root:
+                logger.warning("Skipping ZIP slip path: %s", member.filename)
+                continue
+        except ValueError:
+            logger.warning("Skipping ZIP member (invalid path): %s", member.filename)
+            continue
+        parent = os.path.dirname(dest_path)
+        if parent:
+            os.makedirs(parent, exist_ok=True)
+        with zf.open(member, "r") as src, open(dest_path, "wb") as dst:
+            shutil.copyfileobj(src, dst)
+
+
 def extract_resumes_from_zip(uploaded_file) -> dict:
     """
     Extract resume texts from an uploaded ZIP file.
-    Returns dict of {filename: text}
+    Returns dict of {archive_relative_path: text} (paths use / so nested files stay unique).
     """
     resumes = {}
     failed = []
@@ -95,13 +127,14 @@ def extract_resumes_from_zip(uploaded_file) -> dict:
         with open(zip_path, "wb") as f:
             f.write(uploaded_file.getbuffer())
 
-        # Extract ZIP
         extract_dir = os.path.join(tmpdir, "extracted")
+        os.makedirs(extract_dir, exist_ok=True)
+        extract_root = os.path.realpath(extract_dir)
         with zipfile.ZipFile(zip_path, "r") as z:
-            z.extractall(extract_dir)
+            _safe_extractall(z, extract_root)
 
         # Walk through extracted files
-        for root, dirs, files in os.walk(extract_dir):
+        for root, dirs, files in os.walk(extract_root):
             # Skip __MACOSX folders
             if "__MACOSX" in root:
                 continue
@@ -116,10 +149,11 @@ def extract_resumes_from_zip(uploaded_file) -> dict:
                 file_path = os.path.join(root, fname)
                 text = extract_text(file_path)
 
+                rel_path = os.path.relpath(file_path, extract_root).replace(os.sep, "/")
                 if len(text.strip()) > 20:
-                    resumes[fname] = text
+                    resumes[rel_path] = text
                 else:
-                    failed.append(fname)
+                    failed.append(rel_path)
 
     return resumes, failed
 

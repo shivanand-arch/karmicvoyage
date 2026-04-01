@@ -62,7 +62,6 @@ def generate_excel(candidates: list, framework: dict, role_name: str) -> io.Byte
 
     dimensions = list(framework["dimensions"].keys())
     weights = framework["weights"]
-    has_bonus = "bonus_dimensions" in framework
     bonus_dims = list(framework.get("bonus_dimensions", {}).keys())
 
     # ── Build headers ────────────────────────
@@ -153,6 +152,15 @@ def generate_excel(candidates: list, framework: dict, role_name: str) -> io.Byte
         total_col = dim_end_col + 1
         verdict_col = total_col + 1
 
+        # Precompute bonus column indices
+        bonus_start = verdict_col + 1
+        bonus_score_cols = set()
+        bonus_note_cols = set()
+        for i in range(len(bonus_dims)):
+            bonus_score_cols.add(bonus_start + i * 2)
+            bonus_note_cols.add(bonus_start + i * 2 + 1)
+        text_cols_start = bonus_start + len(bonus_dims) * 2
+
         for col, val in enumerate(row_data, 1):
             cell = ws.cell(row=row, column=col, value=val)
             cell.font = data_font
@@ -180,20 +188,15 @@ def generate_excel(candidates: list, framework: dict, role_name: str) -> io.Byte
                 cell.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
 
             # Bonus score columns
-            bonus_start = verdict_col + 1
-            for i, bd in enumerate(bonus_dims):
-                score_col = bonus_start + i * 2
-                note_col = score_col + 1
-                if col == score_col and isinstance(val, (int, float)):
-                    cell.fill = score_fill(val)
-                    cell.font = Font(name="Arial", bold=True, size=10)
-                    cell.number_format = "0.0"
-                if col == note_col:
-                    cell.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
-                    cell.font = small_font
+            if col in bonus_score_cols and isinstance(val, (int, float)):
+                cell.fill = score_fill(val)
+                cell.font = Font(name="Arial", bold=True, size=10)
+                cell.number_format = "0.0"
+            elif col in bonus_note_cols:
+                cell.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+                cell.font = small_font
 
             # Text columns at the end — left align, wrap, small font
-            text_cols_start = bonus_start + len(bonus_dims) * 2
             if col >= text_cols_start:
                 cell.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
                 cell.font = small_font
@@ -210,7 +213,7 @@ def generate_excel(candidates: list, framework: dict, role_name: str) -> io.Byte
     ws2.column_dimensions["B"].width = 15
 
     from collections import Counter
-    vc = Counter(c["verdict"] for c in candidates)
+    vc = Counter(c.get("verdict", "No") for c in candidates)
 
     summary_rows = [
         ("Role", role_name),

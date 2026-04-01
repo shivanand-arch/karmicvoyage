@@ -150,10 +150,6 @@ GenAI product uses Python, LangChain, LangGraph, RAG pipelines, agent workflows,
 }
 
 
-# ─────────────────────────────────────────────
-# VERDICT THRESHOLDS
-# ─────────────────────────────────────────────
-
 VERDICT_THRESHOLDS = {
     "Strong Yes": 8.0,
     "Yes": 6.5,
@@ -161,16 +157,19 @@ VERDICT_THRESHOLDS = {
     "No": 0.0,
 }
 
+# Highest band first; everything below Maybe is "No".
+_VERDICT_ORDER = [
+    ("Strong Yes", VERDICT_THRESHOLDS["Strong Yes"]),
+    ("Yes", VERDICT_THRESHOLDS["Yes"]),
+    ("Maybe", VERDICT_THRESHOLDS["Maybe"]),
+]
+
 
 def get_verdict(score: float) -> str:
-    if score >= 8.0:
-        return "Strong Yes"
-    elif score >= 6.5:
-        return "Yes"
-    elif score >= 5.0:
-        return "Maybe"
-    else:
-        return "No"
+    for label, threshold in _VERDICT_ORDER:
+        if score >= threshold:
+            return label
+    return "No"
 
 
 def calculate_total(scores: dict, weights: dict) -> float:
@@ -209,16 +208,24 @@ SCORING DIMENSIONS (each 1-10):
 {dimensions_desc}
 {bonus_section}
 VERDICT THRESHOLDS: Strong Yes (≥8.0), Yes (6.5-7.9), Maybe (5.0-6.4), No (<5.0)
-Total score = weighted sum of dimension scores.
+Total score = weighted sum of dimension scores (the app recomputes total_score and verdict from your dimension scores).
 
 RESUME (filename: {filename}):
 {resume_text[:3500]}
 
 INSTRUCTIONS:
 - Read the resume carefully. Extract specific evidence for each dimension.
-- Be calibrated: 5 = average, 7 = good, 9 = exceptional. Don't inflate.
-- If evidence is missing for a dimension, score low (2-4), don't assume.
+- SCORING CALIBRATION (use the full 1-10 range — do NOT cluster all scores around 5-6):
+  1-2: No evidence at all for this dimension
+  3-4: Weak/tangential evidence, mostly unrelated experience
+  5: Average — meets basic expectations but nothing notable
+  6-7: Good — clear, specific evidence of competence in this area
+  8: Strong — multiple concrete achievements with measurable impact
+  9-10: Exceptional — rare, standout evidence (e.g., built systems at scale, published work, led major migrations)
+- DIFFERENTIATE across dimensions: A candidate strong in backend but weak in GenAI should show a 3+ point gap between those scores. Do not give flat scores. Your highest and lowest dimension scores for any candidate should differ by at least 2 points.
+- If evidence is missing for a dimension, score 1-3. Do not assume competence without evidence.
 - Extract the candidate's full name, current role/company, and estimated YOE.
+- You may omit total_score and verdict — they will be recomputed from dimension scores.
 
 Respond with ONLY valid JSON (no markdown, no explanation):
 """
@@ -243,7 +250,7 @@ Respond with ONLY valid JSON (no markdown, no explanation):
 
     json_template += """
   "total_score": 0.00,
-  "verdict": "Strong Yes/Yes/Maybe/No",
+  "verdict": "Maybe",
   "key_strengths": ["strength1", "strength2"],
   "key_concerns": ["concern1", "concern2"],
   "evidence_summary": "2-3 sentence summary with specific resume evidence"
@@ -251,6 +258,74 @@ Respond with ONLY valid JSON (no markdown, no explanation):
 
     prompt += json_template
     return prompt
+
+
+def build_evaluation_prompt_split(framework_key: str, jd_text: str, resume_text: str, filename: str) -> tuple:
+    """Build system + user message pair for evaluation. Returns (system_text, user_text)."""
+    fw = FRAMEWORKS[framework_key]
+
+    dimensions_desc = "\n".join(
+        f"- **{k}** (weight {fw['weights'][k]:.0%}): {v}"
+        for k, v in fw["dimensions"].items()
+    )
+
+    bonus_section = ""
+    if "bonus_dimensions" in fw:
+        bonus_desc = "\n".join(
+            f"- **{k}**: {v}" for k, v in fw["bonus_dimensions"].items()
+        )
+        bonus_section = f"""
+BONUS DIMENSIONS (score separately, NOT included in total):
+{bonus_desc}
+"""
+
+    system_text = f"""You are an expert resume screener for Exotel. You evaluate resumes against job descriptions with rigorous, evidence-based scoring.
+
+ROLE CONTEXT:
+{fw['context']}
+
+SCORING DIMENSIONS (each 1-10):
+{dimensions_desc}
+{bonus_section}
+VERDICT THRESHOLDS: Strong Yes (≥8.0), Yes (6.5-7.9), Maybe (5.0-6.4), No (<5.0)
+Total score = weighted sum of dimension scores (the app recomputes total_score and verdict from your dimension scores).
+
+SCORING CALIBRATION (use the full 1-10 range — do NOT cluster all scores around 5-6):
+  1-2: No evidence at all for this dimension
+  3-4: Weak/tangential evidence, mostly unrelated experience
+  5: Average — meets basic expectations but nothing notable
+  6-7: Good — clear, specific evidence of competence in this area
+  8: Strong — multiple concrete achievements with measurable impact
+  9-10: Exceptional — rare, standout evidence (e.g., built systems at scale, published work, led major migrations)
+
+DIFFERENTIATE across dimensions: A candidate strong in backend but weak in GenAI should show a 3+ point gap between those scores. Do not give flat scores.
+If evidence is missing for a dimension, score 1-3. Do not assume competence without evidence.
+
+Respond with ONLY valid JSON (no markdown, no explanation)."""
+
+    # Build the JSON template
+    score_fields = ", ".join(f'"{k}": 0.0' for k in fw["dimensions"])
+    json_template = f"""\n{{\n  "name": "Full Name",\n  "file": "{filename}",\n  "current_role": "Current Title @ Company",\n  "yoe": 0,\n  "scores": {{\n    {score_fields}\n  }},"""
+
+    if "bonus_dimensions" in fw:
+        bonus_score_fields = ", ".join(f'"{k}": 0.0' for k in fw["bonus_dimensions"])
+        bonus_note_fields = ", ".join(f'"{k}": "brief note"' for k in fw["bonus_dimensions"])
+        json_template += f"""\n  "bonus_scores": {{{bonus_score_fields}}},\n  "bonus_notes": {{{bonus_note_fields}}},"""
+
+    json_template += """\n  "total_score": 0.00,\n  "verdict": "Maybe",\n  "key_strengths": ["strength1", "strength2"],\n  "key_concerns": ["concern1", "concern2"],\n  "evidence_summary": "2-3 sentence summary with specific resume evidence"\n}"""
+
+    user_text = f"""Evaluate this resume against the job description below.
+
+JOB DESCRIPTION:
+{jd_text}
+
+RESUME (filename: {filename}):
+{resume_text[:3500]}
+
+Extract the candidate's full name, current role/company, and estimated YOE. Score each dimension with specific evidence. Return JSON in this format:
+{json_template}"""
+
+    return system_text, user_text
 
 
 def get_framework_names() -> list:
