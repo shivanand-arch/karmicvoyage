@@ -172,12 +172,14 @@ st.markdown("---")
 # EVALUATION ENGINE
 # ─────────────────────────────────────────────
 
-def evaluate_single_resume(api_key, model, framework_key, jd_text, filename, resume_text):
+def evaluate_single_resume(api_key, model, framework_key, jd_text, filename, resume_text, custom_notes=""):
     """Evaluate a single resume via Claude API. Returns parsed result dict.
     Creates its own Anthropic client per call for thread safety.
     """
     client = anthropic.Anthropic(api_key=api_key)
     prompt = build_evaluation_prompt(framework_key, jd_text, resume_text, filename)
+    if custom_notes:
+        prompt += f"\n\nADDITIONAL EVALUATION INSTRUCTIONS FROM HIRING MANAGER:\n{custom_notes}"
     fw = FRAMEWORKS[framework_key]
 
     for attempt in range(MAX_RETRIES + 1):
@@ -312,9 +314,13 @@ if st.button(
     # Sort by score
     all_results.sort(key=lambda x: x.get("total_score", 0), reverse=True)
 
-    # Store results in session state for post-evaluation refinement
+    # Store results + context in session state for post-evaluation refinement
     st.session_state["eval_results"] = all_results
     st.session_state["eval_framework_name"] = framework_name
+    st.session_state["eval_resumes"] = dict(resumes)
+    st.session_state["eval_jd_text"] = jd_text
+    st.session_state["eval_model"] = model_choice
+    st.session_state["eval_api_key"] = api_key
 
     st.success(f"✅ Evaluation complete! {len(all_results)} candidates ranked.")
 
@@ -384,6 +390,70 @@ if "eval_results" in st.session_state and st.session_state["eval_results"]:
     with reset_col:
         if st.button("Reset to defaults", key="reset_weights"):
             st.session_state["adjusted_weights"] = dict(stored_fw["weights"])
+            st.rerun()
+
+    # ── Refine evaluation criteria text box ──
+    st.markdown("**Update evaluation criteria**")
+    refine_notes = st.text_area(
+        "Add or change evaluation instructions",
+        height=100,
+        placeholder="e.g. 'Prefer candidates with startup experience', 'Must have Kubernetes knowledge', 'Penalize job-hoppers with <1yr stints', 'Bonus for open-source contributions'...",
+        help="These notes will be sent to the AI along with the original JD to re-score all resumes.",
+        key="refine_notes",
+    )
+
+    if st.button(
+        "🔄 Re-evaluate with updated criteria",
+        disabled=not refine_notes.strip(),
+        help="Re-runs AI evaluation on all resumes with your updated instructions. This uses API calls.",
+        key="re_evaluate_btn",
+    ):
+        stored_resumes = st.session_state.get("eval_resumes", {})
+        stored_jd = st.session_state.get("eval_jd_text", "")
+        stored_model = st.session_state.get("eval_model", "claude-sonnet-4-6")
+        stored_api_key = st.session_state.get("eval_api_key", "")
+
+        if not stored_resumes or not stored_api_key:
+            st.error("Missing evaluation context. Please run the initial evaluation first.")
+        else:
+            re_progress = st.progress(0)
+            re_status = st.empty()
+            re_results = []
+            total = len(stored_resumes)
+            completed = 0
+
+            with concurrent.futures.ThreadPoolExecutor(max_workers=max_parallel) as executor:
+                future_to_file = {
+                    executor.submit(
+                        evaluate_single_resume,
+                        stored_api_key, stored_model, stored_fw_name,
+                        stored_jd, fname, text, refine_notes.strip()
+                    ): fname
+                    for fname, text in stored_resumes.items()
+                }
+                for future in concurrent.futures.as_completed(future_to_file):
+                    fname = future_to_file[future]
+                    completed += 1
+                    try:
+                        result = future.result()
+                        re_results.append(result)
+                    except Exception as e:
+                        re_results.append({
+                            "name": fname, "file": fname,
+                            "current_role": "Error", "yoe": 0,
+                            "scores": {k: 0 for k in stored_fw["dimensions"]},
+                            "total_score": 0, "verdict": "No",
+                            "key_strengths": [],
+                            "key_concerns": [str(e)[:100]],
+                            "evidence_summary": f"Error: {str(e)[:100]}",
+                        })
+                    re_progress.progress(completed / total)
+                    re_status.text(f"Re-evaluated {completed}/{total} resumes")
+
+            re_results.sort(key=lambda x: x.get("total_score", 0), reverse=True)
+            st.session_state["eval_results"] = re_results
+            raw_results = re_results
+            st.success("✅ Re-evaluation complete with updated criteria!")
             st.rerun()
 
     # ── Recalculate scores with adjusted weights ──
