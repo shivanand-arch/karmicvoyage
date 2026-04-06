@@ -47,6 +47,7 @@ Red flags: frontend-heavy, only scripting/automation, QA/DevOps without backend,
             "field_sales": "Field sales — in-person meetings, customer visits. Weak: pure inside sales, only remote selling.",
             "company_context": "Company context — SaaS, enterprise software, AI/automation platforms, CX/contact center tools = high signal. Transactional/hardware/channel/distributor = low signal.",
             "numbers_metrics": "Numbers & ownership — quota achievement, revenue numbers, deal sizes, pipeline ownership, growth metrics. RED FLAG: sales resume without numbers.",
+            "leadership": "Leadership signals — team management, mentoring junior reps, sales playbook creation, hiring involvement, cross-functional coordination, regional/segment ownership",
         },
         "weights": {
             "hunter_mindset": 0.20,
@@ -56,6 +57,7 @@ Red flags: frontend-heavy, only scripting/automation, QA/DevOps without backend,
             "field_sales": 0.05,
             "company_context": 0.15,
             "numbers_metrics": 0.10,
+            "leadership": 0.0,
         },
         "bonus_dimensions": {
             "ai_first_selling": "AI-First Solution Selling — has the candidate sold AI-first solutions? Conversational AI, GenAI, Voice AI/Bots, NLP, AI automation platforms, AI-first SaaS. Score 1-10 but report SEPARATELY.",
@@ -77,6 +79,7 @@ Red flags: no revenue metrics, pure account management, channel-only, small tick
             "technical_curiosity": "Technical curiosity — SaaS exposure, API/SDK familiarity, automation tools, CRM usage (HubSpot/Salesforce), GenAI for research. Strong: sold SaaS, used Apollo/Sales Navigator. Weak: pure non-tech B2B.",
             "industry_persona": "Industry & persona awareness — persona-based messaging (CXOs, Founders, Product Heads), industry pain points (BFSI, D2C, FMCG), contextualized value props. Weak: generic mass messaging.",
             "self_discipline": "Self-discipline & ownership — consistency in target achievement, self-driven prospecting, independent pipeline generation, long tenure in outbound roles. Red flags: frequent switches (<1yr), heavy dependence on marketing.",
+            "leadership": "Leadership signals — mentoring junior SDRs, training new hires, creating outreach playbooks, SDR team lead experience, process improvements",
         },
         "weights": {
             "outbound_ownership": 0.25,
@@ -85,6 +88,7 @@ Red flags: no revenue metrics, pure account management, channel-only, small tick
             "technical_curiosity": 0.15,
             "industry_persona": 0.10,
             "self_discipline": 0.15,
+            "leadership": 0.0,
         },
         "context": """Exotel SDR is not a generic cold-calling role. It requires structured outbound prospecting, persona-based outreach (CXOs, Founders, Product Heads), discovery-driven qualification, technical curiosity (APIs, automation, contact center tools), funnel math understanding, and collaboration with AEs.
 SDRs generate qualified opportunities, not just meetings.
@@ -105,6 +109,7 @@ Tier 3 (Low Fit): Primarily inbound, no metrics, no qualification depth.""",
             "domain_fit": "Domain fit — B2B SaaS, CPaaS, CX tech, telecom experience. Nice-to-have: worked with founders/CEO directly",
             "leadership_eq": "Leadership & EQ — people leadership, emotional intelligence, executive presence, managing up, navigating ambiguity, influence without authority",
             "company_pedigree": "Company pedigree — brand value of companies worked at. FAANG/Big Tech=10, Unicorn=9, Global brand=8, Recognized mid-tier=7, Established niche=6, Small known=5, Unknown=3-4",
+            "leadership": "Leadership signals — direct team management, hiring, building functions/teams, driving org-level initiatives, managing managers, program ownership across departments",
         },
         "weights": {
             "strategic_thinking": 0.20,
@@ -114,6 +119,7 @@ Tier 3 (Low Fit): Primarily inbound, no metrics, no qualification depth.""",
             "domain_fit": 0.10,
             "leadership_eq": 0.15,
             "company_pedigree": 0.10,
+            "leadership": 0.0,
         },
         "context": """Chief of Staff for CEO's Office at Exotel. 8-12 YOE preferred. Strategy & Ops / Consulting / BizOps / Product Ops background.
 Key responsibilities: CEO priorities, operating cadence, cross-functional programs, decision support, special projects.
@@ -159,6 +165,7 @@ GenAI product uses Python, LangChain, LangGraph, RAG pipelines, agent workflows,
             "expansion": "Expansion (upsell/cross-sell/renewals) — revenue influence within accounts, identifying growth opportunities, renewal ownership. Weak: no commercial awareness.",
             "technical_curiosity": "API & product understanding — basic API understanding, SaaS platform experience, ability to explain product workflows. Weak: no exposure to technical products.",
             "communication_execution": "Communication & execution — clear outcome-driven communication, handling multiple stakeholders, structured thinking, ownership mindset.",
+            "leadership": "Leadership signals — team management, mentoring junior CSMs, building CS processes/playbooks, hiring involvement, regional/segment ownership",
         },
         "weights": {
             "portfolio_scale": 0.25,
@@ -168,6 +175,7 @@ GenAI product uses Python, LangChain, LangGraph, RAG pipelines, agent workflows,
             "expansion": 0.10,
             "technical_curiosity": 0.05,
             "communication_execution": 0.10,
+            "leadership": 0.0,
         },
         "context": """Exotel SMB CSM is a high-volume, high-ownership role — NOT a relationship-only role.
 The SMB CSM owns ~700-800 accounts, drives product adoption/retention/expansion at scale, segments accounts and prioritizes effectively, uses structured engagement and automation.
@@ -187,6 +195,7 @@ Red flags: no multi-account ownership, pure support/onboarding-only role, only e
             "stakeholder_management": "Stakeholder management — multi-threaded engagement, working with business + operational stakeholders, managing decision-makers. Weak: single point of contact only.",
             "technical_product": "Technical/product understanding — SaaS/product understanding, basic API awareness, mapping product to use cases. Weak: no technical curiosity.",
             "problem_solving": "Problem-solving & execution — driving outcomes, resolving customer issues end-to-end, cross-functional collaboration.",
+            "leadership": "Leadership signals — team management, mentoring junior CSMs, building CS processes/playbooks, hiring involvement, segment ownership",
         },
         "weights": {
             "portfolio_complexity": 0.20,
@@ -196,6 +205,7 @@ Red flags: no multi-account ownership, pure support/onboarding-only role, only e
             "stakeholder_management": 0.10,
             "technical_product": 0.05,
             "problem_solving": 0.10,
+            "leadership": 0.0,
         },
         "context": """Exotel Mid-Market CSM is a balanced role between scale and depth.
 Owns ~20-100 accounts, drives adoption/retention/expansion, engages multiple stakeholders per account, requires structured account planning.
@@ -215,6 +225,7 @@ Red flags: no account ownership, pure support roles, only SMB volume without str
             "stakeholder_cxo": "CXO-level stakeholder management — engagement with CTO/Product Heads/Business Leaders, multi-threaded relationships, influence across functions. Weak: single-threaded relationships.",
             "consultative_approach": "Problem-solving & consultative approach — understanding customer business goals, mapping product to outcomes, business problem-solving, use-case driven engagement.",
             "technical_understanding": "Technical/product understanding — APIs and integrations, technical workflows, comfort with product/engineering teams. Weak: no technical exposure.",
+            "leadership": "Leadership signals — CS team management, mentoring, hiring, building enterprise CS function, managing managers, defining CS strategy",
         },
         "weights": {
             "account_value": 0.20,
@@ -224,6 +235,7 @@ Red flags: no account ownership, pure support roles, only SMB volume without str
             "stakeholder_cxo": 0.10,
             "consultative_approach": 0.10,
             "technical_understanding": 0.05,
+            "leadership": 0.0,
         },
         "context": """Exotel Enterprise CSM is a high-impact, strategic ownership role — closer to consultative sales + program management, NOT support or SMB CS.
 Owns ~5-20 high-value accounts, drives long-term retention and large renewals, influences expansion, engages CXOs/Product/Business leaders, navigates complex stakeholder environments, acts as strategic advisor.
@@ -242,6 +254,7 @@ Red flags: no enterprise account ownership, pure support or SMB-only roles, no r
             "customer_communication": "Customer handling & communication — clarity of communication, ability to explain technical issues simply, client/stakeholder interaction. For freshers, strong communication can compensate for lack of experience.",
             "ownership": "Ownership — end-to-end issue handling, closure responsibility, independent work. Weak: only assisting roles.",
             "learning_ability": "Learning ability — curiosity, projects/internships, hands-on exposure. Important especially for freshers.",
+            "leadership": "Leadership signals — team lead experience, mentoring junior engineers, shift management, creating runbooks/SOPs, process improvements",
         },
         "weights": {
             "linux_fundamentals": 0.25,
@@ -251,6 +264,7 @@ Red flags: no enterprise account ownership, pure support or SMB-only roles, no r
             "customer_communication": 0.10,
             "ownership": 0.10,
             "learning_ability": 0.05,
+            "leadership": 0.0,
         },
         "context": """Exotel L1 Support is NOT a ticket-routing role. The L1 Product Support Engineer troubleshoots issues across Linux, networking, and databases on production systems impacting real-time communication.
 Owns issues end-to-end within defined scope, communicates clearly with customers and internal teams, operates in an SLA-driven environment.
@@ -270,6 +284,7 @@ Soft red flags: no debugging examples, generic resume, poor communication signal
             "escalation_handling": "Escalation handling — high-severity incidents, customer escalations, communication under pressure.",
             "mentorship_leadership": "Mentorship & team contribution — mentoring junior engineers, knowledge sharing, creating playbooks/runbooks.",
             "cross_functional": "Ownership & collaboration — driving issues end-to-end, working with engineering/product, accountability beyond scope.",
+            "leadership": "Leadership signals — support team management, hiring, defining escalation processes, managing shifts/on-call, building support org structure",
         },
         "weights": {
             "linux_advanced": 0.20,
@@ -279,6 +294,7 @@ Soft red flags: no debugging examples, generic resume, poor communication signal
             "escalation_handling": 0.10,
             "mentorship_leadership": 0.10,
             "cross_functional": 0.10,
+            "leadership": 0.0,
         },
         "context": """Exotel L3 Support Lead is a senior ownership role requiring deep technical expertise + ownership + leadership + customer handling.
 Handles complex production issues, performs end-to-end RCA, manages customer escalations, mentors L1/L2 engineers, works across systems (Linux, DB, networking, application), drives resolution across teams.
