@@ -119,23 +119,6 @@ with col1:
     else:
         st.session_state["leadership_weight"] = None  # not applicable
 
-    # GenAI toggle — shown for frameworks that have the dimension
-    has_genai_dim = "genai_expertise" in framework["dimensions"]
-    if has_genai_dim:
-        is_genai_role = st.toggle(
-            "GenAI role? (CQA / Chatbot / Voice AI team)",
-            value=framework["weights"].get("genai_expertise", 0) > 0,
-            key="genai_toggle_setup",
-            help="Turn on for GenAI team roles. Off for ECC, Platform, and other backend teams.",
-        )
-        if is_genai_role:
-            st.session_state["genai_weight"] = 0.15
-        else:
-            st.caption("GenAI expertise weight → 0%")
-            st.session_state["genai_weight"] = 0.0
-    else:
-        st.session_state["genai_weight"] = None  # not applicable
-
     st.subheader("2. Job Description")
     jd_source = st.radio("JD source", ["Paste text", "Upload file"], horizontal=True)
 
@@ -363,11 +346,6 @@ if "eval_results" in st.session_state and st.session_state["eval_results"]:
     ldr_weight = st.session_state.get("leadership_weight")
     if ldr_weight is not None and "leadership" in st.session_state["adjusted_weights"]:
         st.session_state["adjusted_weights"]["leadership"] = ldr_weight
-
-    # Apply GenAI weight from the setup toggle (section 1)
-    genai_weight = st.session_state.get("genai_weight")
-    if genai_weight is not None and "genai_expertise" in st.session_state["adjusted_weights"]:
-        st.session_state["adjusted_weights"]["genai_expertise"] = genai_weight
 
     adjusted_weights = {}
     weight_cols = st.columns(min(len(dimensions), 4))
