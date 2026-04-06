@@ -282,14 +282,130 @@ if st.button(
     # Sort by score
     all_results.sort(key=lambda x: x.get("total_score", 0), reverse=True)
 
+    # Store results in session state for post-evaluation refinement
+    st.session_state["eval_results"] = all_results
+    st.session_state["eval_framework_name"] = framework_name
+
     st.success(f"✅ Evaluation complete! {len(all_results)} candidates ranked.")
 
-    # ── Display results table ────────────────
+
+# ─────────────────────────────────────────────
+# DISPLAY RESULTS (from session state)
+# ─────────────────────────────────────────────
+
+if "eval_results" in st.session_state and st.session_state["eval_results"]:
+    stored_fw_name = st.session_state.get("eval_framework_name", framework_name)
+    stored_fw = FRAMEWORKS.get(stored_fw_name, framework)
+    raw_results = st.session_state["eval_results"]
+    dimensions = list(stored_fw["dimensions"].keys())
+
+    # ── Refine Criteria Panel ────────────────
+    st.markdown("---")
+    st.subheader("5. Refine Criteria (adjust weights in real-time)")
+    st.caption(
+        "Drag the sliders to change dimension weights. "
+        "Rankings recalculate instantly — no re-evaluation needed."
+    )
+
+    # Initialize adjusted weights from framework defaults
+    if "adjusted_weights" not in st.session_state or st.session_state.get("_weights_fw") != stored_fw_name:
+        st.session_state["adjusted_weights"] = dict(stored_fw["weights"])
+        st.session_state["_weights_fw"] = stored_fw_name
+
+    # Leadership level control — only for frameworks with a "leadership" dimension
+    has_leadership_dim = "leadership" in stored_fw["dimensions"]
+    if has_leadership_dim:
+        ldr_col1, ldr_col2 = st.columns([1, 2])
+        with ldr_col1:
+            is_leadership_role = st.toggle(
+                "Leadership position?",
+                value=st.session_state["adjusted_weights"].get("leadership", 0) > 0,
+                key="leadership_toggle",
+            )
+        with ldr_col2:
+            if is_leadership_role:
+                leadership_level = st.select_slider(
+                    "How much leadership?",
+                    options=["Light (tech lead)", "Moderate (lead + mentoring)", "Heavy (EM / people mgr)"],
+                    value="Moderate (lead + mentoring)",
+                    key="leadership_level",
+                )
+                leadership_weight_map = {
+                    "Light (tech lead)": 0.10,
+                    "Moderate (lead + mentoring)": 0.20,
+                    "Heavy (EM / people mgr)": 0.30,
+                }
+                target_weight = leadership_weight_map[leadership_level]
+            else:
+                st.caption("Leadership weight set to 0% — ranking based on IC skills only")
+                target_weight = 0.0
+
+        # Apply leadership weight if it changed
+        current_ldr = st.session_state["adjusted_weights"].get("leadership", 0)
+        if abs(current_ldr - target_weight) > 0.001:
+            st.session_state["adjusted_weights"]["leadership"] = target_weight
+            st.rerun()
+
+    adjusted_weights = {}
+    weight_cols = st.columns(min(len(dimensions), 4))
+    for idx, dim in enumerate(dimensions):
+        col = weight_cols[idx % len(weight_cols)]
+        label = dim.replace("_", " ").title()
+        default_val = int(stored_fw["weights"][dim] * 100)
+        current_val = int(st.session_state["adjusted_weights"].get(dim, stored_fw["weights"][dim]) * 100)
+        adjusted_weights[dim] = col.slider(
+            f"{label}",
+            min_value=0,
+            max_value=50,
+            value=current_val,
+            step=5,
+            key=f"w_{dim}",
+            help=stored_fw["dimensions"][dim][:120],
+        ) / 100.0
+
+    # Normalize weights so they sum to 1.0
+    weight_sum = sum(adjusted_weights.values())
+    if weight_sum > 0:
+        normalized_weights = {k: v / weight_sum for k, v in adjusted_weights.items()}
+    else:
+        normalized_weights = {k: 1.0 / len(adjusted_weights) for k in adjusted_weights}
+
+    st.session_state["adjusted_weights"] = adjusted_weights
+
+    # Show normalized weights
+    norm_summary = " · ".join(
+        f"**{k.replace('_', ' ').title()}** {v:.0%}"
+        for k, v in normalized_weights.items() if v > 0
+    )
+    st.caption(f"Normalized weights: {norm_summary}")
+
+    reset_col, _ = st.columns([1, 3])
+    with reset_col:
+        if st.button("Reset to defaults", key="reset_weights"):
+            st.session_state["adjusted_weights"] = dict(stored_fw["weights"])
+            st.rerun()
+
+    # ── Recalculate scores with adjusted weights ──
+    display_results = []
+    for r in raw_results:
+        r_copy = dict(r)
+        scores = r_copy.get("scores", {})
+        r_copy["total_score"] = calculate_total(scores, normalized_weights)
+        r_copy["verdict"] = get_verdict(r_copy["total_score"])
+        display_results.append(r_copy)
+
+    display_results.sort(key=lambda x: x.get("total_score", 0), reverse=True)
+
+    # Build a modified framework dict with the adjusted weights for Excel export
+    display_fw = dict(stored_fw)
+    display_fw["weights"] = normalized_weights
+
+    # ── Rankings ─────────────────────────────
+    st.markdown("---")
     st.subheader("Rankings")
 
-    # Quick stats
     from collections import Counter
-    verdicts = Counter(r.get("verdict", "No") for r in all_results)
+    verdicts = Counter(r.get("verdict", "No") for r in display_results)
 
     stat_cols = st.columns(4)
     stat_cols[0].metric("Strong Yes", verdicts.get("Strong Yes", 0))
@@ -297,8 +413,7 @@ if st.button(
     stat_cols[2].metric("Maybe", verdicts.get("Maybe", 0))
     stat_cols[3].metric("No", verdicts.get("No", 0))
 
-    # Results table
-    for i, r in enumerate(all_results):
+    for i, r in enumerate(display_results):
         verdict = r.get("verdict", "No")
         color_map = {
             "Strong Yes": "🟢", "Yes": "🟡", "Maybe": "🟠", "No": "🔴"
@@ -309,24 +424,21 @@ if st.button(
             f"{icon} #{i+1} — {r.get('name', 'Unknown')} | "
             f"Score: {r.get('total_score', 0):.2f} | {verdict} | "
             f"{r.get('current_role', 'N/A')} | {r.get('yoe', '?')} YOE",
-            expanded=(i < 3),  # Auto-expand top 3
+            expanded=(i < 3),
         ):
-            # Scores
             scores = r.get("scores", {})
             score_cols = st.columns(len(scores))
             for j, (dim, val) in enumerate(scores.items()):
-                weight = framework["weights"].get(dim, 0)
+                weight = normalized_weights.get(dim, 0)
                 label = dim.replace("_", " ").title()
                 score_cols[j].metric(f"{label} ({weight:.0%})", f"{val:.1f}")
 
-            # Bonus scores
             if "bonus_scores" in r:
                 st.markdown("**Bonus Dimensions:**")
                 for bd, val in r["bonus_scores"].items():
                     note = r.get("bonus_notes", {}).get(bd, "")
                     st.markdown(f"- **{bd.replace('_', ' ').title()}**: {val}/10 — {note}")
 
-            # Strengths & concerns
             col_a, col_b = st.columns(2)
             with col_a:
                 st.markdown("**Strengths:**")
@@ -339,15 +451,15 @@ if st.button(
 
             st.caption(r.get("evidence_summary", ""))
 
-    # ── Generate Excel download ──────────────
+    # ── Download ─────────────────────────────
     st.subheader("📥 Download Results")
-    excel_buffer = generate_excel(all_results, framework, framework_name)
+    excel_buffer = generate_excel(display_results, display_fw, stored_fw_name)
 
-    safe_name = framework_name.replace(" ", "_").replace("(", "").replace(")", "")
+    safe_name = stored_fw_name.replace(" ", "_").replace("(", "").replace(")", "")
     filename = f"Exotel_{safe_name}_Screening_Results.xlsx"
 
     st.download_button(
-        label=f"📥 Download Excel ({len(all_results)} candidates)",
+        label=f"📥 Download Excel ({len(display_results)} candidates)",
         data=excel_buffer,
         file_name=filename,
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -355,8 +467,7 @@ if st.button(
         use_container_width=True,
     )
 
-    # Also save raw JSON for debugging
-    json_data = json.dumps(all_results, indent=2, ensure_ascii=False)
+    json_data = json.dumps(display_results, indent=2, ensure_ascii=False)
     st.download_button(
         label="📋 Download raw JSON",
         data=json_data,
