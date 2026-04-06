@@ -17,22 +17,21 @@ FRAMEWORKS = {
             "scale_complexity": "Scale & complexity signals — high throughput, low latency, real-time systems, event-driven, Kafka, horizontal scaling, large data volumes",
             "ownership": "Ownership level — designed/owned systems vs assisted/supported. Look for: designed service, owned system, led implementation, migrated architecture, reduced latency/cost",
             "engineering_maturity": "Engineering maturity — production debugging, incident resolution, monitoring, on-call, reliability improvements, root cause analysis, observability",
-            "genai_expertise": "GenAI signals — LangChain, LangGraph, agent workflows, RAG systems, vector databases, prompt orchestration, evaluation pipelines, production AI systems",
             "tech_stack_fit": "Tech stack fit for Exotel — Go, Java, Python, Kafka, Redis, MongoDB, PostgreSQL/Citus, AWS, Docker/K8s",
             "leadership": "Leadership signals — mentoring, code reviews, technical decision-making, team management, architecture involvement, cross-team collaboration",
         },
         "weights": {
-            "backend_depth": 0.20,
-            "scale_complexity": 0.15,
-            "ownership": 0.15,
+            "backend_depth": 0.25,
+            "scale_complexity": 0.20,
+            "ownership": 0.20,
             "engineering_maturity": 0.10,
-            "genai_expertise": 0.15,
             "tech_stack_fit": 0.10,
             "leadership": 0.15,
         },
         "context": """Exotel builds high reliability, real-time, distributed backend systems with low latency expectations.
-Primary tech: Go (Platform), Java/PostgreSQL/Citus (Contact Center), Python/LangChain/LangGraph (GenAI).
+Primary tech: Go (Platform), Java/PostgreSQL/Citus (Contact Center), Python (services).
 Ownership-driven engineering culture. Production sensitivity is critical.
+This framework is for ECC, Platform, and general backend roles — NOT for GenAI/CQA/Chatbot/Voice AI teams (use the EM GenAI framework for those).
 Red flags: frontend-heavy, only scripting/automation, QA/DevOps without backend, buzzword-heavy without depth, service company background without strong eng signals.""",
     },
 

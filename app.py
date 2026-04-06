@@ -41,12 +41,14 @@ with st.sidebar:
     st.image("https://www.exotel.com/wp-content/themes/flavor-jeera/assets/images/logo.svg", width=150)
     st.title("⚙️ Settings")
 
-    api_key = st.text_input(
-        "Anthropic API Key",
-        type="password",
-        value=os.environ.get("ANTHROPIC_API_KEY", ""),
-        help="Get yours at console.anthropic.com",
-    )
+    # API key: read from secrets/env only, never show in UI
+    api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+    if hasattr(st, "secrets"):
+        api_key = st.secrets.get("ANTHROPIC_API_KEY", api_key)
+    if api_key:
+        st.success("API key configured", icon="🔑")
+    else:
+        st.error("API key not configured. Set ANTHROPIC_API_KEY in Streamlit secrets.")
 
     model_choice = st.selectbox(
         "Model",
@@ -88,6 +90,34 @@ with col1:
         help="This determines the scoring dimensions and weights",
     )
     framework = FRAMEWORKS[framework_name]
+
+    # Leadership toggle — shown inline for frameworks that have the dimension
+    has_leadership_dim = "leadership" in framework["dimensions"]
+    if has_leadership_dim:
+        is_leadership_role = st.toggle(
+            "Leadership position?",
+            value=True,
+            key="leadership_toggle_setup",
+            help="Turn off for IC roles (SE-1, SE-2, Sr. Engineer). Leadership weight goes to 0%.",
+        )
+        if is_leadership_role:
+            leadership_level = st.select_slider(
+                "How much leadership?",
+                options=["Light (tech lead)", "Moderate (lead + mentoring)", "Heavy (EM / people mgr)"],
+                value="Moderate (lead + mentoring)",
+                key="leadership_level_setup",
+            )
+            leadership_weight_map = {
+                "Light (tech lead)": 0.10,
+                "Moderate (lead + mentoring)": 0.20,
+                "Heavy (EM / people mgr)": 0.30,
+            }
+            st.session_state["leadership_weight"] = leadership_weight_map[leadership_level]
+        else:
+            st.caption("Leadership weight → 0% — ranking based on IC skills only")
+            st.session_state["leadership_weight"] = 0.0
+    else:
+        st.session_state["leadership_weight"] = None  # not applicable
 
     st.subheader("2. Job Description")
     jd_source = st.radio("JD source", ["Paste text", "Upload file"], horizontal=True)
@@ -312,39 +342,10 @@ if "eval_results" in st.session_state and st.session_state["eval_results"]:
         st.session_state["adjusted_weights"] = dict(stored_fw["weights"])
         st.session_state["_weights_fw"] = stored_fw_name
 
-    # Leadership level control — only for frameworks with a "leadership" dimension
-    has_leadership_dim = "leadership" in stored_fw["dimensions"]
-    if has_leadership_dim:
-        ldr_col1, ldr_col2 = st.columns([1, 2])
-        with ldr_col1:
-            is_leadership_role = st.toggle(
-                "Leadership position?",
-                value=st.session_state["adjusted_weights"].get("leadership", 0) > 0,
-                key="leadership_toggle",
-            )
-        with ldr_col2:
-            if is_leadership_role:
-                leadership_level = st.select_slider(
-                    "How much leadership?",
-                    options=["Light (tech lead)", "Moderate (lead + mentoring)", "Heavy (EM / people mgr)"],
-                    value="Moderate (lead + mentoring)",
-                    key="leadership_level",
-                )
-                leadership_weight_map = {
-                    "Light (tech lead)": 0.10,
-                    "Moderate (lead + mentoring)": 0.20,
-                    "Heavy (EM / people mgr)": 0.30,
-                }
-                target_weight = leadership_weight_map[leadership_level]
-            else:
-                st.caption("Leadership weight set to 0% — ranking based on IC skills only")
-                target_weight = 0.0
-
-        # Apply leadership weight if it changed
-        current_ldr = st.session_state["adjusted_weights"].get("leadership", 0)
-        if abs(current_ldr - target_weight) > 0.001:
-            st.session_state["adjusted_weights"]["leadership"] = target_weight
-            st.rerun()
+    # Apply leadership weight from the setup toggle (section 1)
+    ldr_weight = st.session_state.get("leadership_weight")
+    if ldr_weight is not None and "leadership" in st.session_state["adjusted_weights"]:
+        st.session_state["adjusted_weights"]["leadership"] = ldr_weight
 
     adjusted_weights = {}
     weight_cols = st.columns(min(len(dimensions), 4))
