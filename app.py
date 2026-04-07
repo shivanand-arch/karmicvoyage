@@ -331,8 +331,7 @@ if "eval_results" in st.session_state and st.session_state["eval_results"]:
     st.subheader("5. Refine Criteria (adjust weights in real-time)")
     st.caption(
         "Adjust how much each dimension matters. "
-        "**Total score and ranking order update instantly** — per-dimension AI scores stay fixed. "
-        "Default weights set by Exotel HR."
+        "**Total score and ranking order update instantly** — per-dimension AI scores stay fixed."
     )
 
     # Initialize adjusted weights from framework defaults
