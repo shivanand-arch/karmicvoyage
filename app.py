@@ -349,33 +349,35 @@ if "eval_results" in st.session_state and st.session_state["eval_results"]:
     for idx, dim in enumerate(dimensions):
         col = weight_cols[idx % len(weight_cols)]
         label = dim.replace("_", " ").title()
-        default_val = int(stored_fw["weights"][dim] * 100)
         current_val = int(st.session_state["adjusted_weights"].get(dim, stored_fw["weights"][dim]) * 100)
         adjusted_weights[dim] = col.slider(
-            f"{label}",
+            f"{label} (%)",
             min_value=0,
-            max_value=50,
+            max_value=100,
             value=current_val,
             step=5,
             key=f"w_{dim}",
             help=stored_fw["dimensions"][dim][:120],
         ) / 100.0
 
-    # Normalize weights so they sum to 1.0
+    # Show total and warn if not 100%
+    weight_total_pct = int(round(sum(adjusted_weights.values()) * 100))
+    if weight_total_pct == 100:
+        st.success(f"Total: **{weight_total_pct}%**")
+    elif weight_total_pct > 100:
+        st.error(f"Total: **{weight_total_pct}%** — exceeds 100%. Please reduce some weights.")
+    elif weight_total_pct == 0:
+        st.error("Total: **0%** — at least one dimension must have weight.")
+    else:
+        st.warning(f"Total: **{weight_total_pct}%** — does not add up to 100%.")
+
+    # Use weights as-is (percentages), normalize only for calculation
+    st.session_state["adjusted_weights"] = adjusted_weights
     weight_sum = sum(adjusted_weights.values())
     if weight_sum > 0:
         normalized_weights = {k: v / weight_sum for k, v in adjusted_weights.items()}
     else:
         normalized_weights = {k: 1.0 / len(adjusted_weights) for k in adjusted_weights}
-
-    st.session_state["adjusted_weights"] = adjusted_weights
-
-    # Show normalized weights
-    norm_summary = " · ".join(
-        f"**{k.replace('_', ' ').title()}** {v:.0%}"
-        for k, v in normalized_weights.items() if v > 0
-    )
-    st.caption(f"Normalized weights: {norm_summary}")
 
     reset_col, _ = st.columns([1, 3])
     with reset_col:
