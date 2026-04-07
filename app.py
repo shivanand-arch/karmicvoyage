@@ -46,19 +46,27 @@ st.set_page_config(
 
 ALLOWED_DOMAIN = "exotel.com"
 
-if not st.user.is_logged_in:
-    st.title("Exotel Resume Screener")
-    st.caption("Sign in with your Exotel Google account to continue.")
-    if st.button("Sign in with Google", type="primary"):
-        st.login()
-    st.stop()
+# Check if auth is configured (secrets has [auth] section)
+_auth_configured = False
+try:
+    _ = st.secrets["auth"]
+    _auth_configured = True
+except (KeyError, FileNotFoundError):
+    pass
 
-_user_email = getattr(st.user, "email", "") or ""
-if not _user_email.endswith(f"@{ALLOWED_DOMAIN}"):
-    st.error(f"Access restricted to @{ALLOWED_DOMAIN} accounts. You are signed in as **{_user_email}**.")
-    if st.button("Sign out"):
-        st.logout()
-    st.stop()
+if _auth_configured:
+    if not st.user.is_logged_in:
+        st.title("Exotel Resume Screener")
+        st.caption("Sign in with your Exotel Google account to continue.")
+        st.login()
+        st.stop()
+
+    _user_email = getattr(st.user, "email", "") or ""
+    if _user_email and not _user_email.endswith(f"@{ALLOWED_DOMAIN}"):
+        st.error(f"Access restricted to @{ALLOWED_DOMAIN} accounts. You are signed in as **{_user_email}**.")
+        if st.button("Sign out"):
+            st.logout()
+        st.stop()
 
 
 # ─────────────────────────────────────────────
@@ -69,10 +77,11 @@ with st.sidebar:
     st.image("https://www.exotel.com/wp-content/themes/flavor-jeera/assets/images/logo.svg", width=150)
     st.title("⚙️ Settings")
 
-    st.caption(f"Signed in as **{_user_email}**")
-    if st.button("Sign out", key="sidebar_logout"):
-        st.logout()
-    st.markdown("---")
+    if _auth_configured and st.user.is_logged_in:
+        st.caption(f"Signed in as **{getattr(st.user, 'email', '')}**")
+        if st.button("Sign out", key="sidebar_logout"):
+            st.logout()
+        st.markdown("---")
 
     # API key: read from secrets/env only, never show in UI
     api_key = os.environ.get("ANTHROPIC_API_KEY", "")
