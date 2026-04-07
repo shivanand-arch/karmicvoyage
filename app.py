@@ -15,8 +15,14 @@ from frameworks import (
     FRAMEWORKS, get_framework_names, build_evaluation_prompt,
     calculate_total, get_verdict,
 )
-from resume_processor import extract_resumes_from_zip, extract_text_from_uploaded_file
+from resume_processor import (
+    extract_resumes_from_zip, extract_text_from_uploaded_file, extract_text_from_bytes,
+)
 from excel_generator import generate_excel
+from trakstar_client import (
+    create_session, fetch_openings, fetch_candidates,
+    deduplicate, get_unique_stages, fetch_resume_bytes,
+)
 
 
 # ─────────────────────────────────────────────
@@ -68,6 +74,21 @@ with st.sidebar:
             for dim, desc in fw["dimensions"].items():
                 weight = fw["weights"][dim]
                 st.markdown(f"- **{dim.replace('_', ' ').title()}** ({weight:.0%}): {desc[:80]}...")
+
+
+# ─────────────────────────────────────────────
+# TRAKSTAR CONFIG (from secrets/env)
+# ─────────────────────────────────────────────
+
+def _get_secret(key, default=""):
+    try:
+        return st.secrets.get(key, os.environ.get(key, default))
+    except Exception:
+        return os.environ.get(key, default)
+
+TRAKSTAR_API_KEY = _get_secret("TRAKSTAR_API_KEY")
+TRAKSTAR_COOKIE = _get_secret("TRAKSTAR_COOKIE")
+TRAKSTAR_SUBDOMAIN = _get_secret("TRAKSTAR_SUBDOMAIN", "exotel")
 
 
 # ─────────────────────────────────────────────
@@ -130,31 +151,184 @@ with col1:
                 st.text(jd_text[:500] + "...")
 
 with col2:
-    st.subheader("3. Upload Resumes")
-    resume_zip = st.file_uploader(
-        "Upload ZIP file containing resumes",
-        type=["zip"],
-        help="ZIP containing PDF, DOCX, or TXT resume files",
+    st.subheader("3. Resumes")
+    resume_source = st.radio(
+        "Resume source",
+        ["Upload ZIP", "Pull from Trakstar"],
+        horizontal=True,
+        help="Upload a ZIP of resumes, or pull directly from Trakstar Hire",
     )
 
-    if resume_zip:
-        with st.spinner("Extracting resumes..."):
-            resumes, failed_extract = extract_resumes_from_zip(resume_zip)
-        st.success(f"✅ Extracted {len(resumes)} resumes")
-        if failed_extract:
-            st.warning(
-                f"⚠️ {len(failed_extract)} files could not be read: "
-                f"{', '.join(failed_extract[:5])}"
-            )
+    if resume_source == "Upload ZIP":
+        resume_zip = st.file_uploader(
+            "Upload ZIP file containing resumes",
+            type=["zip"],
+            help="ZIP containing PDF, DOCX, or TXT resume files",
+        )
 
-        with st.expander(f"Preview extracted resumes ({len(resumes)})"):
-            st.caption(
-                "First ~3,500 characters of each resume are sent to the model for scoring."
+        if resume_zip:
+            with st.spinner("Extracting resumes..."):
+                resumes, failed_extract = extract_resumes_from_zip(resume_zip)
+            st.success(f"Extracted {len(resumes)} resumes")
+            if failed_extract:
+                st.warning(
+                    f"{len(failed_extract)} files could not be read: "
+                    f"{', '.join(failed_extract[:5])}"
+                )
+
+            with st.expander(f"Preview extracted resumes ({len(resumes)})"):
+                st.caption(
+                    "First ~3,500 characters of each resume are sent to the model for scoring."
+                )
+                for fname, text in list(resumes.items())[:5]:
+                    st.markdown(f"**{fname}** ({len(text)} chars)")
+                    st.text(text[:150] + "...")
+                    st.markdown("---")
+    else:
+        # ── Trakstar Pull ────────────────────────
+        tk_has_auth = bool(TRAKSTAR_API_KEY or TRAKSTAR_COOKIE)
+
+        if not tk_has_auth:
+            st.warning(
+                "Trakstar credentials not configured. "
+                "Set `TRAKSTAR_API_KEY` in `.streamlit/secrets.toml` or environment variables."
             )
-            for fname, text in list(resumes.items())[:5]:
-                st.markdown(f"**{fname}** ({len(text)} chars)")
-                st.text(text[:150] + "...")
-                st.markdown("---")
+        else:
+            try:
+                tk_session, tk_base = create_session(
+                    TRAKSTAR_SUBDOMAIN, TRAKSTAR_API_KEY, TRAKSTAR_COOKIE
+                )
+
+                # Cache openings in session state
+                if "tk_openings" not in st.session_state:
+                    with st.spinner("Fetching positions from Trakstar..."):
+                        st.session_state.tk_openings = fetch_openings(tk_session, tk_base)
+
+                tk_openings = st.session_state.tk_openings
+                tk_published = [o for o in tk_openings if o.get("status") == "Published"]
+
+                if not tk_published:
+                    st.error("No published openings found. Check your credentials.")
+                else:
+                    # Build display names for all published openings
+                    tk_display_names = [
+                        o.get("title") or o.get("name") or "Unknown"
+                        for o in tk_published
+                    ]
+
+                    tk_selected_name = st.selectbox(
+                        f"Select or type a position ({len(tk_published)} published)",
+                        options=[""] + tk_display_names,
+                        format_func=lambda x: "Type or select a position..." if x == "" else x,
+                        key="tk_position",
+                    )
+
+                    # If nothing selected from dropdown, allow free-text search
+                    if not tk_selected_name:
+                        tk_keyword = st.text_input(
+                            "Or search by keyword",
+                            placeholder="e.g. backend, success, sales, CSM",
+                            key="tk_search",
+                        )
+                        if tk_keyword:
+                            matched = [
+                                o for o in tk_published
+                                if tk_keyword.lower() in (o.get("title") or o.get("name", "")).lower()
+                            ]
+                            if not matched:
+                                st.warning(f"No positions match \"{tk_keyword}\"")
+                            elif len(matched) == 1:
+                                tk_selected_name = matched[0].get("title") or matched[0].get("name")
+                                st.success(f"Matched: **{tk_selected_name}**")
+                            else:
+                                match_names = [
+                                    o.get("title") or o.get("name") or "Unknown"
+                                    for o in matched
+                                ]
+                                tk_selected_name = st.selectbox(
+                                    f"{len(matched)} matches — pick one",
+                                    match_names,
+                                    key="tk_match_pick",
+                                )
+
+                    # Resolve selection to opening object
+                    tk_selected = None
+                    if tk_selected_name:
+                        tk_selected = next(
+                            (o for o in tk_published
+                             if (o.get("title") or o.get("name")) == tk_selected_name),
+                            None,
+                        )
+
+                    if tk_selected:
+                        # Fetch candidates for stage filter
+                        tk_cache_key = f"tk_cands_{tk_selected['id']}"
+                        if tk_cache_key not in st.session_state:
+                            with st.spinner("Loading candidates..."):
+                                raw_cands = fetch_candidates(tk_session, tk_base, tk_selected["id"])
+                                st.session_state[tk_cache_key] = deduplicate(raw_cands)
+
+                        tk_all_cands = st.session_state[tk_cache_key]
+                        tk_stages = get_unique_stages(tk_all_cands)
+
+                        tk_stage = st.selectbox("Filter by stage", ["All stages"] + tk_stages, key="tk_stage")
+                        tk_limit = st.number_input("Max candidates (0 = all)", min_value=0, value=0, step=10, key="tk_limit")
+
+                        # Apply filters
+                        tk_cands = tk_all_cands
+                        if tk_stage != "All stages":
+                            sl = tk_stage.lower()
+                            tk_cands = [
+                                c for c in tk_cands
+                                if sl in ((c.get("current_stage") or {}).get("name", "").lower()
+                                          or (c.get("stage") or "").lower())
+                            ]
+                        if tk_limit > 0:
+                            tk_cands = tk_cands[:tk_limit]
+
+                        st.info(f"**{len(tk_cands)}** candidates ready (out of {len(tk_all_cands)} total)")
+
+                        if st.button(f"Pull {len(tk_cands)} Resumes from Trakstar", key="tk_pull"):
+                            progress = st.progress(0)
+                            status = st.empty()
+                            downloaded = 0
+                            skipped = 0
+
+                            for i, c in enumerate(tk_cands):
+                                cand_name = f"{c.get('first_name', '')} {c.get('last_name', '')}".strip() or str(c["id"])
+                                progress.progress((i + 1) / len(tk_cands))
+                                status.text(f"Downloading {i + 1}/{len(tk_cands)}: {cand_name}")
+
+                                try:
+                                    fname, data = fetch_resume_bytes(tk_session, tk_base, c["id"])
+                                    if fname and data:
+                                        safe_name = "".join(ch for ch in cand_name if ch not in r'\/:*?"<>|')
+                                        display_name = f"{safe_name} - {fname}"
+                                        text = extract_text_from_bytes(fname, data)
+                                        if len(text.strip()) > 20:
+                                            resumes[display_name] = text
+                                            downloaded += 1
+                                        else:
+                                            failed_extract.append(display_name)
+                                            skipped += 1
+                                    else:
+                                        skipped += 1
+                                except Exception:
+                                    skipped += 1
+
+                            progress.progress(1.0)
+                            status.empty()
+                            st.success(f"Pulled **{downloaded}** resumes ({skipped} skipped — no resume or unreadable)")
+
+                            if resumes:
+                                with st.expander(f"Preview pulled resumes ({len(resumes)})"):
+                                    for fname, text in list(resumes.items())[:5]:
+                                        st.markdown(f"**{fname}** ({len(text)} chars)")
+                                        st.text(text[:150] + "...")
+                                        st.markdown("---")
+
+            except Exception as e:
+                st.error(f"Trakstar error: {e}")
 
 st.markdown("---")
 
@@ -241,7 +415,7 @@ def evaluate_single_resume(api_key, model, framework_key, jd_text, filename, res
 if st.button(
     "🚀 Evaluate & Rank Resumes",
     type="primary",
-    disabled=not (api_key and jd_text and resume_zip and len(resumes) > 0),
+    disabled=not (api_key and jd_text and len(resumes) > 0),
     use_container_width=True,
 ):
     if not api_key:
@@ -251,7 +425,7 @@ if st.button(
         st.error("Please provide a Job Description")
         st.stop()
     if not len(resumes) > 0:
-        st.error("Please upload a resume ZIP file")
+        st.error("Please provide resumes (upload a ZIP or pull from Trakstar)")
         st.stop()
 
     st.subheader("Evaluating...")

@@ -165,3 +165,12 @@ def extract_text_from_uploaded_file(uploaded_file) -> str:
         with open(file_path, "wb") as f:
             f.write(uploaded_file.getbuffer())
         return extract_text(file_path)
+
+
+def extract_text_from_bytes(filename: str, data: bytes, max_chars: int = 4000) -> str:
+    """Extract text from raw file bytes (used for Trakstar-downloaded resumes)."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        file_path = os.path.join(tmpdir, filename)
+        with open(file_path, "wb") as f:
+            f.write(data)
+        return extract_text(file_path, max_chars)
