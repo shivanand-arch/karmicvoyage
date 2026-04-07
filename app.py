@@ -148,7 +148,10 @@ TRAKSTAR_SUBDOMAIN = _get_secret("TRAKSTAR_SUBDOMAIN", "exotel")
 st.title("📋 Exotel Resume Screener")
 st.caption("Upload a JD + resume ZIP → Get AI-powered ranked Excel output")
 
-resumes = {}
+# Persist resumes across Streamlit reruns (critical for Trakstar pull)
+if "pulled_resumes" not in st.session_state:
+    st.session_state["pulled_resumes"] = {}
+resumes = dict(st.session_state["pulled_resumes"])
 failed_extract = []
 
 col1, col2 = st.columns(2)
@@ -225,6 +228,7 @@ with col2:
         if resume_zip:
             with st.spinner("Extracting resumes..."):
                 resumes, failed_extract = extract_resumes_from_zip(resume_zip)
+            st.session_state["pulled_resumes"] = dict(resumes)
             st.success(f"Extracted {len(resumes)} resumes")
             if failed_extract:
                 st.warning(
@@ -372,6 +376,7 @@ with col2:
 
                             progress.progress(1.0)
                             status.empty()
+                            st.session_state["pulled_resumes"] = dict(resumes)
                             st.success(f"Pulled **{downloaded}** resumes ({skipped} skipped — no resume or unreadable)")
 
                             if resumes:
@@ -383,6 +388,10 @@ with col2:
 
             except Exception as e:
                 st.error(f"Trakstar error: {e}")
+
+        # Show persistent count of loaded resumes (survives Streamlit reruns)
+        if resumes and resume_source == "Pull from Trakstar":
+            st.success(f"✅ {len(resumes)} resumes loaded from Trakstar")
 
 st.markdown("---")
 
