@@ -31,14 +31,37 @@ FRAMEWORKS = {
             "leadership": 0.15,
         },
         "context": """Exotel builds high reliability, real-time, distributed backend systems with low latency expectations.
-Primary tech: Go (Platform), Java/PostgreSQL/Citus (Contact Center), Python/LangChain/LangGraph (GenAI).
+Primary tech: Go (Platform — distributed services, async/event-driven, Kafka, Redis, MongoDB, AWS, high concurrency), Java/PostgreSQL/Citus (Contact Center — scalable APIs, multi-tenant, data-heavy), Python/LangChain/LangGraph (GenAI — RAG, agent workflows, LLM orchestration).
 Ownership-driven engineering culture. Production sensitivity is critical.
-Red flags: frontend-heavy, only scripting/automation, QA/DevOps without backend, buzzword-heavy without depth, service company background without strong eng signals.""",
+
+LEVEL-WISE EXPECTATIONS (calibrate scoring based on candidate's YOE):
+
+SE-1 (0-2 YOE): Strong fundamentals + learning. Go/Java/Python preferred. Expected: REST API dev, basic DB, frameworks, Linux, Git. Good: internship backend, deployed projects, Docker, SQL. NOT expected: architecture, distributed systems. Red flags: only tutorials, no backend ownership.
+
+SE-2 (2-4 YOE): Independent feature ownership. Production backend required. Must show: E2E feature ownership, DB understanding, performance awareness. Strong: caching implementation, queue usage, async workflows, API optimization, DB indexing. Weak: only implementation tickets, no impact statements.
+
+SE-3/Tech Lead (4-5+ YOE): System-level contributor — Exotel hiring bar increases significantly here. MANDATORY: design participation, distributed systems exposure, scalability thinking. Strong: event-driven architecture, Kafka/messaging, service decomposition, HA design, load handling, retry/timeout/rate limiting, observability. Also: mentoring, code reviews, technical decisions. Common rejection: senior title but execution-level work only.
+
+Principal Engineer (7+ YOE): Makes key tech choices, establishes patterns, writes most critical components, reviews designs. Signals: system redesign, scaling architecture, migration initiatives, DB scaling, reliability improvements. They DRIVE decisions, not just contribute. Red flag: title inflation without cross-system impact.
+
+Engineering Manager: Ideal = Lead SWE from product companies who managed 4-6 engineers while staying technical. Must show: strong backend past, architecture involvement, team management, mentoring, delivery ownership, sprint planning, stakeholder alignment. Red flags: pure delivery/PM, no engineering depth, managed 15+ directly (too far from hands-on).
+
+Sr. Engineering Manager: Managed 15-20 people, cross-functional collaboration with Product/QA/other eng teams, engineering process improvements, technical direction setting. Should still have recent technical contributions. Complete absence of technical involvement is concerning.
+
+ADVANCED SYSTEM THINKING SIGNALS (important for SE-3 and above — increase score confidence):
+- Tradeoff Awareness: latency vs consistency, performance vs cost, simplicity vs scalability, technology evaluation with reasoning
+- Failure Handling & Reliability: partial failures, retry mechanisms, timeout strategies, circuit breakers, fail-safe design
+- Load Management & System Protection: rate limiting, backpressure handling, queue buffering, traffic shaping
+- Data & Request Safety: idempotency handling, duplicate event protection, safe retries, exactly-once/at-least-once awareness
+- Graceful Degradation: system continues in reduced capacity during failures, feature fallbacks instead of total outages
+Absence of these signals is acceptable for SE-1 and early SE-2. For SE-3+ their presence is a strong positive.
+
+Red flags: frontend-heavy, only scripting/automation, QA/DevOps without backend, buzzword-heavy without depth, service company background without strong eng signals, too many technologies listed without ownership, repeated short tenures.""",
     },
 
-    # ── SALES MANAGER ────────────────────────
-    "Sales Manager": {
-        "description": "Enterprise Sales roles — Mid-Market, Enterprise, International",
+    # ── SALES: MID-MARKET ─────────────────────
+    "Sales — Mid-Market": {
+        "description": "Mid-Market Sales Manager — faster cycles, multi-industry, pipeline creation",
         "dimensions": {
             "hunter_mindset": "Hunter validation — new logo acquisition, outbound pipeline creation, greenfield acquisition, self-generated pipeline. Deprioritize if revenue from existing accounts/renewals only.",
             "solution_selling": "Solution selling — sold platform/AI/technical/consultative offerings. Strong: AI products, automation platforms, CX platforms, enterprise SaaS. Weak: feature/price/catalogue selling.",
@@ -63,15 +86,97 @@ Red flags: frontend-heavy, only scripting/automation, QA/DevOps without backend,
             "ai_first_selling": "AI-First Solution Selling — has the candidate sold AI-first solutions? Conversational AI, GenAI, Voice AI/Bots, NLP, AI automation platforms, AI-first SaaS. Score 1-10 but report SEPARATELY.",
         },
         "context": """Exotel sells communication infrastructure, contact center platforms, and AI-led solutions (Voice Bots, Conversational AI, CCaaS, CPaaS).
-Selling requires solution-led conversations, technical understanding, multi-stakeholder alignment, long cycles, internal coordination.
-Successful sellers: influence without authority, navigate eng/product/biz stakeholders, drive deals despite ambiguity, end-to-end ownership.
+
+MID-MARKET SEGMENT: Faster sales cycles, caters across industries (industry-agnostic), multiple concurrent opportunities, strong discovery and qualification needed.
+Key success signals: pipeline creation ability, efficient deal progression, handling multiple stakeholders quickly, strong qualification.
+Strong signals: outbound prospecting, full-cycle sales ownership, demo to closure, solution mapping.
+
+Levels: Sales Manager (5-8/11 yrs) = independent solution hunter, new logo, pipeline creation, full-cycle ownership. Senior Sales Manager (8-14 yrs) = complex deal closer, larger deals, stronger solutioning. Principal Sales Manager (14+ yrs) = high-trust complex seller, ambiguous deals, senior stakeholder influence, E2E outcome ownership. Red flag at Principal: only leadership without individual selling.
+
 This is for individual contributor hunter roles, NOT account management or customer success.
 Red flags: no revenue metrics, pure account management, channel-only, small ticket, inside-sales heavy.""",
     },
 
-    # ── SDR ───────────────────────────────────
-    "SDR (Sales Development Representative)": {
-        "description": "Outbound SDR roles — Scaleup, Enterprise, International",
+    # ── SALES: ENTERPRISE ────────────────────
+    "Sales — Enterprise": {
+        "description": "Enterprise Sales Manager — long cycles, complex stakeholders, industry-specific",
+        "dimensions": {
+            "hunter_mindset": "Hunter validation — new logo acquisition, outbound pipeline creation, greenfield acquisition, self-generated pipeline. Deprioritize if revenue from existing accounts/renewals only.",
+            "solution_selling": "Solution selling — sold platform/AI/technical/consultative offerings. Strong: AI products, automation platforms, CX platforms, enterprise SaaS. Weak: feature/price/catalogue selling.",
+            "multi_threading": "Multi-threading — engaged multiple stakeholders, CXO conversations, cross-functional alignment, business + technical selling simultaneously. Critical: ability to understand what to sell to which persona (CTO=architecture/integration, Ops=efficiency/workflow, Business=ROI/outcomes).",
+            "influence_ownership": "Influence without authority — drove deals forward despite dependencies, coordinated internal stakeholders, owned outcomes beyond formal scope.",
+            "field_sales": "Field sales — in-person meetings, customer visits. Weak: pure inside sales, only remote selling.",
+            "company_context": "Company & industry context — SaaS, enterprise software, AI/automation, CX/contact center = high signal. Industry match weighting: same vertical=high, similar buyer environment (regulated/large enterprise)=medium, different industry but strong solution selling=neutral. Transactional/hardware/channel=low.",
+            "numbers_metrics": "Numbers & ownership — quota achievement, revenue numbers, deal sizes, pipeline ownership, growth metrics. RED FLAG: sales resume without numbers.",
+            "leadership": "Leadership signals — team management, mentoring junior reps, sales playbook creation, hiring involvement, cross-functional coordination, regional/segment ownership",
+        },
+        "weights": {
+            "hunter_mindset": 0.20,
+            "solution_selling": 0.20,
+            "multi_threading": 0.15,
+            "influence_ownership": 0.15,
+            "field_sales": 0.05,
+            "company_context": 0.15,
+            "numbers_metrics": 0.10,
+            "leadership": 0.0,
+        },
+        "bonus_dimensions": {
+            "ai_first_selling": "AI-First Solution Selling — has the candidate sold AI-first solutions? Conversational AI, GenAI, Voice AI/Bots, NLP, AI automation platforms, AI-first SaaS. Score 1-10 but report SEPARATELY.",
+        },
+        "context": """Exotel sells communication infrastructure, contact center platforms, and AI-led solutions (Voice Bots, Conversational AI, CCaaS, CPaaS).
+
+ENTERPRISE SEGMENT: Long sales cycles, complex stakeholder structures, technical solutioning required, industry-specific.
+Strong signals: enterprise account selling, CXO engagement, technical discovery, complex negotiations, RFP participation.
+Critical success indicator: ability to understand WHAT to sell to WHICH persona — CTO=architecture/integration value, Ops=efficiency & workflow, Business=ROI & outcomes.
+Industry match weighting: same vertical=high weight, similar buyer environment (regulated industries, large enterprises)=medium, different industry but strong enterprise solution selling=neutral.
+
+Levels: Sales Manager (5-8/11 yrs) = independent solution hunter, new logo, pipeline creation, full-cycle ownership. Senior Sales Manager (8-14 yrs) = complex deal closer, larger deals, stronger solutioning, negotiation maturity. Principal Sales Manager (14+ yrs) = high-trust complex seller, ambiguous deals, senior stakeholder influence, consensus driving. Red flag at Principal: only leadership without individual selling.
+
+This is for individual contributor hunter roles, NOT account management or customer success.
+Red flags: no revenue metrics, pure account management, channel-only, small ticket, inside-sales heavy.""",
+    },
+
+    # ── SALES: INTERNATIONAL ─────────────────
+    "Sales — International": {
+        "description": "International Sales Manager — Africa/ME/SEA markets, cross-border selling",
+        "dimensions": {
+            "hunter_mindset": "Hunter validation — new logo acquisition, outbound pipeline creation, greenfield acquisition, self-generated pipeline. Deprioritize if revenue from existing accounts/renewals only.",
+            "solution_selling": "Solution selling — sold platform/AI/technical/consultative offerings. Strong: AI products, automation platforms, CX platforms, enterprise SaaS. Weak: feature/price/catalogue selling.",
+            "multi_threading": "Multi-threading — engaged multiple stakeholders, CXO conversations, cross-functional alignment, business + technical selling simultaneously.",
+            "influence_ownership": "Influence without authority — drove deals forward despite dependencies, coordinated internal stakeholders, owned outcomes beyond formal scope.",
+            "international_selling": "International selling — selling into Africa/ME/SEA markets, handling remote stakeholders, working across time zones, global procurement processes, understanding regional buying patterns and decision cycles, adapting to cultural and communication differences. Strong: closing large deals with international customers, prior experience in same region. Weak: only outbound calling to international prospects.",
+            "company_context": "Company context — SaaS, enterprise software, AI/automation platforms, CX/contact center tools = high signal. Transactional/hardware/channel/distributor = low signal.",
+            "numbers_metrics": "Numbers & ownership — quota achievement, revenue numbers, deal sizes, pipeline ownership, growth metrics. RED FLAG: sales resume without numbers.",
+            "leadership": "Leadership signals — team management, mentoring junior reps, sales playbook creation, hiring involvement, cross-functional coordination, regional/segment ownership",
+        },
+        "weights": {
+            "hunter_mindset": 0.20,
+            "solution_selling": 0.15,
+            "multi_threading": 0.10,
+            "influence_ownership": 0.10,
+            "international_selling": 0.15,
+            "company_context": 0.10,
+            "numbers_metrics": 0.10,
+            "leadership": 0.10,
+        },
+        "bonus_dimensions": {
+            "ai_first_selling": "AI-First Solution Selling — has the candidate sold AI-first solutions? Conversational AI, GenAI, Voice AI/Bots, NLP, AI automation platforms, AI-first SaaS. Score 1-10 but report SEPARATELY.",
+        },
+        "context": """Exotel sells communication infrastructure, contact center platforms, and AI-led solutions (Voice Bots, Conversational AI, CCaaS, CPaaS).
+
+INTERNATIONAL SEGMENT: Selling into Africa/ME/SEA markets with remote stakeholders across time zones.
+Additional signals: closing large deals with international customers, handling cultural and communication differences, understanding regional buying patterns and decision cycles, prior experience selling into the same region the role is focused on.
+Strong: named international deal closures, region-specific pipeline. Weak: only outbound calling to international prospects.
+
+Levels: Sales Manager (5-8/11 yrs) = independent solution hunter, new logo, pipeline creation, full-cycle ownership. Senior Sales Manager (8-14 yrs) = complex deal closer, larger deals, stronger solutioning. Principal Sales Manager (14+ yrs) = high-trust complex seller, ambiguous deals, senior stakeholder influence.
+
+This is for individual contributor hunter roles, NOT account management or customer success.
+Red flags: no revenue metrics, pure account management, channel-only, small ticket, inside-sales heavy.""",
+    },
+
+    # ── SDR: SCALEUP ─────────────────────────
+    "SDR — Scaleup": {
+        "description": "Scaleup SDR — high-volume outreach, multi-industry, fast experimentation",
         "dimensions": {
             "outbound_ownership": "Outbound ownership — did they GENERATE pipeline or only handle inbound? Cold calling, account research, multi-channel outreach (LinkedIn+Email+Calls), self-generated meetings. Hard deprioritize: no outbound exposure.",
             "funnel_metrics": "Funnel & metric thinking — call-to-meeting ratios, conversion rates, monthly targets, activity metrics (calls/day, emails/day), pipeline contribution. RED FLAG: SDR resume with zero metrics.",
@@ -90,12 +195,84 @@ Red flags: no revenue metrics, pure account management, channel-only, small tick
             "self_discipline": 0.15,
             "leadership": 0.0,
         },
-        "context": """Exotel SDR is not a generic cold-calling role. It requires structured outbound prospecting, persona-based outreach (CXOs, Founders, Product Heads), discovery-driven qualification, technical curiosity (APIs, automation, contact center tools), funnel math understanding, and collaboration with AEs.
-SDRs generate qualified opportunities, not just meetings.
+        "context": """Exotel SDR is not a generic cold-calling role. SDRs generate qualified opportunities, not just meetings.
 Platform: communication APIs, contact centers, AI-led solutions. 10B+ conversations/year for brands like Swiggy, Ola, Zerodha, Flipkart.
-Tier 1 (Strong SDR Fit): Clear outbound, metric-driven, consultative, tech-curious.
+
+SCALEUP SEGMENT: Faster sales cycles, high-volume outreach, multi-industry coverage.
+Strong signals: handling multiple verticals, fast experimentation in messaging, high activity volume with structured tracking.
+
+Tier 1 (Strong Fit): Clear outbound ownership, metric-driven, consultative, tech-curious.
 Tier 2 (Potential Fit): Outbound exposure but lacks structure or metrics.
-Tier 3 (Low Fit): Primarily inbound, no metrics, no qualification depth.""",
+Tier 3 (Low Fit): Primarily inbound, no metrics, no qualification depth.
+Hard red flags: no outbound, no metrics, pure inbound/support. Soft: only volume focus without funnel awareness, generic resume.""",
+    },
+
+    # ── SDR: ENTERPRISE ──────────────────────
+    "SDR — Enterprise": {
+        "description": "Enterprise SDR — account-based, research-heavy, quality over quantity",
+        "dimensions": {
+            "outbound_ownership": "Outbound ownership — did they GENERATE pipeline or only handle inbound? Account-based prospecting, named account targeting, research-heavy outreach. Hard deprioritize: no outbound exposure.",
+            "funnel_metrics": "Funnel & metric thinking — call-to-meeting ratios, conversion rates, monthly targets, pipeline contribution. Focus on quality metrics over volume. RED FLAG: SDR resume with zero metrics.",
+            "qualification_depth": "Qualification depth — discovery questioning, BANT/MEDDIC awareness, pain-point identification, qualification before handoff. Critical for enterprise: quality over quantity mindset. Strong: qualified on budget/timeline/use-case, worked with AEs on enterprise accounts. Weak: booked demos without qualification.",
+            "technical_curiosity": "Technical curiosity — SaaS exposure, API/SDK familiarity, automation tools, CRM usage (HubSpot/Salesforce), GenAI for research. Strong: sold SaaS, used Apollo/Sales Navigator. Weak: pure non-tech B2B.",
+            "industry_persona": "Industry & persona awareness — persona-based messaging (CXOs, Founders, Product Heads), multi-threading outreach within one account, industry pain points, contextualized value props. Weak: generic mass messaging.",
+            "self_discipline": "Self-discipline & ownership — consistency in target achievement, self-driven prospecting, independent pipeline generation, long tenure in outbound roles. Red flags: frequent switches (<1yr), heavy dependence on marketing.",
+            "leadership": "Leadership signals — mentoring junior SDRs, training new hires, creating outreach playbooks, SDR team lead experience, process improvements",
+        },
+        "weights": {
+            "outbound_ownership": 0.20,
+            "funnel_metrics": 0.15,
+            "qualification_depth": 0.20,
+            "technical_curiosity": 0.15,
+            "industry_persona": 0.15,
+            "self_discipline": 0.15,
+            "leadership": 0.0,
+        },
+        "context": """Exotel SDR is not a generic cold-calling role. SDRs generate qualified opportunities, not just meetings.
+Platform: communication APIs, contact centers, AI-led solutions. 10B+ conversations/year for brands like Swiggy, Ola, Zerodha, Flipkart.
+
+ENTERPRISE SEGMENT: Account-based prospecting, research-heavy outreach, fewer but high-value meetings.
+Strong signals: named account targeting, multi-threading outreach within one account, working with AEs on enterprise accounts.
+Critical indicator: QUALITY over quantity mindset. Booking 3 well-qualified enterprise meetings > 20 spray-and-pray demos.
+
+Tier 1 (Strong Fit): Clear outbound ownership, metric-driven, consultative, tech-curious, account-based approach.
+Tier 2 (Potential Fit): Outbound exposure but lacks structure or enterprise focus.
+Tier 3 (Low Fit): Primarily inbound, no metrics, no qualification depth, only volume-based outreach.
+Hard red flags: no outbound, no metrics, pure inbound/support.""",
+    },
+
+    # ── SDR: INTERNATIONAL ───────────────────
+    "SDR — International": {
+        "description": "International SDR — US/MEA/SEA markets, cross-timezone prospecting",
+        "dimensions": {
+            "outbound_ownership": "Outbound ownership — did they GENERATE pipeline or only handle inbound? Cold calling, account research, multi-channel outreach (LinkedIn+Email+Calls), self-generated meetings. Hard deprioritize: no outbound exposure.",
+            "funnel_metrics": "Funnel & metric thinking — call-to-meeting ratios, conversion rates, monthly targets, activity metrics, pipeline contribution. RED FLAG: SDR resume with zero metrics.",
+            "qualification_depth": "Qualification depth — discovery questioning, BANT/MEDDIC awareness, pain-point identification, qualification before handoff. Strong: qualified on budget/timeline/use-case. Weak: booked demos without qualification.",
+            "international_prospecting": "International prospecting — experience prospecting into US/MEA/SEA markets, working across time zones, handling remote stakeholders, adapting messaging to regional nuances. Strong: booking qualified meetings with international buyers. Weak: only bulk cold emailing internationally, no ownership of qualification.",
+            "technical_curiosity": "Technical curiosity — SaaS exposure, API/SDK familiarity, automation tools, CRM usage (HubSpot/Salesforce), GenAI for research. Strong: sold SaaS, used Apollo/Sales Navigator. Weak: pure non-tech B2B.",
+            "self_discipline": "Self-discipline & ownership — consistency in target achievement, self-driven prospecting, independent pipeline generation, long tenure in outbound roles. Red flags: frequent switches (<1yr), heavy dependence on marketing.",
+            "leadership": "Leadership signals — mentoring junior SDRs, training new hires, creating outreach playbooks, SDR team lead experience, process improvements",
+        },
+        "weights": {
+            "outbound_ownership": 0.20,
+            "funnel_metrics": 0.20,
+            "qualification_depth": 0.15,
+            "international_prospecting": 0.15,
+            "technical_curiosity": 0.10,
+            "self_discipline": 0.15,
+            "leadership": 0.05,
+        },
+        "context": """Exotel SDR is not a generic cold-calling role. SDRs generate qualified opportunities, not just meetings.
+Platform: communication APIs, contact centers, AI-led solutions. 10B+ conversations/year for brands like Swiggy, Ola, Zerodha, Flipkart.
+
+INTERNATIONAL SEGMENT: Prospecting into US/MEA/SEA markets, working across time zones, handling remote stakeholders.
+Strong signals: booking qualified meetings with international buyers, adapting messaging to regional nuances, experience in target region.
+Weak signals: only bulk cold emailing internationally, no ownership of qualification.
+
+Tier 1 (Strong Fit): Clear outbound ownership, metric-driven, international experience, consultative.
+Tier 2 (Potential Fit): Outbound exposure but no international experience.
+Tier 3 (Low Fit): Primarily inbound, no metrics, no qualification depth.
+Hard red flags: no outbound, no metrics, pure inbound/support.""",
     },
 
     # ── CHIEF OF STAFF ───────────────────────
