@@ -9,54 +9,213 @@ All role-specific scoring dimensions, weights, and evaluation prompts.
 
 FRAMEWORKS = {
 
-    # ── BACKEND ENGINEERING ──────────────────
-    "Backend Engineer (SE-1 to Sr. EM)": {
-        "description": "Backend engineering roles at Exotel across levels",
+    # ── BACKEND: SE-1 ────────────────────────
+    "Backend — SE-1 (0-2 YOE)": {
+        "description": "Junior Backend Engineer — fundamentals + learning ability",
         "dimensions": {
-            "backend_depth": "Core backend engineering depth — API design, microservices, distributed systems, concurrency, async processing, DB optimization, caching, system performance",
-            "scale_complexity": "Scale & complexity signals — high throughput, low latency, real-time systems, event-driven, Kafka, horizontal scaling, large data volumes",
-            "ownership": "Ownership level — designed/owned systems vs assisted/supported. Look for: designed service, owned system, led implementation, migrated architecture, reduced latency/cost",
-            "engineering_maturity": "Engineering maturity — production debugging, incident resolution, monitoring, on-call, reliability improvements, root cause analysis, observability",
+            "backend_fundamentals": "Backend fundamentals — REST API development, basic DB usage (SQL, schema design), backend frameworks, server-side logic. Go/Java/Python preferred but any strong backend language acceptable.",
+            "learning_ability": "Learning ability & curiosity — internship backend work, deployed projects, personal projects, hackathons, open-source contributions, hands-on exposure beyond coursework. Important: demonstrates self-driven learning.",
+            "tech_exposure": "Tech exposure — Linux familiarity, Git workflows, basic Docker usage, SQL understanding, any cloud exposure (AWS). Strong: has actually deployed something. Weak: only tutorials/certifications.",
+            "ownership": "Ownership signals — did they OWN something (even small)? Built a feature end-to-end, owned a module, deployed to production. Weak: only assisted, only followed tutorials, resume filled with tools but no work.",
+            "communication_clarity": "Resume quality & communication — clear description of what they did vs what the team did, specific technologies mentioned with context, structured resume. Weak: buzzword-heavy, vague descriptions.",
             "genai_expertise": "GenAI signals — LangChain, LangGraph, agent workflows, RAG systems, vector databases, prompt orchestration, evaluation pipelines, production AI systems",
-            "tech_stack_fit": "Tech stack fit for Exotel — Go, Java, Python, Kafka, Redis, MongoDB, PostgreSQL/Citus, AWS, Docker/K8s",
-            "leadership": "Leadership signals — mentoring, code reviews, technical decision-making, team management, architecture involvement, cross-team collaboration",
+            "leadership": "Leadership signals — college tech lead, organized events, mentored peers, led project teams",
         },
         "weights": {
-            "backend_depth": 0.25,
-            "scale_complexity": 0.20,
-            "ownership": 0.20,
-            "engineering_maturity": 0.10,
+            "backend_fundamentals": 0.30,
+            "learning_ability": 0.25,
+            "tech_exposure": 0.20,
+            "ownership": 0.15,
+            "communication_clarity": 0.10,
             "genai_expertise": 0.0,
+            "leadership": 0.0,
+        },
+        "context": """Exotel builds high reliability, real-time, distributed backend systems.
+Primary tech: Go (Platform), Java/PostgreSQL/Citus (Contact Center), Python (GenAI).
+
+SE-1 (0-2 YOE): Strong fundamentals + learning ability. Candidate is expected to be implementation-focused.
+Expected: REST API dev, basic DB, backend frameworks, Linux, Git. Go/Java/Python preferred.
+Good signals: internship backend work, deployed projects, basic Docker, SQL understanding, API development, basic concurrency, DB schema usage.
+NOT expected: architecture design, distributed systems expertise — do NOT penalize for missing these.
+Red flags: only tutorials, no backend ownership, resume filled with tools but no actual work, only frontend/scripting.
+Red flags (general): frontend-heavy, only scripting/automation, QA/DevOps without backend.""",
+    },
+
+    # ── BACKEND: SE-2 ────────────────────────
+    "Backend — SE-2 (2-4 YOE)": {
+        "description": "Mid-level Backend Engineer — independent feature ownership",
+        "dimensions": {
+            "backend_depth": "Backend engineering depth — API design, microservices, DB optimization, concurrency, async processing, caching, system performance. Must show production backend experience, not just side projects.",
+            "feature_ownership": "End-to-end feature ownership — built and shipped features independently without handholding. Look for: E2E ownership, DB understanding, performance awareness. Weak: only implementation tickets, no impact statements.",
+            "performance_awareness": "Performance & optimization — caching implementation, queue usage, async workflows, API optimization, DB indexing. Strong: 'improved API latency by introducing Redis caching'. Weak: no mention of performance.",
+            "tech_stack_fit": "Tech stack fit — Go, Java, Python, Kafka, Redis, MongoDB, PostgreSQL/Citus, AWS, Docker/K8s. Production usage required, not just listed.",
+            "ownership": "Ownership level — impact statements, measurable outcomes, 'I built/designed/improved X'. Weak: vague team contributions, no specific impact.",
+            "genai_expertise": "GenAI signals — LangChain, LangGraph, agent workflows, RAG systems, vector databases, prompt orchestration, evaluation pipelines, production AI systems",
+            "leadership": "Leadership signals — mentoring juniors, code reviews, onboarding new team members",
+        },
+        "weights": {
+            "backend_depth": 0.30,
+            "feature_ownership": 0.25,
+            "performance_awareness": 0.15,
+            "tech_stack_fit": 0.15,
+            "ownership": 0.15,
+            "genai_expertise": 0.0,
+            "leadership": 0.0,
+        },
+        "context": """Exotel builds high reliability, real-time, distributed backend systems.
+Primary tech: Go (Platform), Java/PostgreSQL/Citus (Contact Center), Python (GenAI).
+
+SE-2 (2-4 YOE): Independent feature ownership. Engineer should execute without handholding. Production backend exposure required.
+Must show: end-to-end feature ownership, database understanding, performance awareness.
+Strong signals: caching implementation, queue usage, async workflows, API optimization, DB indexing.
+Good example: 'Improved API latency by introducing Redis caching.'
+Weak signals: only implementation tickets, no impact statements, no production exposure.
+Red flags: frontend-heavy, only scripting/automation, QA/DevOps without backend, buzzword-heavy without depth, service company background without strong eng signals.""",
+    },
+
+    # ── BACKEND: SE-3 / TECH LEAD ────────────
+    "Backend — SE-3 / Tech Lead (4-5+ YOE)": {
+        "description": "Senior Backend / Tech Lead — system-level contributor, Exotel hiring bar increases significantly",
+        "dimensions": {
+            "backend_depth": "Core backend depth — API design, microservices, distributed systems, concurrency, async processing, DB optimization, caching, system performance at scale.",
+            "system_design": "System design & architecture — MANDATORY at this level. Design participation, distributed systems exposure, scalability thinking. Strong: event-driven architecture, Kafka/messaging, service decomposition, HA design, load handling. Common rejection reason: senior title but execution-level work only.",
+            "scale_complexity": "Scale & complexity — high throughput, low latency, real-time systems, event-driven, horizontal scaling, large data volumes. Must show evidence of operating at scale.",
+            "advanced_system_thinking": "Advanced system thinking — tradeoff awareness (latency vs consistency, perf vs cost), failure handling (retries, timeouts, circuit breakers), load management (rate limiting, backpressure, queue buffering), data safety (idempotency, exactly-once processing), graceful degradation. Presence is a strong positive at this level.",
+            "ownership": "Ownership level — designed/owned systems, led implementation, migrated architecture, reduced latency/cost, improved throughput. Must show 'designed' or 'owned', not just 'assisted'.",
+            "tech_stack_fit": "Tech stack fit — Go, Java, Python, Kafka, Redis, MongoDB, PostgreSQL/Citus, AWS, Docker/K8s.",
+            "genai_expertise": "GenAI signals — LangChain, LangGraph, agent workflows, RAG systems, vector databases, prompt orchestration, evaluation pipelines, production AI systems",
+            "leadership": "Leadership signals — mentoring juniors, code reviews, technical decision-making, architecture involvement, cross-team collaboration",
+        },
+        "weights": {
+            "backend_depth": 0.20,
+            "system_design": 0.20,
+            "scale_complexity": 0.15,
+            "advanced_system_thinking": 0.15,
+            "ownership": 0.15,
             "tech_stack_fit": 0.10,
+            "genai_expertise": 0.0,
+            "leadership": 0.05,
+        },
+        "context": """Exotel builds high reliability, real-time, distributed backend systems.
+Primary tech: Go (Platform), Java/PostgreSQL/Citus (Contact Center), Python (GenAI).
+
+SE-3 / Tech Lead (4-5+ YOE): System-level contributor. Exotel hiring bar increases SIGNIFICANTLY here.
+MANDATORY signals: design participation, distributed systems exposure, scalability thinking.
+Strong technical signals: event-driven architecture, Kafka or messaging systems, service decomposition, high availability design, load handling improvements, retry strategies, timeout management, rate limiting, system observability design.
+Expected exposure: performance bottlenecks, service ownership, reliability improvements.
+Additional signals: mentoring juniors, code reviews, technical decision involvement.
+
+ADVANCED SYSTEM THINKING (strong positive at this level):
+- Tradeoff awareness: latency vs consistency, performance vs cost, simplicity vs scalability
+- Failure handling: partial failures, retry mechanisms, timeout strategies, circuit breakers
+- Load management: rate limiting, backpressure handling, queue buffering, traffic shaping
+- Data safety: idempotency, duplicate event protection, safe retries, exactly-once awareness
+- Graceful degradation: reduced capacity during failures, feature fallbacks
+
+Common rejection reason: senior title but execution-level work only — no design, no system thinking.
+Red flags: frontend-heavy, only scripting/automation, buzzword-heavy without depth, service company without strong eng signals.""",
+    },
+
+    # ── BACKEND: PRINCIPAL ENGINEER ──────────
+    "Backend — Principal Engineer (7+ YOE)": {
+        "description": "Principal Engineer — key tech choices, cross-system impact, drives decisions",
+        "dimensions": {
+            "technical_direction": "Technical direction & decision-making — makes key technology choices, establishes patterns other engineers follow, evaluates tradeoffs with reasoning. They DRIVE decisions, not just contribute. Look for: 'defined system architecture', 'led technical direction', 'introduced new architecture patterns'.",
+            "system_impact": "Cross-system impact — system redesign, scaling architecture, migration initiatives, DB scaling strategies, reliability improvements. Must show impact beyond a single service. Strong: reduced infra cost, improved throughput, eliminated bottlenecks, multi-service ownership.",
+            "advanced_system_thinking": "Advanced system thinking — tradeoff awareness, failure handling & reliability (retries, circuit breakers, fail-safe), load management (rate limiting, backpressure), data safety (idempotency, exactly-once), graceful degradation. Expected to be strong at this level.",
+            "backend_depth": "Core backend depth — deep expertise in API design, distributed systems, concurrency, DB optimization, caching, system performance at scale.",
+            "ownership": "Ownership — writes most critical/complex components, reviews designs from other engineers for coherence. Must show 'designed' and 'drove', not 'contributed'.",
+            "tech_stack_fit": "Tech stack fit — Go, Java, Python, Kafka, Redis, MongoDB, PostgreSQL/Citus, AWS, Docker/K8s.",
+            "genai_expertise": "GenAI signals — LangChain, LangGraph, agent workflows, RAG systems, vector databases, prompt orchestration, evaluation pipelines, production AI systems",
+            "leadership": "Leadership signals — technical mentoring across teams, architecture reviews, establishing engineering standards, hiring bar-raiser",
+        },
+        "weights": {
+            "technical_direction": 0.25,
+            "system_impact": 0.20,
+            "advanced_system_thinking": 0.15,
+            "backend_depth": 0.15,
+            "ownership": 0.10,
+            "tech_stack_fit": 0.05,
+            "genai_expertise": 0.0,
+            "leadership": 0.10,
+        },
+        "context": """Exotel builds high reliability, real-time, distributed backend systems.
+Primary tech: Go (Platform), Java/PostgreSQL/Citus (Contact Center), Python (GenAI).
+
+Principal Engineer (7+ YOE): Makes key technology choices, establishes patterns that other engineers follow, writes the most critical or complex components, reviews designs from other engineers to ensure coherence.
+They make technical tradeoffs and decide 'how things should be built.'
+
+Required resume signals: system redesign, scaling architecture, migration initiatives, database scaling strategies, reliability improvements.
+Strong indicators: reduced infra cost, improved throughput, eliminated bottlenecks, multi-service ownership.
+Important distinction: they DRIVE decisions, not just contribute to them.
+
+Red flag: title inflation without cross-system impact — senior title but no evidence of architectural influence.
+Red flags (general): buzzword-heavy without depth, no measurable outcomes, repeated short tenures.""",
+    },
+
+    # ── BACKEND: ENGINEERING MANAGER ─────────
+    "Backend — Engineering Manager": {
+        "description": "Backend EM — hands-on technical leader, managed 4-6 engineers",
+        "dimensions": {
+            "backend_depth": "Backend engineering depth — strong backend past, architecture involvement, system design. Must have been a credible engineer before managing.",
+            "team_management": "Team management — managed 4-6 engineers (ideal for Exotel), mentoring, hiring, team building. Red flag: managed 15+ directly (too far from hands-on), pure delivery/PM with no eng depth.",
+            "delivery_execution": "Delivery & execution — project delivery, sprint planning, scope-quality-time tradeoffs, stakeholder management. Breaking down large initiatives, coordinating across teams, managing dependencies.",
+            "technical_credibility": "Technical credibility — still technically involved. Look for: 'code review practices', 'provided technical guidance', 'unblocked complex technical challenges', architecture involvement. Positive: '50% coding, 50% people management'. Negative: complete absence of technical work.",
+            "engineering_maturity": "Engineering maturity — code review practices, engineering process improvements, unblocking complex challenges, production debugging involvement.",
+            "tech_stack_fit": "Tech stack fit — Go, Java, Python, Kafka, Redis, MongoDB, PostgreSQL/Citus, AWS, Docker/K8s.",
+            "genai_expertise": "GenAI signals — LangChain, LangGraph, agent workflows, RAG systems, vector databases, prompt orchestration, evaluation pipelines, production AI systems",
+            "leadership": "Leadership depth — people management maturity, hiring involvement, conflict resolution, performance management, cross-functional collaboration",
+        },
+        "weights": {
+            "backend_depth": 0.15,
+            "team_management": 0.25,
+            "delivery_execution": 0.15,
+            "technical_credibility": 0.20,
+            "engineering_maturity": 0.10,
+            "tech_stack_fit": 0.05,
+            "genai_expertise": 0.0,
+            "leadership": 0.10,
+        },
+        "context": """Exotel builds high reliability, real-time, distributed backend systems.
+Primary tech: Go (Platform), Java/PostgreSQL/Citus (Contact Center), Python (GenAI).
+
+Engineering Manager: Exotel wants hands-on technical leaders. Ideal profile = Lead Software Engineers in good product companies (Fintech, E-commerce, etc.) who managed small teams while staying technically involved.
+Target: managed 4-6 engineers, still technically credible, architecture involvement.
+Must show: strong backend past, architecture involvement, team management, mentoring, delivery ownership, sprint planning, stakeholder alignment.
+Positive signals: 'managed team of 5 while contributing to architecture', 'balanced 50% coding with 50% people management', 'established code review practices', 'unblocked team on complex technical challenges'.
+Red flags: pure delivery/project managers with no engineering depth, managed very large teams (15+ directly — suggests beyond hands-on level, typically second-level managers who don't code).""",
+    },
+
+    # ── BACKEND: SR. ENGINEERING MANAGER ─────
+    "Backend — Sr. Engineering Manager": {
+        "description": "Sr. EM — manages 15-20, cross-functional, technical direction",
+        "dimensions": {
+            "team_scale": "Team scale & org management — managed 15-20 people, potentially managing managers. Cross-functional collaboration with Product, QA, and other engineering teams to deliver larger initiatives.",
+            "technical_direction": "Technical direction — defining technical strategy, driving architectural evolution. Should still have recent technical contributions (less than first-level EMs). Look for: architectural reviews, unblocking complex challenges, contributing to critical system designs.",
+            "engineering_process": "Engineering process — engineering process improvements, quality bar-setting, incident response maturity, release management, tech debt management.",
+            "delivery_execution": "Delivery & execution — delivered larger cross-team initiatives, managed dependencies across teams, stakeholder management at senior level.",
+            "backend_depth": "Backend engineering depth — strong backend past. Complete absence of technical involvement in recent roles is concerning.",
+            "tech_stack_fit": "Tech stack fit — Go, Java, Python, Kafka, Redis, MongoDB, PostgreSQL/Citus, AWS, Docker/K8s.",
+            "genai_expertise": "GenAI signals — LangChain, LangGraph, agent workflows, RAG systems, vector databases, prompt orchestration, evaluation pipelines, production AI systems",
+            "leadership": "Leadership depth — managing managers, hiring, org design, people development, cross-functional influence, conflict resolution at org level",
+        },
+        "weights": {
+            "team_scale": 0.20,
+            "technical_direction": 0.20,
+            "engineering_process": 0.15,
+            "delivery_execution": 0.15,
+            "backend_depth": 0.10,
+            "tech_stack_fit": 0.05,
+            "genai_expertise": 0.0,
             "leadership": 0.15,
         },
-        "context": """Exotel builds high reliability, real-time, distributed backend systems with low latency expectations.
-Primary tech: Go (Platform — distributed services, async/event-driven, Kafka, Redis, MongoDB, AWS, high concurrency), Java/PostgreSQL/Citus (Contact Center — scalable APIs, multi-tenant, data-heavy), Python/LangChain/LangGraph (GenAI — RAG, agent workflows, LLM orchestration).
-Ownership-driven engineering culture. Production sensitivity is critical.
+        "context": """Exotel builds high reliability, real-time, distributed backend systems.
+Primary tech: Go (Platform), Java/PostgreSQL/Citus (Contact Center), Python (GenAI).
 
-LEVEL-WISE EXPECTATIONS (calibrate scoring based on candidate's YOE):
-
-SE-1 (0-2 YOE): Strong fundamentals + learning. Go/Java/Python preferred. Expected: REST API dev, basic DB, frameworks, Linux, Git. Good: internship backend, deployed projects, Docker, SQL. NOT expected: architecture, distributed systems. Red flags: only tutorials, no backend ownership.
-
-SE-2 (2-4 YOE): Independent feature ownership. Production backend required. Must show: E2E feature ownership, DB understanding, performance awareness. Strong: caching implementation, queue usage, async workflows, API optimization, DB indexing. Weak: only implementation tickets, no impact statements.
-
-SE-3/Tech Lead (4-5+ YOE): System-level contributor — Exotel hiring bar increases significantly here. MANDATORY: design participation, distributed systems exposure, scalability thinking. Strong: event-driven architecture, Kafka/messaging, service decomposition, HA design, load handling, retry/timeout/rate limiting, observability. Also: mentoring, code reviews, technical decisions. Common rejection: senior title but execution-level work only.
-
-Principal Engineer (7+ YOE): Makes key tech choices, establishes patterns, writes most critical components, reviews designs. Signals: system redesign, scaling architecture, migration initiatives, DB scaling, reliability improvements. They DRIVE decisions, not just contribute. Red flag: title inflation without cross-system impact.
-
-Engineering Manager: Ideal = Lead SWE from product companies who managed 4-6 engineers while staying technical. Must show: strong backend past, architecture involvement, team management, mentoring, delivery ownership, sprint planning, stakeholder alignment. Red flags: pure delivery/PM, no engineering depth, managed 15+ directly (too far from hands-on).
-
-Sr. Engineering Manager: Managed 15-20 people, cross-functional collaboration with Product/QA/other eng teams, engineering process improvements, technical direction setting. Should still have recent technical contributions. Complete absence of technical involvement is concerning.
-
-ADVANCED SYSTEM THINKING SIGNALS (important for SE-3 and above — increase score confidence):
-- Tradeoff Awareness: latency vs consistency, performance vs cost, simplicity vs scalability, technology evaluation with reasoning
-- Failure Handling & Reliability: partial failures, retry mechanisms, timeout strategies, circuit breakers, fail-safe design
-- Load Management & System Protection: rate limiting, backpressure handling, queue buffering, traffic shaping
-- Data & Request Safety: idempotency handling, duplicate event protection, safe retries, exactly-once/at-least-once awareness
-- Graceful Degradation: system continues in reduced capacity during failures, feature fallbacks instead of total outages
-Absence of these signals is acceptable for SE-1 and early SE-2. For SE-3+ their presence is a strong positive.
-
-Red flags: frontend-heavy, only scripting/automation, QA/DevOps without backend, buzzword-heavy without depth, service company background without strong eng signals, too many technologies listed without ownership, repeated short tenures.""",
+Senior Engineering Manager: Influences technical direction of the team. Should still have recent technical contributions, although less than first-level EMs. Look for: involvement in architectural reviews, unblocking complex technical challenges, contributing to critical system designs.
+Expected: managed 15-20 people, cross-functional collaboration (Product, QA, other eng teams), engineering process improvements, technical direction setting.
+Complete absence of technical involvement in recent roles is concerning.
+Red flags: pure people manager with zero technical awareness, no engineering process improvements, only operational/delivery focus without strategic technical involvement.""",
     },
 
     # ── SALES: MID-MARKET ─────────────────────
