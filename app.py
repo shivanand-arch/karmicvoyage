@@ -81,16 +81,16 @@ with st.sidebar:
 # ─────────────────────────────────────────────
 
 def _get_secret(key, default=""):
-    """Read from Streamlit secrets or env var."""
-    # Try st.secrets first (Streamlit Cloud)
+    """Read from Streamlit secrets or env var. Handles flat keys and [section] nesting."""
+    # Try top-level st.secrets[key]
     try:
         val = st.secrets[key]
         if val:
             return str(val)
     except (KeyError, FileNotFoundError, AttributeError):
         pass
-    # Try nested under [trakstar] or [default] sections
-    for section in ("trakstar", "default", "general"):
+    # Try nested under common sections (in case TOML ordering put them under [auth] etc.)
+    for section in ("auth", "trakstar", "default"):
         try:
             val = st.secrets[section][key]
             if val:
@@ -103,17 +103,6 @@ def _get_secret(key, default=""):
 TRAKSTAR_API_KEY = _get_secret("TRAKSTAR_API_KEY")
 TRAKSTAR_COOKIE = _get_secret("TRAKSTAR_COOKIE")
 TRAKSTAR_SUBDOMAIN = _get_secret("TRAKSTAR_SUBDOMAIN", "exotel")
-
-# Debug: show available secret keys in sidebar (remove after confirming it works)
-with st.sidebar:
-    try:
-        _available_keys = list(st.secrets.keys()) if hasattr(st.secrets, "keys") else []
-        if _available_keys:
-            st.caption(f"Secrets found: {', '.join(_available_keys)}")
-        else:
-            st.caption("No secrets found")
-    except Exception as _e:
-        st.caption(f"Secrets error: {_e}")
 
 
 # ─────────────────────────────────────────────
