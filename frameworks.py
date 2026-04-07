@@ -297,13 +297,13 @@ Red flags: no revenue metrics, pure account management, channel-only, small tick
 
     # ── SALES: INTERNATIONAL ─────────────────
     "Sales — International": {
-        "description": "International Sales Manager — Africa/ME/SEA markets, cross-border selling",
+        "description": "International Sales Manager — cross-border selling into target markets specified in JD",
         "dimensions": {
             "hunter_mindset": "Hunter validation — new logo acquisition, outbound pipeline creation, greenfield acquisition, self-generated pipeline. Deprioritize if revenue from existing accounts/renewals only.",
             "solution_selling": "Solution selling — sold platform/AI/technical/consultative offerings. Strong: AI products, automation platforms, CX platforms, enterprise SaaS. Weak: feature/price/catalogue selling.",
             "multi_threading": "Multi-threading — engaged multiple stakeholders, CXO conversations, cross-functional alignment, business + technical selling simultaneously.",
             "influence_ownership": "Influence without authority — drove deals forward despite dependencies, coordinated internal stakeholders, owned outcomes beyond formal scope.",
-            "international_selling": "International selling — selling into Africa/ME/SEA markets, handling remote stakeholders, working across time zones, global procurement processes, understanding regional buying patterns and decision cycles, adapting to cultural and communication differences. Strong: closing large deals with international customers, prior experience in same region. Weak: only outbound calling to international prospects.",
+            "international_selling": "International selling — evaluate against the TARGET MARKETS specified in the Job Description. Look for: selling into those specific markets/regions, handling remote stakeholders, working across time zones, global procurement processes, understanding regional buying patterns and decision cycles, adapting to cultural and communication differences. Strong: prior experience selling into the SAME region(s) the JD targets, named deal closures in those markets. Weak: only outbound calling to international prospects, or experience in unrelated regions.",
             "company_context": "Company context — SaaS, enterprise software, AI/automation platforms, CX/contact center tools = high signal. Transactional/hardware/channel/distributor = low signal.",
             "numbers_metrics": "Numbers & ownership — quota achievement, revenue numbers, deal sizes, pipeline ownership, growth metrics. RED FLAG: sales resume without numbers.",
             "leadership": "Leadership signals — team management, mentoring junior reps, sales playbook creation, hiring involvement, cross-functional coordination, regional/segment ownership",
@@ -323,9 +323,9 @@ Red flags: no revenue metrics, pure account management, channel-only, small tick
         },
         "context": """Exotel sells communication infrastructure, contact center platforms, and AI-led solutions (Voice Bots, Conversational AI, CCaaS, CPaaS).
 
-INTERNATIONAL SEGMENT: Selling into Africa/ME/SEA markets with remote stakeholders across time zones.
-Additional signals: closing large deals with international customers, handling cultural and communication differences, understanding regional buying patterns and decision cycles, prior experience selling into the same region the role is focused on.
-Strong: named international deal closures, region-specific pipeline. Weak: only outbound calling to international prospects.
+INTERNATIONAL SEGMENT: The target market/region is defined in the Job Description — use it as the primary reference for which geography to evaluate against. Do NOT assume specific regions (e.g., Africa, ME, SEA, US) unless the JD explicitly mentions them.
+Additional signals: closing large deals with international customers in the JD's target market, handling cultural and communication differences relevant to that region, understanding regional buying patterns and decision cycles, prior experience selling into the same region the JD specifies.
+Strong: named deal closures in the JD's target region, region-specific pipeline. Weak: only outbound calling to international prospects, or experience in unrelated regions.
 
 Levels: Sales Manager (5-8/11 yrs) = independent solution hunter, new logo, pipeline creation, full-cycle ownership. Senior Sales Manager (8-14 yrs) = complex deal closer, larger deals, stronger solutioning. Principal Sales Manager (14+ yrs) = high-trust complex seller, ambiguous deals, senior stakeholder influence.
 
@@ -402,12 +402,12 @@ Hard red flags: no outbound, no metrics, pure inbound/support.""",
 
     # ── SDR: INTERNATIONAL ───────────────────
     "SDR — International": {
-        "description": "International SDR — US/MEA/SEA markets, cross-timezone prospecting",
+        "description": "International SDR — cross-timezone prospecting into target markets specified in JD",
         "dimensions": {
             "outbound_ownership": "Outbound ownership — did they GENERATE pipeline or only handle inbound? Cold calling, account research, multi-channel outreach (LinkedIn+Email+Calls), self-generated meetings. Hard deprioritize: no outbound exposure.",
             "funnel_metrics": "Funnel & metric thinking — call-to-meeting ratios, conversion rates, monthly targets, activity metrics, pipeline contribution. RED FLAG: SDR resume with zero metrics.",
             "qualification_depth": "Qualification depth — discovery questioning, BANT/MEDDIC awareness, pain-point identification, qualification before handoff. Strong: qualified on budget/timeline/use-case. Weak: booked demos without qualification.",
-            "international_prospecting": "International prospecting — experience prospecting into US/MEA/SEA markets, working across time zones, handling remote stakeholders, adapting messaging to regional nuances. Strong: booking qualified meetings with international buyers. Weak: only bulk cold emailing internationally, no ownership of qualification.",
+            "international_prospecting": "International prospecting — evaluate against the TARGET MARKETS specified in the Job Description. Look for: experience prospecting into those specific markets/regions, working across time zones, handling remote stakeholders, adapting messaging to regional nuances. Strong: booking qualified meetings with buyers in the JD's target region. Weak: only bulk cold emailing internationally, no ownership of qualification, or experience in unrelated regions.",
             "technical_curiosity": "Technical curiosity — SaaS exposure, API/SDK familiarity, automation tools, CRM usage (HubSpot/Salesforce), GenAI for research. Strong: sold SaaS, used Apollo/Sales Navigator. Weak: pure non-tech B2B.",
             "self_discipline": "Self-discipline & ownership — consistency in target achievement, self-driven prospecting, independent pipeline generation, long tenure in outbound roles. Red flags: frequent switches (<1yr), heavy dependence on marketing.",
             "leadership": "Leadership signals — mentoring junior SDRs, training new hires, creating outreach playbooks, SDR team lead experience, process improvements",
@@ -424,9 +424,9 @@ Hard red flags: no outbound, no metrics, pure inbound/support.""",
         "context": """Exotel SDR is not a generic cold-calling role. SDRs generate qualified opportunities, not just meetings.
 Platform: communication APIs, contact centers, AI-led solutions. 10B+ conversations/year for brands like Swiggy, Ola, Zerodha, Flipkart.
 
-INTERNATIONAL SEGMENT: Prospecting into US/MEA/SEA markets, working across time zones, handling remote stakeholders.
-Strong signals: booking qualified meetings with international buyers, adapting messaging to regional nuances, experience in target region.
-Weak signals: only bulk cold emailing internationally, no ownership of qualification.
+INTERNATIONAL SEGMENT: The target market/region is defined in the Job Description — use it as the primary reference for which geography to evaluate against. Do NOT assume specific regions (e.g., US, MEA, SEA) unless the JD explicitly mentions them.
+Strong signals: booking qualified meetings with buyers in the JD's target region, adapting messaging to regional nuances, prior experience in that specific market.
+Weak signals: only bulk cold emailing internationally, no ownership of qualification, experience in unrelated regions.
 
 Tier 1 (Strong Fit): Clear outbound ownership, metric-driven, international experience, consultative.
 Tier 2 (Potential Fit): Outbound exposure but no international experience.
