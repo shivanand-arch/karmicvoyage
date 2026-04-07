@@ -81,10 +81,16 @@ with st.sidebar:
 # ─────────────────────────────────────────────
 
 def _get_secret(key, default=""):
+    """Read from Streamlit secrets or env var."""
+    # Try st.secrets first (Streamlit Cloud)
     try:
-        return st.secrets.get(key, os.environ.get(key, default))
-    except Exception:
-        return os.environ.get(key, default)
+        val = st.secrets[key]
+        if val:
+            return val
+    except (KeyError, FileNotFoundError, AttributeError):
+        pass
+    # Fallback to env var
+    return os.environ.get(key, default)
 
 TRAKSTAR_API_KEY = _get_secret("TRAKSTAR_API_KEY")
 TRAKSTAR_COOKIE = _get_secret("TRAKSTAR_COOKIE")
