@@ -22,6 +22,7 @@ from excel_generator import generate_excel
 from trakstar_client import (
     create_session, fetch_openings, fetch_candidates,
     deduplicate, get_unique_stages, fetch_resume_bytes,
+    get_opening_name, is_active_opening,
 )
 
 
@@ -219,15 +220,14 @@ with col2:
                         st.session_state.tk_openings = fetch_openings(tk_session, tk_base)
 
                 tk_openings = st.session_state.tk_openings
-                tk_published = [o for o in tk_openings if o.get("status") == "Published"]
+                tk_published = [o for o in tk_openings if is_active_opening(o)]
 
                 if not tk_published:
-                    st.error("No published openings found. Check your credentials.")
+                    st.error("No active openings found. Check your credentials.")
                 else:
-                    # Build display names for all published openings
+                    # Build display names for all active openings
                     tk_display_names = [
-                        o.get("title") or o.get("name") or "Unknown"
-                        for o in tk_published
+                        get_opening_name(o) for o in tk_published
                     ]
 
                     tk_selected_name = st.selectbox(
@@ -247,17 +247,16 @@ with col2:
                         if tk_keyword:
                             matched = [
                                 o for o in tk_published
-                                if tk_keyword.lower() in (o.get("title") or o.get("name", "")).lower()
+                                if tk_keyword.lower() in get_opening_name(o).lower()
                             ]
                             if not matched:
                                 st.warning(f"No positions match \"{tk_keyword}\"")
                             elif len(matched) == 1:
-                                tk_selected_name = matched[0].get("title") or matched[0].get("name")
+                                tk_selected_name = get_opening_name(matched[0])
                                 st.success(f"Matched: **{tk_selected_name}**")
                             else:
                                 match_names = [
-                                    o.get("title") or o.get("name") or "Unknown"
-                                    for o in matched
+                                    get_opening_name(o) for o in matched
                                 ]
                                 tk_selected_name = st.selectbox(
                                     f"{len(matched)} matches — pick one",
@@ -270,7 +269,7 @@ with col2:
                     if tk_selected_name:
                         tk_selected = next(
                             (o for o in tk_published
-                             if (o.get("title") or o.get("name")) == tk_selected_name),
+                             if get_opening_name(o) == tk_selected_name),
                             None,
                         )
 

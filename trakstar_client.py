@@ -92,6 +92,22 @@ def deduplicate(cands):
     return list(unique.values())
 
 
+def get_opening_name(opening):
+    """Get display name for an opening (API uses 'name', web UI uses 'title')."""
+    return opening.get("title") or opening.get("name") or "Unknown"
+
+
+def get_opening_state(opening):
+    """Get state for an opening (API uses 'state', web UI uses 'status')."""
+    return opening.get("state") or opening.get("status") or ""
+
+
+def is_active_opening(opening):
+    """Check if an opening is active/published. API='hiring', web='Published'."""
+    state = get_opening_state(opening).lower()
+    return state in ("hiring", "published")
+
+
 def get_unique_stages(cands):
     """Extract unique pipeline stage names from candidates."""
     stages = set()
