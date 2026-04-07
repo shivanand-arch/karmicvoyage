@@ -72,10 +72,10 @@ def generate_excel(candidates: list, framework: dict, role_name: str) -> io.Byte
         headers.append(f"{label}\n({weight_pct})")
     headers.extend(["Total\nScore", "Verdict"])
 
-    # Bonus dimension headers
+    # Bonus dimension headers — clearly marked as separate from total
     for bd in bonus_dims:
         label = bd.replace("_", " ").title()
-        headers.append(f"{label}*")
+        headers.append(f"{label}\n(Bonus — not in total)")
         headers.append(f"{label} Notes")
 
     headers.extend(["Key Strengths", "Key Concerns"])
@@ -234,10 +234,10 @@ def generate_excel(candidates: list, framework: dict, role_name: str) -> io.Byte
 
     if bonus_dims:
         summary_rows.append(("", ""))
-        summary_rows.append(("* Bonus Dimensions", "(Separate)"))
+        summary_rows.append(("Bonus Dimensions (NOT in total score)", ""))
         for bd in bonus_dims:
             label = bd.replace("_", " ").title()
-            summary_rows.append((label, "Scored 1-10, not in total"))
+            summary_rows.append((label, "Scored 1-10, reported separately"))
 
     for r, (k, v) in enumerate(summary_rows, 1):
         ws2.cell(row=r, column=1, value=k).font = Font(name="Arial", bold=bool(k), size=10)

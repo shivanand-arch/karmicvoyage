@@ -120,23 +120,14 @@ with col1:
         st.session_state["leadership_weight"] = None  # not applicable
 
     st.subheader("2. Job Description")
-    jd_source = st.radio("JD source", ["Paste text", "Upload file"], horizontal=True)
-
-    if jd_source == "Paste text":
-        jd_text = st.text_area(
-            "Paste JD here",
-            height=200,
-            placeholder="Paste the full job description...",
-        )
-    else:
-        jd_file = st.file_uploader("Upload JD (PDF/DOCX/TXT)", type=["pdf", "docx", "txt"])
-        jd_text = ""
-        if jd_file:
-            jd_text = extract_text_from_uploaded_file(jd_file)
-            if jd_text:
-                st.success(f"Extracted {len(jd_text)} chars from JD")
-                with st.expander("Preview JD text"):
-                    st.text(jd_text[:500] + "...")
+    jd_file = st.file_uploader("Upload JD (PDF/DOCX/TXT)", type=["pdf", "docx", "txt"])
+    jd_text = ""
+    if jd_file:
+        jd_text = extract_text_from_uploaded_file(jd_file)
+        if jd_text:
+            st.success(f"Extracted {len(jd_text)} chars from JD")
+            with st.expander("Preview JD text"):
+                st.text(jd_text[:500] + "...")
 
 with col2:
     st.subheader("3. Upload Resumes")
@@ -339,8 +330,9 @@ if "eval_results" in st.session_state and st.session_state["eval_results"]:
     st.markdown("---")
     st.subheader("5. Refine Criteria (adjust weights in real-time)")
     st.caption(
-        "Drag the sliders to change dimension weights. "
-        "Rankings recalculate instantly — no re-evaluation needed."
+        "Adjust how much each dimension matters. "
+        "**Total score and ranking order update instantly** — per-dimension AI scores stay fixed. "
+        "Default weights set by Exotel HR."
     )
 
     # Initialize adjusted weights from framework defaults
@@ -484,31 +476,68 @@ if "eval_results" in st.session_state and st.session_state["eval_results"]:
     stat_cols[2].metric("Maybe", verdicts.get("Maybe", 0))
     stat_cols[3].metric("No", verdicts.get("No", 0))
 
+    # ── Quick-glance ranking table (updates live with slider changes) ──
+    verdict_icons = {"Strong Yes": "🟢", "Yes": "🟡", "Maybe": "🟠", "No": "🔴"}
+    table_rows = []
+    for i, r in enumerate(display_results):
+        v = r.get("verdict", "No")
+        table_rows.append({
+            "Rank": i + 1,
+            "Candidate": r.get("name", "Unknown"),
+            "Weighted Total": round(r.get("total_score", 0), 2),
+            "Verdict": f"{verdict_icons.get(v, '⚪')} {v}",
+            "Role": r.get("current_role", "N/A"),
+            "YOE": r.get("yoe", "?"),
+        })
+    st.dataframe(table_rows, use_container_width=True, hide_index=True)
+
+    # ── Detailed cards ──
     for i, r in enumerate(display_results):
         verdict = r.get("verdict", "No")
-        color_map = {
-            "Strong Yes": "🟢", "Yes": "🟡", "Maybe": "🟠", "No": "🔴"
-        }
-        icon = color_map.get(verdict, "⚪")
+        icon = verdict_icons.get(verdict, "⚪")
 
         with st.expander(
             f"{icon} #{i+1} — {r.get('name', 'Unknown')} | "
-            f"Score: {r.get('total_score', 0):.2f} | {verdict} | "
+            f"Weighted Total: {r.get('total_score', 0):.2f} | {verdict} | "
             f"{r.get('current_role', 'N/A')} | {r.get('yoe', '?')} YOE",
             expanded=(i < 3),
         ):
+            # Show weighted contribution per dimension
             scores = r.get("scores", {})
-            score_cols = st.columns(len(scores))
-            for j, (dim, val) in enumerate(scores.items()):
-                weight = normalized_weights.get(dim, 0)
-                label = dim.replace("_", " ").title()
-                score_cols[j].metric(f"{label} ({weight:.0%})", f"{val:.1f}")
+            active_dims = [d for d in scores if normalized_weights.get(d, 0) > 0]
+            inactive_dims = [d for d in scores if normalized_weights.get(d, 0) == 0]
 
+            if active_dims:
+                score_cols = st.columns(min(len(active_dims), 4))
+                for j, dim in enumerate(active_dims):
+                    col = score_cols[j % len(score_cols)]
+                    val = scores[dim]
+                    weight = normalized_weights.get(dim, 0)
+                    contribution = val * weight
+                    label = dim.replace("_", " ").title()
+                    col.metric(
+                        f"{label} ({weight:.0%})",
+                        f"{val:.1f}",
+                        delta=f"→ {contribution:.2f} weighted",
+                        delta_color="off",
+                    )
+
+            if inactive_dims:
+                with st.expander("Dimensions with 0% weight (scored but not counted)"):
+                    zero_cols = st.columns(min(len(inactive_dims), 4))
+                    for j, dim in enumerate(inactive_dims):
+                        col = zero_cols[j % len(zero_cols)]
+                        val = scores[dim]
+                        label = dim.replace("_", " ").title()
+                        col.metric(f"{label} (0%)", f"{val:.1f}")
+
+            # Bonus dimensions — with clear labeling
             if "bonus_scores" in r:
-                st.markdown("**Bonus Dimensions:**")
+                st.markdown("**Bonus Dimensions** *(scored separately — NOT included in total score)*")
                 for bd, val in r["bonus_scores"].items():
                     note = r.get("bonus_notes", {}).get(bd, "")
-                    st.markdown(f"- **{bd.replace('_', ' ').title()}**: {val}/10 — {note}")
+                    label = bd.replace("_", " ").title()
+                    st.markdown(f"- **{label}**: {val}/10 — {note}")
 
             col_a, col_b = st.columns(2)
             with col_a:
