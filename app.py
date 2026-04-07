@@ -86,15 +86,34 @@ def _get_secret(key, default=""):
     try:
         val = st.secrets[key]
         if val:
-            return val
+            return str(val)
     except (KeyError, FileNotFoundError, AttributeError):
         pass
+    # Try nested under [trakstar] or [default] sections
+    for section in ("trakstar", "default", "general"):
+        try:
+            val = st.secrets[section][key]
+            if val:
+                return str(val)
+        except (KeyError, FileNotFoundError, AttributeError, TypeError):
+            pass
     # Fallback to env var
     return os.environ.get(key, default)
 
 TRAKSTAR_API_KEY = _get_secret("TRAKSTAR_API_KEY")
 TRAKSTAR_COOKIE = _get_secret("TRAKSTAR_COOKIE")
 TRAKSTAR_SUBDOMAIN = _get_secret("TRAKSTAR_SUBDOMAIN", "exotel")
+
+# Debug: show available secret keys in sidebar (remove after confirming it works)
+with st.sidebar:
+    try:
+        _available_keys = list(st.secrets.keys()) if hasattr(st.secrets, "keys") else []
+        if _available_keys:
+            st.caption(f"Secrets found: {', '.join(_available_keys)}")
+        else:
+            st.caption("No secrets found")
+    except Exception as _e:
+        st.caption(f"Secrets error: {_e}")
 
 
 # ─────────────────────────────────────────────
