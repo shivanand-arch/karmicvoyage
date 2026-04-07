@@ -194,11 +194,17 @@ with col1:
     jd_file = st.file_uploader("Upload JD (PDF/DOCX/TXT)", type=["pdf", "docx", "txt"])
     jd_text = ""
     if jd_file:
-        jd_text = extract_text_from_uploaded_file(jd_file)
+        try:
+            jd_text = extract_text_from_uploaded_file(jd_file)
+        except Exception as e:
+            st.error(f"Failed to extract JD text: {e}")
+            jd_text = ""
         if jd_text:
             st.success(f"Extracted {len(jd_text)} chars from JD")
             with st.expander("Preview JD text"):
                 st.text(jd_text[:500] + "...")
+        elif jd_file:
+            st.error("Could not extract text from JD file. Try uploading as DOCX or TXT instead.")
 
 with col2:
     st.subheader("3. Resumes")
@@ -460,10 +466,22 @@ def evaluate_single_resume(api_key, model, framework_key, jd_text, filename, res
 # RUN EVALUATION
 # ─────────────────────────────────────────────
 
+# Show clear status of what's missing before the button
+ready_checks = []
+if not api_key:
+    ready_checks.append("API key not configured")
+if not jd_text:
+    ready_checks.append("Job Description not uploaded or text extraction failed")
+if len(resumes) == 0:
+    ready_checks.append("No resumes loaded — upload a ZIP or pull from Trakstar")
+
+if ready_checks:
+    st.warning("**Cannot evaluate yet:** " + " · ".join(ready_checks))
+
 if st.button(
     "🚀 Evaluate & Rank Resumes",
     type="primary",
-    disabled=not (api_key and jd_text and len(resumes) > 0),
+    disabled=len(ready_checks) > 0,
     use_container_width=True,
 ):
     if not api_key:
