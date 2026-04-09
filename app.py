@@ -74,7 +74,7 @@ if _auth_configured:
 # ─────────────────────────────────────────────
 
 with st.sidebar:
-    st.image("https://www.exotel.com/wp-content/themes/flavor-jeera/assets/images/logo.svg", width=150)
+    st.image("https://exotel.com/wp-content/themes/exotel/img/logo/logo.svg", width=150)
     st.title("⚙️ Settings")
 
     if _auth_configured and st.user.is_logged_in:
