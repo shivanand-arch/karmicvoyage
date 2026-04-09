@@ -158,15 +158,17 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("1. Select Role Framework")
+    framework_names = get_framework_names()
     framework_name = st.selectbox(
         "Choose evaluation framework",
-        get_framework_names(),
+        options=[""] + framework_names,
+        format_func=lambda x: "Select a framework..." if x == "" else x,
         help="This determines the scoring dimensions and weights",
     )
-    framework = FRAMEWORKS[framework_name]
+    framework = FRAMEWORKS.get(framework_name) if framework_name else None
 
     # Leadership toggle — shown inline for frameworks that have the dimension
-    has_leadership_dim = "leadership" in framework["dimensions"]
+    has_leadership_dim = framework and "leadership" in framework["dimensions"]
     if has_leadership_dim:
         is_leadership_role = st.toggle(
             "Leadership position?",
@@ -445,6 +447,8 @@ def evaluate_single_resume(api_key, model, framework_key, jd_text, filename, res
 
 # Show clear status of what's missing before the button
 ready_checks = []
+if not framework_name:
+    ready_checks.append("No evaluation framework selected")
 if not api_key:
     ready_checks.append("API key not configured")
 if not jd_text:
