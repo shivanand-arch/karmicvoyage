@@ -270,15 +270,8 @@ with col2:
                 if not tk_published:
                     st.error("No active openings found. Check your credentials.")
                 else:
-                    # Build lookups
-                    tk_by_label = {
-                        f"{get_opening_name(o)} (ID: {o['id']})": o
-                        for o in tk_published
-                    }
                     tk_by_id = {str(o["id"]): o for o in tk_published}
-                    tk_labels = sorted(tk_by_label.keys())
 
-                    # Direct Job ID entry or dropdown selection
                     tk_job_id = st.text_input(
                         "Enter Job ID (from Trakstar URL)",
                         placeholder="e.g. 693436",
@@ -291,42 +284,7 @@ with col2:
                         if tk_selected:
                             st.success(f"**{get_opening_name(tk_selected)}** (ID: {tk_selected['id']})")
                         else:
-                            st.warning(f"No active opening with ID {tk_job_id}. Try the dropdown below.")
-
-                    if not tk_selected:
-                        tk_selected_label = st.selectbox(
-                            f"Or select a position ({len(tk_published)} active)",
-                            options=[""] + tk_labels,
-                            format_func=lambda x: "Type or select a position..." if x == "" else x,
-                            key="tk_position",
-                        )
-
-                        # Keyword search fallback
-                        if not tk_selected_label:
-                            tk_keyword = st.text_input(
-                                "Or search by keyword",
-                                placeholder="e.g. backend, success, sales, CSM",
-                                key="tk_search",
-                            )
-                            if tk_keyword:
-                                matched = {
-                                    label: o for label, o in tk_by_label.items()
-                                    if tk_keyword.lower() in get_opening_name(o).lower()
-                                }
-                                if not matched:
-                                    st.warning(f"No positions match \"{tk_keyword}\"")
-                                elif len(matched) == 1:
-                                    tk_selected_label = list(matched.keys())[0]
-                                    st.success(f"Matched: **{tk_selected_label}**")
-                                else:
-                                    tk_selected_label = st.selectbox(
-                                        f"{len(matched)} matches — pick one",
-                                        sorted(matched.keys()),
-                                        key="tk_match_pick",
-                                    )
-
-                        if tk_selected_label:
-                            tk_selected = tk_by_label.get(tk_selected_label)
+                            st.warning(f"No active opening with ID {tk_job_id}")
 
                     if tk_selected:
                         # Fetch candidates for stage filter
