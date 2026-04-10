@@ -60,7 +60,10 @@ if _auth_configured:
     if not st.user.is_logged_in:
         st.title("Exotel Resume Screener")
         st.caption("Sign in with your Exotel Google account to continue.")
-        st.login("google")
+        try:
+            st.login("google")
+        except Exception as e:
+            st.error(f"Login failed: {e}")
         st.stop()
 
     _user_email = getattr(st.user, "email", "") or ""
