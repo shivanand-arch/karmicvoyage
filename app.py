@@ -46,11 +46,13 @@ st.set_page_config(
 
 ALLOWED_DOMAIN = "exotel.com"
 
-# Check if auth is configured (secrets has [auth] section)
+# Check if auth is configured (secrets has [auth] with required fields)
 _auth_configured = False
 try:
-    _ = st.secrets["auth"]
-    _auth_configured = True
+    _auth_section = st.secrets["auth"]
+    # Require both redirect_uri and cookie_secret for auth to be active
+    if _auth_section.get("redirect_uri") and _auth_section.get("cookie_secret"):
+        _auth_configured = True
 except (KeyError, FileNotFoundError):
     pass
 
@@ -58,7 +60,7 @@ if _auth_configured:
     if not st.user.is_logged_in:
         st.title("Exotel Resume Screener")
         st.caption("Sign in with your Exotel Google account to continue.")
-        st.login()
+        st.login("google")
         st.stop()
 
     _user_email = getattr(st.user, "email", "") or ""
