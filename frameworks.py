@@ -9,637 +9,832 @@ All role-specific scoring dimensions, weights, and evaluation prompts.
 
 FRAMEWORKS = {
 
-    # ── BACKEND: SE-1 ────────────────────────
+    # ── BACKEND: SE-1 ────────────────────────────
     "Backend — SE-1 (0-2 YOE)": {
-        "description": "Junior Backend Engineer — fundamentals + learning ability",
+        "description": "Junior backend engineer with strong fundamentals and learning ability, expected to be implementation-focused.",
         "dimensions": {
-            "backend_fundamentals": "Backend fundamentals — REST API development, basic DB usage (SQL, schema design), backend frameworks, server-side logic. Go/Java/Python preferred but any strong backend language acceptable.",
-            "learning_ability": "Learning ability & curiosity — internship backend work, deployed projects, personal projects, hackathons, open-source contributions, hands-on exposure beyond coursework. Important: demonstrates self-driven learning.",
-            "tech_exposure": "Tech exposure — Linux familiarity, Git workflows, basic Docker usage, SQL understanding, any cloud exposure (AWS). Strong: has actually deployed something. Weak: only tutorials/certifications.",
-            "ownership": "Ownership signals — did they OWN something (even small)? Built a feature end-to-end, owned a module, deployed to production. Weak: only assisted, only followed tutorials, resume filled with tools but no work.",
-            "communication_clarity": "Resume quality & communication — clear description of what they did vs what the team did, specific technologies mentioned with context, structured resume. Weak: buzzword-heavy, vague descriptions.",
-            "genai_expertise": "GenAI signals — LangChain, LangGraph, agent workflows, RAG systems, vector databases, prompt orchestration, evaluation pipelines, production AI systems",
-            "leadership": "Leadership signals — college tech lead, organized events, mentored peers, led project teams",
+            "backend_fundamentals": "Proficiency in core backend languages (Go, Java, Python or similar). Evidence of REST API development, basic database usage (SQL understanding, DB schema usage), backend frameworks, Linux familiarity, and Git workflows. Look for internship backend work, deployed projects, basic Docker usage. Evaluate whether the candidate has hands-on experience writing server-side logic, not just tutorials or tool listings.",
+            "code_and_implementation_quality": "Ability to write clean, functional backend code and deliver working features. Look for evidence of building backend services, API development, basic concurrency handling. Assess whether projects show real implementation effort vs. copy-paste or tutorial-following. Strong signals include deployed projects with actual backend logic, contributions to production codebases.",
+            "database_and_storage": "Basic understanding of databases and data storage. Evidence of SQL usage, DB schema design or interaction, basic query writing. At this level, deep optimization is not expected, but the candidate should demonstrate they can work with databases beyond trivial CRUD. Look for PostgreSQL, MongoDB, or similar database interaction in projects or work experience.",
+            "learning_ability_and_potential": "Signals of growth trajectory, curiosity, and adaptability. Strong academic background, relevant side projects, open-source contributions, hackathon participation with backend focus, certifications in relevant technologies. For fresh graduates, quality of internships and project complexity matters. Look for progression from academic to practical backend work.",
+            "company_and_career_context": "Quality of companies and environments worked in. Product companies, funded startups, SaaS platforms are stronger signals than service companies or maintenance roles. For freshers, quality of internships and university project context matters. Tenure stability is less critical at this level but multiple very short stints are still a concern.",
+            "genai_expertise": "Experience with GenAI/LLM technologies: LangChain, LangGraph, RAG pipelines, agent workflows, vector databases, prompt orchestration, evaluation pipelines. Production GenAI deployment is the strongest signal. Weak signals include OpenAI API wrappers, demo chatbots, or hackathon-only projects.",
+            "leadership": "Leadership signals such as mentoring, team coordination, technical decision-making, or people management. Not expected at SE-1 level.",
         },
         "weights": {
-            "backend_fundamentals": 0.30,
-            "learning_ability": 0.25,
-            "tech_exposure": 0.20,
-            "ownership": 0.15,
-            "communication_clarity": 0.10,
+            "backend_fundamentals": 0.35,
+            "code_and_implementation_quality": 0.25,
+            "database_and_storage": 0.15,
+            "learning_ability_and_potential": 0.15,
+            "company_and_career_context": 0.10,
             "genai_expertise": 0.0,
             "leadership": 0.0,
         },
-        "context": """Exotel builds high reliability, real-time, distributed backend systems.
-Primary tech: Go (Platform), Java/PostgreSQL/Citus (Contact Center), Python (GenAI).
+        "context": """Exotel backend context: High-throughput, event-driven, reliability-sensitive systems with low-latency expectations. Tech stacks include Golang (platform/voice/messaging), Java with PostgreSQL/Citus (contact center), and Python (GenAI product). Production ownership is expected from all engineers.
 
-SE-1 (0-2 YOE): Strong fundamentals + learning ability. Candidate is expected to be implementation-focused.
-Expected: REST API dev, basic DB, backend frameworks, Linux, Git. Go/Java/Python preferred.
-Good signals: internship backend work, deployed projects, basic Docker, SQL understanding, API development, basic concurrency, DB schema usage.
-NOT expected: architecture design, distributed systems expertise — do NOT penalize for missing these.
-Red flags: only tutorials, no backend ownership, resume filled with tools but no actual work, only frontend/scripting.
-Red flags (general): frontend-heavy, only scripting/automation, QA/DevOps without backend.""",
+SE-1 expectations: Implementation-focused. Should demonstrate strong fundamentals and ability to learn. Not expected to have architecture design, distributed systems expertise, or leadership/mentoring experience.
+
+Strong signals: Backend internship work, deployed projects, API development experience, basic concurrency understanding, SQL proficiency, Git workflow familiarity, basic Docker usage.
+
+Weak signals: Only CRUD services with no depth, tool-heavy but impact-light resumes, no scale or performance discussion (acceptable at this level but noted).
+
+Red flags: Only tutorials with no real projects, no backend ownership evidence, resume filled with tools/buzzwords but no actual work, frontend-heavy with no backend, only scripting/automation, QA/DevOps without backend history, academic-only projects with no practical application.""",
     },
 
-    # ── BACKEND: SE-2 ────────────────────────
+    # ── BACKEND: SE-2 ────────────────────────────
     "Backend — SE-2 (2-4 YOE)": {
-        "description": "Mid-level Backend Engineer — independent feature ownership",
+        "description": "Mid-level backend engineer capable of independent feature ownership, expected to execute without handholding.",
         "dimensions": {
-            "backend_depth": "Backend engineering depth — API design, microservices, DB optimization, concurrency, async processing, caching, system performance. Must show production backend experience, not just side projects.",
-            "feature_ownership": "End-to-end feature ownership — built and shipped features independently without handholding. Look for: E2E ownership, DB understanding, performance awareness. Weak: only implementation tickets, no impact statements.",
-            "performance_awareness": "Performance & optimization — caching implementation, queue usage, async workflows, API optimization, DB indexing. Strong: 'improved API latency by introducing Redis caching'. Weak: no mention of performance.",
-            "tech_stack_fit": "Tech stack fit — Go, Java, Python, Kafka, Redis, MongoDB, PostgreSQL/Citus, AWS, Docker/K8s. Production usage required, not just listed.",
-            "ownership": "Ownership level — impact statements, measurable outcomes, 'I built/designed/improved X'. Weak: vague team contributions, no specific impact.",
-            "genai_expertise": "GenAI signals — LangChain, LangGraph, agent workflows, RAG systems, vector databases, prompt orchestration, evaluation pipelines, production AI systems",
-            "leadership": "Leadership signals — mentoring juniors, code reviews, onboarding new team members",
+            "backend_engineering_depth": "Production backend experience in Go, Java, Python or equivalent. Must show end-to-end feature ownership, not just ticket implementation. Look for API development and optimization, microservices experience, async processing, concurrency handling. Evidence of building and maintaining backend services in production. Strong signals: caching implementation (Redis), queue usage (Kafka, RabbitMQ), async workflows, API optimization, service ownership.",
+            "database_and_performance": "Database understanding beyond basic CRUD. Look for DB indexing knowledge, query optimization, schema design decisions, caching strategies to reduce latency. Performance awareness is critical — candidate should show they understand how to make systems faster. Strong signal: 'Improved API latency by introducing Redis caching' or similar impact statements. Weak signal: no mention of performance or optimization.",
+            "scale_and_reliability": "Early signals of working in environments with scale considerations. Look for exposure to high-throughput systems, event-driven patterns, queue-based architectures, basic monitoring and observability. Production debugging and incident awareness are positive signals. Not expected to design these systems but should have worked within them.",
+            "ownership_and_impact": "Evidence of owning features end-to-end with measurable outcomes. Language like 'designed', 'owned', 'built', 'improved' vs. 'assisted', 'supported'. Must show impact statements — latency reduced, throughput improved, cost savings. Weak signals: only implementation tickets with no impact, no ownership language, no measurable outcomes.",
+            "company_and_career_context": "Quality of engineering environments. Product companies, funded startups, SaaS platforms, scale-heavy companies are stronger signals. Tenure of 1.5-3 years with increasing responsibility is ideal. Multiple short stints without explanation are concerning. Service company experience with strong engineering roles is acceptable but weighted lower.",
+            "genai_expertise": "Experience with GenAI/LLM technologies: LangChain, LangGraph, RAG pipelines, agent workflows, vector databases, prompt orchestration, evaluation pipelines. Production GenAI deployment is the strongest signal. Weak signals include OpenAI API wrappers, demo chatbots, or hackathon-only projects.",
+            "leadership": "Leadership signals such as mentoring, team coordination, technical decision-making, or people management. Not a primary expectation at SE-2 but early signals are positive.",
         },
         "weights": {
-            "backend_depth": 0.30,
-            "feature_ownership": 0.25,
-            "performance_awareness": 0.15,
-            "tech_stack_fit": 0.15,
-            "ownership": 0.15,
+            "backend_engineering_depth": 0.30,
+            "database_and_performance": 0.25,
+            "scale_and_reliability": 0.20,
+            "ownership_and_impact": 0.15,
+            "company_and_career_context": 0.10,
             "genai_expertise": 0.0,
             "leadership": 0.0,
         },
-        "context": """Exotel builds high reliability, real-time, distributed backend systems.
-Primary tech: Go (Platform), Java/PostgreSQL/Citus (Contact Center), Python (GenAI).
+        "context": """Exotel backend context: High-throughput, event-driven, reliability-sensitive systems with low-latency expectations. Tech stacks include Golang (platform/voice/messaging), Java with PostgreSQL/Citus (contact center), and Python (GenAI product). Production ownership is expected from all engineers.
 
-SE-2 (2-4 YOE): Independent feature ownership. Engineer should execute without handholding. Production backend exposure required.
-Must show: end-to-end feature ownership, database understanding, performance awareness.
-Strong signals: caching implementation, queue usage, async workflows, API optimization, DB indexing.
-Good example: 'Improved API latency by introducing Redis caching.'
-Weak signals: only implementation tickets, no impact statements, no production exposure.
-Red flags: frontend-heavy, only scripting/automation, QA/DevOps without backend, buzzword-heavy without depth, service company background without strong eng signals.""",
+SE-2 expectations: Independent feature ownership. Should execute without handholding. Must demonstrate production backend experience with measurable impact. Performance awareness and database depth are differentiators at this level.
+
+Strong signals: Caching implementation (Redis), queue usage (Kafka), async workflows, API optimization, DB indexing, end-to-end feature delivery with impact metrics, production debugging experience, service ownership.
+
+Weak signals: Only implementation tickets without impact statements, no performance or optimization discussion, no ownership language, tool-heavy but impact-light resumes.
+
+Red flags: No production backend exposure after 2+ years, only frontend or scripting work, buzzword-heavy with no depth, no measurable outcomes, repeated short tenures, senior title at service company with only CRUD work.""",
     },
 
-    # ── BACKEND: SE-3 / TECH LEAD ────────────
-    "Backend — SE-3 / Tech Lead (4-5+ YOE)": {
-        "description": "Senior Backend / Tech Lead — system-level contributor, Exotel hiring bar increases significantly",
+    # ── BACKEND: SE-3 ────────────────────────────
+    "Backend — SE-3/Tech Lead (4-5+ YOE)": {
+        "description": "System-level contributor with distributed systems exposure and design participation; Exotel hiring bar increases significantly at this level.",
         "dimensions": {
-            "backend_depth": "Core backend depth — API design, microservices, distributed systems, concurrency, async processing, DB optimization, caching, system performance at scale.",
-            "system_design": "System design & architecture — MANDATORY at this level. Design participation, distributed systems exposure, scalability thinking. Strong: event-driven architecture, Kafka/messaging, service decomposition, HA design, load handling. Common rejection reason: senior title but execution-level work only.",
-            "scale_complexity": "Scale & complexity — high throughput, low latency, real-time systems, event-driven, horizontal scaling, large data volumes. Must show evidence of operating at scale.",
-            "advanced_system_thinking": "Advanced system thinking — tradeoff awareness (latency vs consistency, perf vs cost), failure handling (retries, timeouts, circuit breakers), load management (rate limiting, backpressure, queue buffering), data safety (idempotency, exactly-once processing), graceful degradation. Presence is a strong positive at this level.",
-            "ownership": "Ownership level — designed/owned systems, led implementation, migrated architecture, reduced latency/cost, improved throughput. Must show 'designed' or 'owned', not just 'assisted'.",
-            "tech_stack_fit": "Tech stack fit — Go, Java, Python, Kafka, Redis, MongoDB, PostgreSQL/Citus, AWS, Docker/K8s.",
-            "genai_expertise": "GenAI signals — LangChain, LangGraph, agent workflows, RAG systems, vector databases, prompt orchestration, evaluation pipelines, production AI systems",
-            "leadership": "Leadership signals — mentoring juniors, code reviews, technical decision-making, architecture involvement, cross-team collaboration",
+            "system_design_and_architecture": "Design participation and architectural thinking. Must show distributed systems exposure, service decomposition, event-driven architecture design. Look for: Kafka or messaging system usage, high availability design, load handling improvements, system observability design. Candidates should demonstrate tradeoff awareness — latency vs consistency, performance vs cost, simplicity vs scalability. Strong signals include technology evaluation with reasoning, migration initiatives, architecture pattern introduction.",
+            "scale_and_reliability_engineering": "Deep experience with scale and reliability challenges. Must demonstrate: retry strategies, timeout management, rate limiting, circuit breakers, backpressure handling, idempotency, graceful degradation. Look for failure handling patterns — partial failure management, fail-safe design, fallback mechanisms. Evidence of handling production incidents, root cause analysis, on-call ownership. This is critical for Exotel's reliability-sensitive environment.",
+            "backend_technical_depth": "Strong backend engineering fundamentals at senior level. Proficiency in Go, Java, or Python with production distributed systems. Concurrency expertise, async processing at scale, performance bottleneck identification and resolution. Look for: event-driven processing, queue-based architectures, caching strategies at scale, database performance tuning, horizontal scaling experience.",
+            "ownership_and_impact": "High ownership signals — 'designed service', 'owned system', 'led implementation', 'migrated architecture', 'reduced latency/cost', 'improved throughput'. Must show system-level impact, not just feature-level. Service ownership across the full lifecycle. Impact should be quantified where possible. Common rejection reason at this level: senior title but execution-level work only.",
+            "mentoring_and_technical_leadership": "Evidence of mentoring juniors, conducting code reviews, involvement in technical decisions. This differentiates SE-3 from strong SE-2. Look for team guidance, design review participation, establishing engineering practices. Should be an informal leader even without a manager title.",
+            "company_and_career_context": "Quality and relevance of engineering environments. Product companies with scale challenges are ideal. Career trajectory should show increasing scope and responsibility. Tenure of 1.5-3 years per role with progression. Strong concern if candidate has senior title but only worked in low-scale or maintenance environments.",
+            "genai_expertise": "Experience with GenAI/LLM technologies: LangChain, LangGraph, RAG pipelines, agent workflows, vector databases, prompt orchestration, evaluation pipelines. Production GenAI deployment is the strongest signal. Weak signals include OpenAI API wrappers, demo chatbots, or hackathon-only projects.",
+            "leadership": "Formal or informal leadership beyond mentoring — driving technical direction, leading cross-team initiatives, project leadership. Positive signal at SE-3 but not the primary evaluation criterion.",
         },
         "weights": {
-            "backend_depth": 0.20,
-            "system_design": 0.20,
-            "scale_complexity": 0.15,
-            "advanced_system_thinking": 0.15,
-            "ownership": 0.15,
-            "tech_stack_fit": 0.10,
+            "system_design_and_architecture": 0.25,
+            "scale_and_reliability_engineering": 0.25,
+            "backend_technical_depth": 0.20,
+            "ownership_and_impact": 0.15,
+            "mentoring_and_technical_leadership": 0.10,
+            "company_and_career_context": 0.05,
             "genai_expertise": 0.0,
-            "leadership": 0.05,
+            "leadership": 0.0,
         },
-        "context": """Exotel builds high reliability, real-time, distributed backend systems.
-Primary tech: Go (Platform), Java/PostgreSQL/Citus (Contact Center), Python (GenAI).
+        "context": """Exotel backend context: High-throughput, event-driven, reliability-sensitive systems with low-latency expectations. Tech stacks include Golang (platform/voice/messaging), Java with PostgreSQL/Citus (contact center), and Python (GenAI product). Production ownership is expected from all engineers.
 
-SE-3 / Tech Lead (4-5+ YOE): System-level contributor. Exotel hiring bar increases SIGNIFICANTLY here.
-MANDATORY signals: design participation, distributed systems exposure, scalability thinking.
-Strong technical signals: event-driven architecture, Kafka or messaging systems, service decomposition, high availability design, load handling improvements, retry strategies, timeout management, rate limiting, system observability design.
-Expected exposure: performance bottlenecks, service ownership, reliability improvements.
-Additional signals: mentoring juniors, code reviews, technical decision involvement.
+SE-3/Tech Lead expectations: System-level contributor. This is where Exotel's hiring bar increases significantly. Must demonstrate design participation, distributed systems exposure, and scalability thinking. Should show advanced system thinking — tradeoff awareness, failure handling, load management, data safety (idempotency), and graceful degradation.
 
-ADVANCED SYSTEM THINKING (strong positive at this level):
-- Tradeoff awareness: latency vs consistency, performance vs cost, simplicity vs scalability
-- Failure handling: partial failures, retry mechanisms, timeout strategies, circuit breakers
-- Load management: rate limiting, backpressure handling, queue buffering, traffic shaping
-- Data safety: idempotency, duplicate event protection, safe retries, exactly-once awareness
-- Graceful degradation: reduced capacity during failures, feature fallbacks
+Strong signals: Event-driven architecture design, Kafka/messaging systems expertise, service decomposition, high availability design, retry/timeout/rate-limiting strategies, circuit breakers, backpressure handling, idempotent API design, system observability, mentoring juniors, code review leadership, technical decision involvement, quantified impact on latency/throughput/cost.
 
-Common rejection reason: senior title but execution-level work only — no design, no system thinking.
-Red flags: frontend-heavy, only scripting/automation, buzzword-heavy without depth, service company without strong eng signals.""",
+Weak signals: Senior title but only execution-level work, no design participation, no distributed systems evidence, no system-level thinking, no mentoring signals, only CRUD or simple microservices.
+
+Red flags: Title inflation without cross-system impact, no reliability or failure-handling experience after 4+ years, inability to articulate tradeoffs, no evidence of owning systems end-to-end, buzzword-heavy resume with no architectural depth, multiple short stints at this seniority level.""",
     },
 
-    # ── BACKEND: PRINCIPAL ENGINEER ──────────
+    # ── BACKEND: Principal ────────────────────────
     "Backend — Principal Engineer (7+ YOE)": {
-        "description": "Principal Engineer — key tech choices, cross-system impact, drives decisions",
+        "description": "Makes key technology choices, establishes patterns for other engineers, writes the most critical components, and reviews designs for coherence across systems.",
         "dimensions": {
-            "technical_direction": "Technical direction & decision-making — makes key technology choices, establishes patterns other engineers follow, evaluates tradeoffs with reasoning. They DRIVE decisions, not just contribute. Look for: 'defined system architecture', 'led technical direction', 'introduced new architecture patterns'.",
-            "system_impact": "Cross-system impact — system redesign, scaling architecture, migration initiatives, DB scaling strategies, reliability improvements. Must show impact beyond a single service. Strong: reduced infra cost, improved throughput, eliminated bottlenecks, multi-service ownership.",
-            "advanced_system_thinking": "Advanced system thinking — tradeoff awareness, failure handling & reliability (retries, circuit breakers, fail-safe), load management (rate limiting, backpressure), data safety (idempotency, exactly-once), graceful degradation. Expected to be strong at this level.",
-            "backend_depth": "Core backend depth — deep expertise in API design, distributed systems, concurrency, DB optimization, caching, system performance at scale.",
-            "ownership": "Ownership — writes most critical/complex components, reviews designs from other engineers for coherence. Must show 'designed' and 'drove', not 'contributed'.",
-            "tech_stack_fit": "Tech stack fit — Go, Java, Python, Kafka, Redis, MongoDB, PostgreSQL/Citus, AWS, Docker/K8s.",
-            "genai_expertise": "GenAI signals — LangChain, LangGraph, agent workflows, RAG systems, vector databases, prompt orchestration, evaluation pipelines, production AI systems",
-            "leadership": "Leadership signals — technical mentoring across teams, architecture reviews, establishing engineering standards, hiring bar-raiser",
+            "architecture_and_technical_vision": "Drives architectural decisions, not just contributes to them. Must show: system redesign, scaling architecture, migration initiatives, database scaling strategies. Look for evidence of defining system architecture, leading technical direction, evaluating tradeoffs at org level, introducing new architecture patterns. Should demonstrate choosing 'how things should be built' for the engineering organization.",
+            "cross_system_impact": "Impact spanning multiple services, teams, or systems. Must show multi-service ownership, eliminated bottlenecks across systems, infrastructure cost reduction, throughput improvements at platform level. Principal Engineers set patterns that other engineers follow — look for evidence of establishing engineering standards, reusable frameworks, or platform-level improvements.",
+            "reliability_and_scale_mastery": "Deep mastery of reliability and scale challenges. Production-proven experience with: high availability at scale, disaster recovery, capacity planning, performance engineering, zero-downtime migrations. Should demonstrate sophisticated failure handling, load management, and system protection patterns. Evidence of handling the most complex technical challenges in the organization.",
+            "technical_decision_making": "Makes technical tradeoffs with business awareness. Technology evaluation with clear reasoning, build-vs-buy decisions, technical debt management at strategic level. Should show evidence of influencing technology roadmap, defining technical standards, and making decisions that shape engineering culture.",
+            "ownership_and_impact": "Writes the most critical or complex components. Quantified impact at system or organizational level — reduced infra cost significantly, improved throughput at platform scale, led critical migrations. Reviews designs from other engineers to ensure coherence. Must demonstrate driving decisions, not just participating.",
+            "company_and_career_context": "Career trajectory showing increasing scope from system to organization level. Strong product company experience, ideally at companies facing real scale challenges. Progressive responsibility growth. Long enough tenures to show deep impact (2+ years in senior roles).",
+            "genai_expertise": "Experience with GenAI/LLM technologies: LangChain, LangGraph, RAG pipelines, agent workflows, vector databases, prompt orchestration, evaluation pipelines. Production GenAI deployment is the strongest signal. Weak signals include OpenAI API wrappers, demo chatbots, or hackathon-only projects.",
+            "leadership": "Technical leadership at organizational level — setting technical direction, influencing engineering culture, mentoring senior engineers, representing engineering in cross-functional decisions.",
         },
         "weights": {
-            "technical_direction": 0.25,
-            "system_impact": 0.20,
-            "advanced_system_thinking": 0.15,
-            "backend_depth": 0.15,
-            "ownership": 0.10,
-            "tech_stack_fit": 0.05,
+            "architecture_and_technical_vision": 0.25,
+            "cross_system_impact": 0.20,
+            "reliability_and_scale_mastery": 0.20,
+            "technical_decision_making": 0.15,
+            "ownership_and_impact": 0.15,
+            "company_and_career_context": 0.05,
             "genai_expertise": 0.0,
-            "leadership": 0.10,
+            "leadership": 0.0,
         },
-        "context": """Exotel builds high reliability, real-time, distributed backend systems.
-Primary tech: Go (Platform), Java/PostgreSQL/Citus (Contact Center), Python (GenAI).
+        "context": """Exotel backend context: High-throughput, event-driven, reliability-sensitive systems with low-latency expectations. Tech stacks include Golang (platform/voice/messaging), Java with PostgreSQL/Citus (contact center), and Python (GenAI product). Production ownership is expected from all engineers.
 
-Principal Engineer (7+ YOE): Makes key technology choices, establishes patterns that other engineers follow, writes the most critical or complex components, reviews designs from other engineers to ensure coherence.
-They make technical tradeoffs and decide 'how things should be built.'
+Principal Engineer expectations: Makes key technology choices and establishes patterns that other engineers follow. Writes the most critical or complex components. Reviews designs from other engineers to ensure coherence. Drives decisions — does not just contribute to them.
 
-Required resume signals: system redesign, scaling architecture, migration initiatives, database scaling strategies, reliability improvements.
-Strong indicators: reduced infra cost, improved throughput, eliminated bottlenecks, multi-service ownership.
-Important distinction: they DRIVE decisions, not just contribute to them.
+Strong signals: System redesign initiatives, scaling architecture across multiple services, migration leadership, database scaling strategies, reduced infra cost at significant scale, eliminated cross-system bottlenecks, multi-service ownership, introduced architecture patterns adopted by the org, defined technical direction for teams, technology evaluation with clear tradeoff reasoning.
 
-Red flag: title inflation without cross-system impact — senior title but no evidence of architectural influence.
-Red flags (general): buzzword-heavy without depth, no measurable outcomes, repeated short tenures.""",
+Weak signals: Senior title but scope limited to single service, no cross-system impact, no architecture or design leadership, only execution even at high quality, no evidence of establishing patterns for others.
+
+Red flags: Title inflation without cross-system impact, 7+ years but scope equivalent to SE-3, no evidence of driving (vs participating in) technical decisions, no reliability or migration experience, career spent entirely in low-scale environments, buzzword-heavy without architectural depth, no measurable organizational-level impact.""",
     },
 
-    # ── BACKEND: ENGINEERING MANAGER ─────────
+    # ── BACKEND: Engineering Manager ──────────────
     "Backend — Engineering Manager": {
-        "description": "Backend EM — hands-on technical leader, managed 4-6 engineers",
+        "description": "Hands-on technical leader managing 4-6 engineers while staying technically credible; Exotel needs EMs who code and architect, not pure people managers.",
         "dimensions": {
-            "backend_depth": "Backend engineering depth — strong backend past, architecture involvement, system design. Must have been a credible engineer before managing.",
-            "team_management": "Team management — managed 4-6 engineers (ideal for Exotel), mentoring, hiring, team building. Red flag: managed 15+ directly (too far from hands-on), pure delivery/PM with no eng depth.",
-            "delivery_execution": "Delivery & execution — project delivery, sprint planning, scope-quality-time tradeoffs, stakeholder management. Breaking down large initiatives, coordinating across teams, managing dependencies.",
-            "technical_credibility": "Technical credibility — still technically involved. Look for: 'code review practices', 'provided technical guidance', 'unblocked complex technical challenges', architecture involvement. Positive: '50% coding, 50% people management'. Negative: complete absence of technical work.",
-            "engineering_maturity": "Engineering maturity — code review practices, engineering process improvements, unblocking complex challenges, production debugging involvement.",
-            "tech_stack_fit": "Tech stack fit — Go, Java, Python, Kafka, Redis, MongoDB, PostgreSQL/Citus, AWS, Docker/K8s.",
-            "genai_expertise": "GenAI signals — LangChain, LangGraph, agent workflows, RAG systems, vector databases, prompt orchestration, evaluation pipelines, production AI systems",
-            "leadership": "Leadership depth — people management maturity, hiring involvement, conflict resolution, performance management, cross-functional collaboration",
+            "technical_credibility": "Strong backend engineering past with continued technical involvement. Must show architecture involvement, code review and technical guidance, unblocking teams on complex technical challenges. Look for: 'managed team while contributing to architecture decisions', 'hands-on coding for critical components', 'balanced coding with people management'. Established code review practices and provided technical guidance to team.",
+            "people_management": "Team management experience with 4-6 engineers (ideal for Exotel's needs). Evidence of mentoring, career development support, hiring involvement, performance management. Look for building and growing engineering teams, not just inheriting large organizations. Managing small teams while staying hands-on is the target profile.",
+            "delivery_and_execution": "Ability to deliver projects on time with quality. Evidence of managing sprint planning, balancing technical debt with features, making scope-quality-time tradeoffs, managing stakeholder expectations. Breaking down large initiatives, coordinating across teams, managing dependencies. Project management skills complementing people management.",
+            "engineering_process": "Establishing and improving engineering processes — code review practices, CI/CD, testing standards, on-call rotations, incident management. Look for evidence of process improvement that increased team velocity or quality without adding bureaucracy.",
+            "stakeholder_management": "Stakeholder alignment, cross-functional collaboration, communicating technical concepts to non-technical stakeholders. Evidence of managing expectations, providing visibility into engineering progress, influencing product direction with technical perspective.",
+            "genai_expertise": "Experience with GenAI/LLM technologies: LangChain, LangGraph, RAG pipelines, agent workflows, vector databases, prompt orchestration, evaluation pipelines. Production GenAI deployment is the strongest signal. Weak signals include OpenAI API wrappers, demo chatbots, or hackathon-only projects.",
+            "leadership": "Broader leadership beyond direct team — influencing engineering culture, driving organizational improvements, cross-team collaboration, strategic thinking about engineering direction.",
         },
         "weights": {
-            "backend_depth": 0.15,
-            "team_management": 0.25,
-            "delivery_execution": 0.15,
-            "technical_credibility": 0.20,
-            "engineering_maturity": 0.10,
-            "tech_stack_fit": 0.05,
-            "genai_expertise": 0.0,
-            "leadership": 0.10,
-        },
-        "context": """Exotel builds high reliability, real-time, distributed backend systems.
-Primary tech: Go (Platform), Java/PostgreSQL/Citus (Contact Center), Python (GenAI).
-
-Engineering Manager: Exotel wants hands-on technical leaders. Ideal profile = Lead Software Engineers in good product companies (Fintech, E-commerce, etc.) who managed small teams while staying technically involved.
-Target: managed 4-6 engineers, still technically credible, architecture involvement.
-Must show: strong backend past, architecture involvement, team management, mentoring, delivery ownership, sprint planning, stakeholder alignment.
-Positive signals: 'managed team of 5 while contributing to architecture', 'balanced 50% coding with 50% people management', 'established code review practices', 'unblocked team on complex technical challenges'.
-Red flags: pure delivery/project managers with no engineering depth, managed very large teams (15+ directly — suggests beyond hands-on level, typically second-level managers who don't code).""",
-    },
-
-    # ── BACKEND: SR. ENGINEERING MANAGER ─────
-    "Backend — Sr. Engineering Manager": {
-        "description": "Sr. EM — manages 15-20, cross-functional, technical direction",
-        "dimensions": {
-            "team_scale": "Team scale & org management — managed 15-20 people, potentially managing managers. Cross-functional collaboration with Product, QA, and other engineering teams to deliver larger initiatives.",
-            "technical_direction": "Technical direction — defining technical strategy, driving architectural evolution. Should still have recent technical contributions (less than first-level EMs). Look for: architectural reviews, unblocking complex challenges, contributing to critical system designs.",
-            "engineering_process": "Engineering process — engineering process improvements, quality bar-setting, incident response maturity, release management, tech debt management.",
-            "delivery_execution": "Delivery & execution — delivered larger cross-team initiatives, managed dependencies across teams, stakeholder management at senior level.",
-            "backend_depth": "Backend engineering depth — strong backend past. Complete absence of technical involvement in recent roles is concerning.",
-            "tech_stack_fit": "Tech stack fit — Go, Java, Python, Kafka, Redis, MongoDB, PostgreSQL/Citus, AWS, Docker/K8s.",
-            "genai_expertise": "GenAI signals — LangChain, LangGraph, agent workflows, RAG systems, vector databases, prompt orchestration, evaluation pipelines, production AI systems",
-            "leadership": "Leadership depth — managing managers, hiring, org design, people development, cross-functional influence, conflict resolution at org level",
-        },
-        "weights": {
-            "team_scale": 0.20,
-            "technical_direction": 0.20,
+            "technical_credibility": 0.30,
+            "people_management": 0.25,
+            "delivery_and_execution": 0.20,
             "engineering_process": 0.15,
-            "delivery_execution": 0.15,
-            "backend_depth": 0.10,
-            "tech_stack_fit": 0.05,
+            "stakeholder_management": 0.10,
             "genai_expertise": 0.0,
-            "leadership": 0.15,
+            "leadership": 0.0,
         },
-        "context": """Exotel builds high reliability, real-time, distributed backend systems.
-Primary tech: Go (Platform), Java/PostgreSQL/Citus (Contact Center), Python (GenAI).
+        "context": """Exotel backend context: High-throughput, event-driven, reliability-sensitive systems with low-latency expectations. Tech stacks include Golang (platform/voice/messaging), Java with PostgreSQL/Citus (contact center), and Python (GenAI product). Production ownership is expected from all engineers.
 
-Senior Engineering Manager: Influences technical direction of the team. Should still have recent technical contributions, although less than first-level EMs. Look for: involvement in architectural reviews, unblocking complex technical challenges, contributing to critical system designs.
-Expected: managed 15-20 people, cross-functional collaboration (Product, QA, other eng teams), engineering process improvements, technical direction setting.
-Complete absence of technical involvement in recent roles is concerning.
-Red flags: pure people manager with zero technical awareness, no engineering process improvements, only operational/delivery focus without strategic technical involvement.""",
+Engineering Manager expectations: Exotel wants hands-on technical leaders. The ideal profile is Lead Software Engineers from good product companies (fintech, ecommerce, etc.) who have managed small teams while staying technically involved. Continued technical involvement is critical. Target: managed 4-6 engineers while still being technically credible.
+
+Strong signals: 'Managed team of 5 engineers while contributing to architecture decisions', 'led team building payment platform with hands-on coding for critical components', 'balanced 50% coding with 50% people management', 'established code review practices', 'provided technical guidance to team', 'unblocked team on complex technical challenges', sprint planning and delivery ownership, stakeholder alignment.
+
+Weak signals: Pure people management with no recent technical involvement, managed only through project management tools without technical depth, no architecture or code review involvement.
+
+Red flags: Pure delivery/project managers with no engineering depth, has managed very large teams (15+ engineers) directly — suggests they are beyond the hands-on level Exotel needs (typically second-level managers who do not code), no backend engineering history, no technical credibility signals in recent roles, career trajectory away from technology.""",
     },
 
-    # ── SALES: MID-MARKET ─────────────────────
+    # ── BACKEND: Sr. Engineering Manager ──────────
+    "Backend — Sr. Engineering Manager": {
+        "description": "Senior engineering leader managing 15-20 people with cross-functional collaboration, engineering process improvements, and technical direction setting while maintaining technical involvement.",
+        "dimensions": {
+            "technical_direction_and_strategy": "Influences technical direction of the team/org. Evidence of defining technical strategy, driving architectural evolution, involvement in architectural reviews, unblocking complex technical challenges, contributing to critical system designs. Should still have recent technical contributions although less than first-level EMs. Complete absence of technical involvement in recent roles is concerning.",
+            "organizational_leadership": "Managing teams of 15-20 people effectively. Cross-functional collaboration with Product, QA, and other engineering teams to deliver larger initiatives. Evidence of building engineering organizations, not just managing existing teams. Ability to scale teams, hire senior talent, and develop engineering leaders.",
+            "engineering_process_and_culture": "Engineering process improvements at organizational level. Driving engineering excellence — quality standards, reliability practices, development velocity improvements. Building engineering culture that attracts and retains talent. Evidence of initiatives that improved engineering maturity across multiple teams.",
+            "delivery_at_scale": "Delivering large, cross-team initiatives successfully. Managing dependencies across teams, coordinating releases, balancing multiple workstreams. Evidence of shipping complex projects involving multiple teams and stakeholders. Strategic prioritization and resource allocation.",
+            "stakeholder_and_cross_functional_management": "Senior stakeholder management — working with product leadership, business teams, and executive leadership. Translating business needs to engineering strategy. Managing expectations at leadership level. Evidence of influencing product and business direction with engineering perspective.",
+            "genai_expertise": "Experience with GenAI/LLM technologies: LangChain, LangGraph, RAG pipelines, agent workflows, vector databases, prompt orchestration, evaluation pipelines. Production GenAI deployment is the strongest signal. Weak signals include OpenAI API wrappers, demo chatbots, or hackathon-only projects.",
+            "leadership": "Executive-level leadership — organizational strategy, talent strategy, engineering vision, cross-functional influence at company level.",
+        },
+        "weights": {
+            "technical_direction_and_strategy": 0.25,
+            "organizational_leadership": 0.25,
+            "engineering_process_and_culture": 0.20,
+            "delivery_at_scale": 0.15,
+            "stakeholder_and_cross_functional_management": 0.15,
+            "genai_expertise": 0.0,
+            "leadership": 0.0,
+        },
+        "context": """Exotel backend context: High-throughput, event-driven, reliability-sensitive systems with low-latency expectations. Tech stacks include Golang (platform/voice/messaging), Java with PostgreSQL/Citus (contact center), and Python (GenAI product). Production ownership is expected from all engineers.
+
+Sr. Engineering Manager expectations: Manages 15-20 people with cross-functional collaboration. Should influence technical direction and still maintain some technical involvement (architectural reviews, unblocking complex challenges, contributing to critical system designs). Expected to drive engineering process improvements and set technical direction at organizational level.
+
+Strong signals: Managed 15-20 person engineering org, cross-functional collaboration with Product/QA/other engineering teams, engineering process improvements at org level, technical strategy definition, architectural evolution leadership, recent technical contributions (even if reduced), delivered large cross-team initiatives, built and scaled engineering teams.
+
+Weak signals: Only people management with no technical involvement, managed through layers with no direct engineering impact, no evidence of process improvement or engineering culture building.
+
+Red flags: Complete absence of technical involvement in recent roles, pure project/program management without engineering depth, managed 50+ people (too senior/removed for Exotel's needs), no cross-functional collaboration evidence, no engineering process improvement signals, career entirely in service companies with no product engineering depth.""",
+    },
+
+    # ── SALES: Mid-Market ────────────────────────
     "Sales — Mid-Market": {
-        "description": "Mid-Market Sales Manager — faster cycles, multi-industry, pipeline creation",
+        "description": "Mid-Market sales IC hunter roles at Exotel — faster cycles, industry-agnostic, high pipeline velocity",
         "dimensions": {
-            "hunter_mindset": "Hunter validation — new logo acquisition, outbound pipeline creation, greenfield acquisition, self-generated pipeline. Deprioritize if revenue from existing accounts/renewals only.",
-            "solution_selling": "Solution selling — sold platform/AI/technical/consultative offerings. Strong: AI products, automation platforms, CX platforms, enterprise SaaS. Weak: feature/price/catalogue selling.",
-            "multi_threading": "Multi-threading — engaged multiple stakeholders, CXO conversations, cross-functional alignment, business + technical selling simultaneously.",
-            "influence_ownership": "Influence without authority — drove deals forward despite dependencies, coordinated internal stakeholders, owned outcomes beyond formal scope.",
-            "field_sales": "Field sales — in-person meetings, customer visits. Weak: pure inside sales, only remote selling.",
-            "company_context": "Company context — SaaS, enterprise software, AI/automation platforms, CX/contact center tools = high signal. Transactional/hardware/channel/distributor = low signal.",
-            "numbers_metrics": "Numbers & ownership — quota achievement, revenue numbers, deal sizes, pipeline ownership, growth metrics. RED FLAG: sales resume without numbers.",
-            "leadership": "Leadership signals — team management, mentoring junior reps, sales playbook creation, hiring involvement, cross-functional coordination, regional/segment ownership",
+            "hunter_mindset": "Hunter validation — new logo acquisition, outbound pipeline creation, greenfield territory development, self-generated pipeline. Must show evidence of CREATING business, not just managing it. Strong: outbound prospecting, full-cycle sales ownership, demo to closure. Deprioritize heavily if revenue comes primarily from existing accounts, renewals, or customer success.",
+            "solution_selling": "Solution selling ability — has the candidate sold platform products, AI products, technical solutions, or configurable/consultative offerings? Strong: AI product selling, automation platforms, CX platforms, enterprise SaaS, solution mapping, use-case driven selling. Weak: feature selling, price-driven selling, catalogue-based selling.",
+            "pipeline_velocity": "Pipeline creation and velocity — ability to manage multiple concurrent opportunities efficiently, strong discovery and qualification skills, efficient deal progression from prospecting to close. Look for: outbound prospecting volume, full-cycle ownership, qualification frameworks, pipeline-to-close ratios, ability to handle high deal volume simultaneously.",
+            "multi_threading": "Multi-threading and stakeholder navigation — ability to handle multiple stakeholders quickly in shorter cycles. Engaged CXO + technical + operations personas. Cross-functional alignment, business + technical selling simultaneously. Must show ability to quickly identify and engage decision-makers.",
+            "company_context": "Company and selling environment fit — SaaS companies, enterprise software, AI/automation platforms, CX/contact center tools, CRM companies, infrastructure or platform sales = high signal. These environments create sellers comfortable with ambiguity and solutioning. Low signal: transactional product selling, hardware-only, channel-led, distributor-driven sales.",
+            "numbers_metrics": "Numbers and ownership validation — quota achievement percentages, revenue numbers, deal sizes, pipeline ownership metrics, growth metrics. Strong: '120% quota for 3 consecutive years', 'built pipeline worth 3X quota'. RED FLAG: sales resume without any numbers or revenue metrics.",
+            "influence_ownership": "Influence without authority and deal ownership — drove deals forward despite dependencies on presales/product/engineering, coordinated internal stakeholders, resolved customer blockers, owned outcomes beyond formal scope. Weak: only passed leads downstream, heavy reliance on presales for deal movement.",
         },
         "weights": {
             "hunter_mindset": 0.20,
             "solution_selling": 0.20,
+            "pipeline_velocity": 0.15,
             "multi_threading": 0.15,
-            "influence_ownership": 0.15,
-            "field_sales": 0.05,
-            "company_context": 0.15,
-            "numbers_metrics": 0.10,
-            "leadership": 0.0,
-        },
-        "bonus_dimensions": {
-            "ai_first_selling": "AI-First Solution Selling — has the candidate sold AI-first solutions? Conversational AI, GenAI, Voice AI/Bots, NLP, AI automation platforms, AI-first SaaS. Score 1-10 but report SEPARATELY.",
-        },
-        "context": """Exotel sells communication infrastructure, contact center platforms, and AI-led solutions (Voice Bots, Conversational AI, CCaaS, CPaaS).
-
-MID-MARKET SEGMENT: Faster sales cycles, caters across industries (industry-agnostic), multiple concurrent opportunities, strong discovery and qualification needed.
-Key success signals: pipeline creation ability, efficient deal progression, handling multiple stakeholders quickly, strong qualification.
-Strong signals: outbound prospecting, full-cycle sales ownership, demo to closure, solution mapping.
-
-Levels: Sales Manager (5-8/11 yrs) = independent solution hunter, new logo, pipeline creation, full-cycle ownership. Senior Sales Manager (8-14 yrs) = complex deal closer, larger deals, stronger solutioning. Principal Sales Manager (14+ yrs) = high-trust complex seller, ambiguous deals, senior stakeholder influence, E2E outcome ownership. Red flag at Principal: only leadership without individual selling.
-
-This is for individual contributor hunter roles, NOT account management or customer success.
-Red flags: no revenue metrics, pure account management, channel-only, small ticket, inside-sales heavy.""",
-    },
-
-    # ── SALES: ENTERPRISE ────────────────────
-    "Sales — Enterprise": {
-        "description": "Enterprise Sales Manager — long cycles, complex stakeholders, industry-specific",
-        "dimensions": {
-            "hunter_mindset": "Hunter validation — new logo acquisition, outbound pipeline creation, greenfield acquisition, self-generated pipeline. Deprioritize if revenue from existing accounts/renewals only.",
-            "solution_selling": "Solution selling — sold platform/AI/technical/consultative offerings. Strong: AI products, automation platforms, CX platforms, enterprise SaaS. Weak: feature/price/catalogue selling.",
-            "multi_threading": "Multi-threading — engaged multiple stakeholders, CXO conversations, cross-functional alignment, business + technical selling simultaneously. Critical: ability to understand what to sell to which persona (CTO=architecture/integration, Ops=efficiency/workflow, Business=ROI/outcomes).",
-            "influence_ownership": "Influence without authority — drove deals forward despite dependencies, coordinated internal stakeholders, owned outcomes beyond formal scope.",
-            "field_sales": "Field sales — in-person meetings, customer visits. Weak: pure inside sales, only remote selling.",
-            "company_context": "Company & industry context — SaaS, enterprise software, AI/automation, CX/contact center = high signal. Industry match weighting: same vertical=high, similar buyer environment (regulated/large enterprise)=medium, different industry but strong solution selling=neutral. Transactional/hardware/channel=low.",
-            "numbers_metrics": "Numbers & ownership — quota achievement, revenue numbers, deal sizes, pipeline ownership, growth metrics. RED FLAG: sales resume without numbers.",
-            "leadership": "Leadership signals — team management, mentoring junior reps, sales playbook creation, hiring involvement, cross-functional coordination, regional/segment ownership",
-        },
-        "weights": {
-            "hunter_mindset": 0.20,
-            "solution_selling": 0.20,
-            "multi_threading": 0.15,
-            "influence_ownership": 0.15,
-            "field_sales": 0.05,
-            "company_context": 0.15,
-            "numbers_metrics": 0.10,
-            "leadership": 0.0,
-        },
-        "bonus_dimensions": {
-            "ai_first_selling": "AI-First Solution Selling — has the candidate sold AI-first solutions? Conversational AI, GenAI, Voice AI/Bots, NLP, AI automation platforms, AI-first SaaS. Score 1-10 but report SEPARATELY.",
-        },
-        "context": """Exotel sells communication infrastructure, contact center platforms, and AI-led solutions (Voice Bots, Conversational AI, CCaaS, CPaaS).
-
-ENTERPRISE SEGMENT: Long sales cycles, complex stakeholder structures, technical solutioning required, industry-specific.
-Strong signals: enterprise account selling, CXO engagement, technical discovery, complex negotiations, RFP participation.
-Critical success indicator: ability to understand WHAT to sell to WHICH persona — CTO=architecture/integration value, Ops=efficiency & workflow, Business=ROI & outcomes.
-Industry match weighting: same vertical=high weight, similar buyer environment (regulated industries, large enterprises)=medium, different industry but strong enterprise solution selling=neutral.
-
-Levels: Sales Manager (5-8/11 yrs) = independent solution hunter, new logo, pipeline creation, full-cycle ownership. Senior Sales Manager (8-14 yrs) = complex deal closer, larger deals, stronger solutioning, negotiation maturity. Principal Sales Manager (14+ yrs) = high-trust complex seller, ambiguous deals, senior stakeholder influence, consensus driving. Red flag at Principal: only leadership without individual selling.
-
-This is for individual contributor hunter roles, NOT account management or customer success.
-Red flags: no revenue metrics, pure account management, channel-only, small ticket, inside-sales heavy.""",
-    },
-
-    # ── SALES: INTERNATIONAL ─────────────────
-    "Sales — International": {
-        "description": "International Sales Manager — cross-border selling into target markets specified in JD",
-        "dimensions": {
-            "hunter_mindset": "Hunter validation — new logo acquisition, outbound pipeline creation, greenfield acquisition, self-generated pipeline. Deprioritize if revenue from existing accounts/renewals only.",
-            "solution_selling": "Solution selling — sold platform/AI/technical/consultative offerings. Strong: AI products, automation platforms, CX platforms, enterprise SaaS. Weak: feature/price/catalogue selling.",
-            "multi_threading": "Multi-threading — engaged multiple stakeholders, CXO conversations, cross-functional alignment, business + technical selling simultaneously.",
-            "influence_ownership": "Influence without authority — drove deals forward despite dependencies, coordinated internal stakeholders, owned outcomes beyond formal scope.",
-            "international_selling": "International selling — evaluate against the TARGET MARKETS specified in the Job Description. Look for: selling into those specific markets/regions, handling remote stakeholders, working across time zones, global procurement processes, understanding regional buying patterns and decision cycles, adapting to cultural and communication differences. Strong: prior experience selling into the SAME region(s) the JD targets, named deal closures in those markets. Weak: only outbound calling to international prospects, or experience in unrelated regions.",
-            "company_context": "Company context — SaaS, enterprise software, AI/automation platforms, CX/contact center tools = high signal. Transactional/hardware/channel/distributor = low signal.",
-            "numbers_metrics": "Numbers & ownership — quota achievement, revenue numbers, deal sizes, pipeline ownership, growth metrics. RED FLAG: sales resume without numbers.",
-            "leadership": "Leadership signals — team management, mentoring junior reps, sales playbook creation, hiring involvement, cross-functional coordination, regional/segment ownership",
-        },
-        "weights": {
-            "hunter_mindset": 0.20,
-            "solution_selling": 0.15,
-            "multi_threading": 0.10,
-            "influence_ownership": 0.10,
-            "international_selling": 0.15,
             "company_context": 0.10,
             "numbers_metrics": 0.10,
-            "leadership": 0.10,
+            "influence_ownership": 0.10,
         },
-        "bonus_dimensions": {
-            "ai_first_selling": "AI-First Solution Selling — has the candidate sold AI-first solutions? Conversational AI, GenAI, Voice AI/Bots, NLP, AI automation platforms, AI-first SaaS. Score 1-10 but report SEPARATELY.",
-        },
-        "context": """Exotel sells communication infrastructure, contact center platforms, and AI-led solutions (Voice Bots, Conversational AI, CCaaS, CPaaS).
+        "context": """Exotel Mid-Market sales involves relatively faster sales cycles, catering across industries (industry-agnostic), managing multiple concurrent opportunities, and strong discovery/qualification skills.
 
-INTERNATIONAL SEGMENT: The target market/region is defined in the Job Description — use it as the primary reference for which geography to evaluate against. Do NOT assume specific regions (e.g., Africa, ME, SEA, US) unless the JD explicitly mentions them.
-Additional signals: closing large deals with international customers in the JD's target market, handling cultural and communication differences relevant to that region, understanding regional buying patterns and decision cycles, prior experience selling into the same region the JD specifies.
-Strong: named deal closures in the JD's target region, region-specific pipeline. Weak: only outbound calling to international prospects, or experience in unrelated regions.
+Company context: Exotel sells communication infrastructure (CPaaS), contact center platforms (CCaaS), and AI-led solutions (Voice Bots, Conversational AI). 10B+ conversations/year for brands like Swiggy, Ola, Zerodha, Flipkart.
 
-Levels: Sales Manager (5-8/11 yrs) = independent solution hunter, new logo, pipeline creation, full-cycle ownership. Senior Sales Manager (8-14 yrs) = complex deal closer, larger deals, stronger solutioning. Principal Sales Manager (14+ yrs) = high-trust complex seller, ambiguous deals, senior stakeholder influence.
+What to look for: Pipeline creation ability is paramount. Mid-market sellers must demonstrate high throughput — managing many deals simultaneously while maintaining quality discovery. Full-cycle ownership from prospecting to close. Solution mapping to customer pain points rather than feature pitching.
 
-This is for individual contributor hunter roles, NOT account management or customer success.
-Red flags: no revenue metrics, pure account management, channel-only, small ticket, inside-sales heavy.""",
+Strong signals: Outbound prospecting, full-cycle sales ownership, demo-to-closure experience, solution mapping, SaaS/platform selling background, clear quota attainment numbers, multiple concurrent deal management.
+
+Weak signals: Pure renewals/account management, inside-sales only, feature/price-driven selling, no revenue metrics, channel-only sales.
+
+Red flags: No revenue metrics on resume, pure account management background, channel-only or distributor-driven sales, small ticket size accounts, inside-sales heavy profiles, only passed leads downstream without owning closure.
+
+Level expectations:
+- Sales Manager (5-8 yrs): Independent solution hunter. Must show new logo acquisition, pipeline creation, full-cycle ownership, stakeholder navigation.
+- Sr Sales Manager (8-14 yrs): Complex deal closer. Larger deal ownership, strong solutioning, negotiation maturity, stakeholder influence.
+- Principal Sales Manager (14+ yrs): High-trust complex seller. Handles ambiguous deals, influences senior stakeholders, drives consensus, end-to-end outcome ownership. Red flag if only leadership without individual selling.""",
     },
 
-    # ── SDR: SCALEUP ─────────────────────────
-    "SDR — Scaleup": {
-        "description": "Scaleup SDR — high-volume outreach, multi-industry, fast experimentation",
+    # ── SALES: Enterprise ────────────────────────
+    "Sales — Enterprise": {
+        "description": "Enterprise sales IC hunter roles at Exotel — long cycles, complex stakeholder structures, industry-specific, technical solutioning",
         "dimensions": {
-            "outbound_ownership": "Outbound ownership — did they GENERATE pipeline or only handle inbound? Cold calling, account research, multi-channel outreach (LinkedIn+Email+Calls), self-generated meetings. Hard deprioritize: no outbound exposure.",
-            "funnel_metrics": "Funnel & metric thinking — call-to-meeting ratios, conversion rates, monthly targets, activity metrics (calls/day, emails/day), pipeline contribution. RED FLAG: SDR resume with zero metrics.",
-            "qualification_depth": "Qualification depth — discovery questioning, BANT/MEDDIC awareness, pain-point identification, qualification before handoff. Strong: qualified on budget/timeline/use-case. Weak: booked demos without qualification.",
-            "technical_curiosity": "Technical curiosity — SaaS exposure, API/SDK familiarity, automation tools, CRM usage (HubSpot/Salesforce), GenAI for research. Strong: sold SaaS, used Apollo/Sales Navigator. Weak: pure non-tech B2B.",
-            "industry_persona": "Industry & persona awareness — persona-based messaging (CXOs, Founders, Product Heads), industry pain points (BFSI, D2C, FMCG), contextualized value props. Weak: generic mass messaging.",
-            "self_discipline": "Self-discipline & ownership — consistency in target achievement, self-driven prospecting, independent pipeline generation, long tenure in outbound roles. Red flags: frequent switches (<1yr), heavy dependence on marketing.",
-            "leadership": "Leadership signals — mentoring junior SDRs, training new hires, creating outreach playbooks, SDR team lead experience, process improvements",
+            "hunter_mindset": "Hunter validation — new logo acquisition in enterprise accounts, greenfield enterprise territory development, self-generated pipeline in large accounts. Must show evidence of CREATING new enterprise business. Strong: new enterprise account acquisition, outbound into large organizations. Deprioritize if revenue comes primarily from farming existing accounts or renewals.",
+            "solution_selling": "Solution selling depth — has the candidate sold complex platform products, AI solutions, or deeply technical/consultative offerings to enterprises? Very strong: AI product selling, automation platforms, CX platforms, enterprise SaaS with long implementation cycles. Must demonstrate ability to tailor solutions to enterprise requirements. Weak: feature/price/catalogue selling, transactional product sales.",
+            "stakeholder_complexity": "Stakeholder complexity and persona-based selling — ability to understand what to sell to which persona: CTO (architecture/integration value), Ops (efficiency/workflow), Business (ROI/outcomes). CXO engagement, technical discovery, complex negotiations, RFP participation. Must show evidence of managing deal across engineering, operations, and procurement stakeholders.",
+            "multi_threading": "Multi-threading across complex org structures — engaged multiple stakeholders simultaneously, navigated enterprise procurement processes, managed technical objections across functions, coordinated internal teams for deal closure. Must show ability to drive deals through organizational complexity with long decision cycles.",
+            "industry_alignment": "Industry and vertical alignment — High weight: same vertical enterprise selling experience (e.g., BFSI for BFSI role, healthcare for healthcare). Medium weight: similar buyer environment (regulated industries, large enterprises). Neutral: different industry but strong enterprise solution selling capability. Look for depth of understanding in specific verticals.",
+            "company_context": "Company and selling environment fit — SaaS companies, enterprise software, AI/automation platforms, CX/contact center tools, infrastructure or platform sales = high signal. Enterprise B2B background with complex sales motions preferred. Low signal: transactional selling, hardware-only, channel-led, SMB-focused backgrounds.",
+            "numbers_metrics": "Numbers, deal sizes, and ownership — quota achievement, revenue numbers, enterprise deal sizes (look for large ACV), pipeline ownership, growth metrics. Strong: 'Closed enterprise deals worth X Cr', multi-year contract values, strategic account growth. RED FLAG: enterprise sales resume without revenue numbers or deal sizes.",
+        },
+        "weights": {
+            "hunter_mindset": 0.15,
+            "solution_selling": 0.20,
+            "stakeholder_complexity": 0.20,
+            "multi_threading": 0.15,
+            "industry_alignment": 0.10,
+            "company_context": 0.10,
+            "numbers_metrics": 0.10,
+        },
+        "context": """Exotel Enterprise sales involves long sales cycles, complex stakeholder structures, technical solutioning requirements, and industry-specific depth.
+
+Company context: Exotel sells communication infrastructure (CPaaS), contact center platforms (CCaaS), and AI-led solutions (Voice Bots, Conversational AI) to large enterprises. Customers include major brands across BFSI, e-commerce, healthcare, and more.
+
+What to look for: The critical success indicator is the ability to understand what to sell to which persona — CTO gets architecture/integration value, Ops gets efficiency/workflow, Business gets ROI/outcomes. Enterprise sellers must demonstrate deep solutioning capability, long-cycle deal management, and multi-stakeholder navigation. Industry vertical experience is weighted based on match to the specific role.
+
+Strong signals: Enterprise account selling, CXO engagement, technical discovery, complex negotiations, RFP participation, strategic enterprise accounts, persona-based selling, multi-year contracts, large deal closures.
+
+Weak signals: Pure SMB/mid-market experience without enterprise complexity, feature/price selling, single-stakeholder deals, channel-only, transactional backgrounds.
+
+Red flags: No revenue metrics or deal sizes, pure account management, channel-only sales, inside-sales heavy, only leadership roles without individual selling (especially at Principal level), small ticket sizes, no evidence of stakeholder complexity.
+
+Industry Match Weighting:
+- High Weight: Same vertical enterprise selling experience (e.g., BFSI for BFSI role)
+- Medium Weight: Similar buyer environment (regulated industries, large enterprises)
+- Neutral: Different industry but strong enterprise solution selling capability
+
+Level expectations:
+- Sales Manager (5-8 yrs): Independent solution hunter in enterprise accounts. New logo acquisition, pipeline creation, full-cycle ownership, stakeholder navigation.
+- Sr Sales Manager (8-14 yrs): Complex deal closer. Larger enterprise deal ownership, strong solutioning, negotiation maturity, stakeholder influence, handling objections across functions.
+- Principal Sales Manager (14+ yrs): High-trust complex seller. Handles ambiguous enterprise deals, influences senior/CXO stakeholders, drives consensus, strategic account ownership. Red flag if only leadership without individual selling.""",
+    },
+
+    # ── SALES: International ─────────────────────
+    "Sales — International": {
+        "description": "International sales IC hunter roles at Exotel — cross-border selling into Africa, ME, SEA markets with regional and cultural complexity",
+        "dimensions": {
+            "hunter_mindset": "Hunter validation — new logo acquisition in international markets, greenfield market development, self-generated pipeline across borders. Must show evidence of CREATING new business in international territories. Strong: new market entry, outbound into foreign markets. Deprioritize if revenue comes primarily from existing accounts or domestic-only experience.",
+            "solution_selling": "Solution selling ability — has the candidate sold platform products, AI products, or technical/consultative offerings to international customers? Must demonstrate ability to adapt solution positioning to regional market needs and pain points. Strong: AI products, automation platforms, CX platforms, enterprise SaaS sold internationally. Weak: feature/price selling, catalogue-based selling.",
+            "regional_market_expertise": "Regional market expertise — selling into Africa, Middle East, or SEA markets depending on role requirement. Understanding of regional buying patterns, decision cycles, market-specific pain points, cultural and communication differences. Prior experience selling into the same region the role is focused on is a strong signal. Handling remote stakeholders, working across time zones, global procurement processes.",
+            "multi_threading": "Multi-threading with international stakeholders — engaged multiple stakeholders across geographies, handled remote stakeholder management, navigated cross-border procurement processes, managed cultural and communication nuances in deal progression. Must show ability to close large deals with international customers.",
+            "influence_ownership": "Influence without authority and deal ownership — drove international deals forward despite geographic dependencies, coordinated internal teams across time zones, resolved cross-border customer blockers, owned outcomes end-to-end despite remote complexity. Weak: only outbound calling to international prospects without deal ownership.",
+            "company_context": "Company and selling environment fit — SaaS companies, enterprise software, AI/automation platforms, CX/contact center tools with international operations = high signal. Global or multi-geography sales experience preferred. Low signal: purely domestic experience, transactional selling, hardware-only, channel-led, distributor-driven sales.",
+            "numbers_metrics": "Numbers, deal sizes, and ownership — quota achievement in international territories, revenue numbers in international markets, deal sizes with cross-border customers, pipeline ownership metrics. Strong: 'Closed international deals worth $X', multi-country account management, regional revenue growth. RED FLAG: international sales resume without revenue numbers.",
+        },
+        "weights": {
+            "hunter_mindset": 0.15,
+            "solution_selling": 0.15,
+            "regional_market_expertise": 0.20,
+            "multi_threading": 0.15,
+            "influence_ownership": 0.15,
+            "company_context": 0.10,
+            "numbers_metrics": 0.10,
+        },
+        "context": """Exotel International sales involves selling communication infrastructure, contact center platforms, and AI-led solutions into Africa, Middle East, and Southeast Asia markets. This requires cross-border deal management, cultural adaptability, and regional market understanding on top of all core Exotel sales competencies.
+
+Company context: Exotel is expanding internationally and needs sellers who can navigate unfamiliar markets, handle remote stakeholder relationships, work across time zones, and understand global procurement processes. The role requires matching regional experience to the specific market the role targets (Africa experience for Africa roles, Middle East for ME roles, etc.).
+
+What to look for: Regional market expertise is the key differentiator for international roles. Candidates must show understanding of regional buying patterns, decision cycles, market-specific pain points, and cultural/communication differences. Closing large deals with international customers is a critical signal. Remote stakeholder management and cross-timezone coordination are essential.
+
+Strong signals: Selling into Africa/ME/SEA markets (matching role requirement), closing large deals with international customers, handling cultural and communication differences, understanding regional buying patterns and decision cycles, prior experience in the same target region, global procurement process navigation, multi-geography pipeline management.
+
+Weak signals: Only outbound calling to international prospects without deal closure, purely domestic experience, no evidence of cross-cultural selling, only remote/inside sales to international markets without field engagement.
+
+Red flags: No revenue metrics, pure account management, domestic-only selling experience with no international exposure, channel-only sales, inside-sales heavy, no evidence of cultural adaptability or regional market understanding.
+
+Level expectations:
+- Sales Manager (5-8 yrs): Independent international hunter. New logo acquisition in target markets, pipeline creation across borders, full-cycle ownership, stakeholder navigation across geographies.
+- Sr Sales Manager (8-14 yrs): Complex international deal closer. Larger deal ownership across regions, strong cross-cultural solutioning, negotiation maturity in international contexts, multi-stakeholder influence across borders.
+- Principal Sales Manager (14+ yrs): High-trust complex international seller. Handles ambiguous cross-border deals, influences senior stakeholders across cultures, drives consensus in multi-geography contexts, owns end-to-end regional outcomes. Red flag if only leadership without individual selling.""",
+    },
+
+    # ── SDR: Scaleup ─────────────────────────────
+    "SDR — Scaleup": {
+        "description": "SDR for Exotel's scaleup segment — high-volume outbound prospecting across multiple verticals with fast sales cycles.",
+        "dimensions": {
+            "outbound_ownership": "Evidence of self-driven outbound prospecting: cold calling, account research before outreach, identifying decision-makers, multi-channel outreach (LinkedIn + Email + Calls), self-generated meetings. Strong signals include building own target account lists, creating messaging sequences, A/B testing outreach, and improving conversion rates. Penalize candidates who only handled inbound/MQLs or had no outbound exposure.",
+            "funnel_metrics": "Quantitative evidence of funnel thinking and metric-driven execution: call-to-meeting ratios, meeting-to-opportunity conversion, monthly targets, activity metrics (calls/day, emails/day), pipeline contribution. Look for specific numbers like '20+ qualified meetings per month', '12% email reply rate', '3X pipeline vs quota'. Resume with zero metrics is a red flag.",
+            "qualification_depth": "Ability to qualify prospects beyond surface level: discovery questioning, BANT/MEDDIC awareness, pain-point identification, understanding decision-making processes, qualification before handoff to AEs. Strong signals include qualifying on budget/timeline/use case, disqualifying poor-fit leads, and collaborating with AEs on account strategy. Penalize if only booking demos without qualification.",
+            "technical_curiosity": "Familiarity with SaaS, APIs, automation tools, and CRM platforms relevant to Exotel's product suite (APIs, contact center, AI solutions). Strong signals include experience selling SaaS, using tools like Apollo/Sales Navigator/HubSpot, leveraging GenAI for research/personalization, and understanding how APIs or platforms work. Penalize pure non-tech B2B sales background.",
+            "high_volume_execution": "Evidence of managing high-volume outbound activity across multiple verticals with structured tracking. Strong signals include handling multiple industry verticals simultaneously, fast experimentation in messaging and sequences, and maintaining high activity volume without sacrificing quality. This is the key differentiator for the scaleup motion vs enterprise.",
+            "discipline_and_ownership": "Consistency in target achievement, self-driven prospecting, independent pipeline generation, and tenure stability in outbound-heavy roles. Red flags include frequent job switches (<1 year without performance context) and heavy dependence on marketing-generated leads.",
         },
         "weights": {
             "outbound_ownership": 0.25,
             "funnel_metrics": 0.20,
             "qualification_depth": 0.15,
-            "technical_curiosity": 0.15,
-            "industry_persona": 0.10,
-            "self_discipline": 0.15,
-            "leadership": 0.0,
-        },
-        "context": """Exotel SDR is not a generic cold-calling role. SDRs generate qualified opportunities, not just meetings.
-Platform: communication APIs, contact centers, AI-led solutions. 10B+ conversations/year for brands like Swiggy, Ola, Zerodha, Flipkart.
-
-SCALEUP SEGMENT: Faster sales cycles, high-volume outreach, multi-industry coverage.
-Strong signals: handling multiple verticals, fast experimentation in messaging, high activity volume with structured tracking.
-
-Tier 1 (Strong Fit): Clear outbound ownership, metric-driven, consultative, tech-curious.
-Tier 2 (Potential Fit): Outbound exposure but lacks structure or metrics.
-Tier 3 (Low Fit): Primarily inbound, no metrics, no qualification depth.
-Hard red flags: no outbound, no metrics, pure inbound/support. Soft: only volume focus without funnel awareness, generic resume.""",
-    },
-
-    # ── SDR: ENTERPRISE ──────────────────────
-    "SDR — Enterprise": {
-        "description": "Enterprise SDR — account-based, research-heavy, quality over quantity",
-        "dimensions": {
-            "outbound_ownership": "Outbound ownership — did they GENERATE pipeline or only handle inbound? Account-based prospecting, named account targeting, research-heavy outreach. Hard deprioritize: no outbound exposure.",
-            "funnel_metrics": "Funnel & metric thinking — call-to-meeting ratios, conversion rates, monthly targets, pipeline contribution. Focus on quality metrics over volume. RED FLAG: SDR resume with zero metrics.",
-            "qualification_depth": "Qualification depth — discovery questioning, BANT/MEDDIC awareness, pain-point identification, qualification before handoff. Critical for enterprise: quality over quantity mindset. Strong: qualified on budget/timeline/use-case, worked with AEs on enterprise accounts. Weak: booked demos without qualification.",
-            "technical_curiosity": "Technical curiosity — SaaS exposure, API/SDK familiarity, automation tools, CRM usage (HubSpot/Salesforce), GenAI for research. Strong: sold SaaS, used Apollo/Sales Navigator. Weak: pure non-tech B2B.",
-            "industry_persona": "Industry & persona awareness — persona-based messaging (CXOs, Founders, Product Heads), multi-threading outreach within one account, industry pain points, contextualized value props. Weak: generic mass messaging.",
-            "self_discipline": "Self-discipline & ownership — consistency in target achievement, self-driven prospecting, independent pipeline generation, long tenure in outbound roles. Red flags: frequent switches (<1yr), heavy dependence on marketing.",
-            "leadership": "Leadership signals — mentoring junior SDRs, training new hires, creating outreach playbooks, SDR team lead experience, process improvements",
-        },
-        "weights": {
-            "outbound_ownership": 0.20,
-            "funnel_metrics": 0.15,
-            "qualification_depth": 0.20,
-            "technical_curiosity": 0.15,
-            "industry_persona": 0.15,
-            "self_discipline": 0.15,
-            "leadership": 0.0,
-        },
-        "context": """Exotel SDR is not a generic cold-calling role. SDRs generate qualified opportunities, not just meetings.
-Platform: communication APIs, contact centers, AI-led solutions. 10B+ conversations/year for brands like Swiggy, Ola, Zerodha, Flipkart.
-
-ENTERPRISE SEGMENT: Account-based prospecting, research-heavy outreach, fewer but high-value meetings.
-Strong signals: named account targeting, multi-threading outreach within one account, working with AEs on enterprise accounts.
-Critical indicator: QUALITY over quantity mindset. Booking 3 well-qualified enterprise meetings > 20 spray-and-pray demos.
-
-Tier 1 (Strong Fit): Clear outbound ownership, metric-driven, consultative, tech-curious, account-based approach.
-Tier 2 (Potential Fit): Outbound exposure but lacks structure or enterprise focus.
-Tier 3 (Low Fit): Primarily inbound, no metrics, no qualification depth, only volume-based outreach.
-Hard red flags: no outbound, no metrics, pure inbound/support.""",
-    },
-
-    # ── SDR: INTERNATIONAL ───────────────────
-    "SDR — International": {
-        "description": "International SDR — cross-timezone prospecting into target markets specified in JD",
-        "dimensions": {
-            "outbound_ownership": "Outbound ownership — did they GENERATE pipeline or only handle inbound? Cold calling, account research, multi-channel outreach (LinkedIn+Email+Calls), self-generated meetings. Hard deprioritize: no outbound exposure.",
-            "funnel_metrics": "Funnel & metric thinking — call-to-meeting ratios, conversion rates, monthly targets, activity metrics, pipeline contribution. RED FLAG: SDR resume with zero metrics.",
-            "qualification_depth": "Qualification depth — discovery questioning, BANT/MEDDIC awareness, pain-point identification, qualification before handoff. Strong: qualified on budget/timeline/use-case. Weak: booked demos without qualification.",
-            "international_prospecting": "International prospecting — evaluate against the TARGET MARKETS specified in the Job Description. Look for: experience prospecting into those specific markets/regions, working across time zones, handling remote stakeholders, adapting messaging to regional nuances. Strong: booking qualified meetings with buyers in the JD's target region. Weak: only bulk cold emailing internationally, no ownership of qualification, or experience in unrelated regions.",
-            "technical_curiosity": "Technical curiosity — SaaS exposure, API/SDK familiarity, automation tools, CRM usage (HubSpot/Salesforce), GenAI for research. Strong: sold SaaS, used Apollo/Sales Navigator. Weak: pure non-tech B2B.",
-            "self_discipline": "Self-discipline & ownership — consistency in target achievement, self-driven prospecting, independent pipeline generation, long tenure in outbound roles. Red flags: frequent switches (<1yr), heavy dependence on marketing.",
-            "leadership": "Leadership signals — mentoring junior SDRs, training new hires, creating outreach playbooks, SDR team lead experience, process improvements",
-        },
-        "weights": {
-            "outbound_ownership": 0.20,
-            "funnel_metrics": 0.20,
-            "qualification_depth": 0.15,
-            "international_prospecting": 0.15,
             "technical_curiosity": 0.10,
-            "self_discipline": 0.15,
-            "leadership": 0.05,
+            "high_volume_execution": 0.20,
+            "discipline_and_ownership": 0.10,
         },
-        "context": """Exotel SDR is not a generic cold-calling role. SDRs generate qualified opportunities, not just meetings.
-Platform: communication APIs, contact centers, AI-led solutions. 10B+ conversations/year for brands like Swiggy, Ola, Zerodha, Flipkart.
+        "context": """Exotel SDR — Scaleup segment. The scaleup SDR motion involves faster sales cycles, high-volume outreach, and multi-industry coverage. This is NOT a generic cold-calling role — it requires structured outbound prospecting, persona-based outreach to CXOs/Founders/Product Heads, and discovery-driven qualification.
 
-INTERNATIONAL SEGMENT: The target market/region is defined in the Job Description — use it as the primary reference for which geography to evaluate against. Do NOT assume specific regions (e.g., US, MEA, SEA) unless the JD explicitly mentions them.
-Strong signals: booking qualified meetings with buyers in the JD's target region, adapting messaging to regional nuances, prior experience in that specific market.
-Weak signals: only bulk cold emailing internationally, no ownership of qualification, experience in unrelated regions.
+Exotel sells APIs, contact center solutions, and AI products. SDRs are expected to generate qualified opportunities, not just meetings. The scaleup SDR must balance volume with quality across multiple verticals (BFSI, D2C, FMCG, etc.).
 
-Tier 1 (Strong Fit): Clear outbound ownership, metric-driven, international experience, consultative.
-Tier 2 (Potential Fit): Outbound exposure but no international experience.
-Tier 3 (Low Fit): Primarily inbound, no metrics, no qualification depth.
-Hard red flags: no outbound, no metrics, pure inbound/support.""",
+PRIMARY SIGNALS (must-have): Outbound prospecting ownership, funnel & conversion thinking, qualification ability, target ownership.
+SECONDARY SIGNALS: SaaS/tech exposure, industry awareness, CRM usage (HubSpot/Salesforce), GenAI or automation tool usage.
+SUPPORTING SIGNALS: Multi-industry experience.
+
+HARD DISQUALIFIERS: No outbound exposure, no metrics mentioned, pure inbound or support roles.
+SOFT RED FLAGS: Only volume focus without qualification, no funnel awareness, extremely generic resume.
+
+TIERING: Tier 1 (Strong Fit) — clear outbound ownership, metric-driven, consultative, tech-curious. Tier 2 (Potential Fit) — outbound exposure but lacks structure or metrics. Tier 3 (Low Fit) — primarily inbound, no metrics, no qualification depth.""",
     },
 
-    # ── CHIEF OF STAFF ───────────────────────
-    "Chief of Staff": {
-        "description": "CoS for CEO's Office — Strategy & Ops",
+    # ── SDR: Enterprise ──────────────────────────
+    "SDR — Enterprise": {
+        "description": "SDR for Exotel's enterprise segment — account-based prospecting with research-heavy outreach targeting high-value named accounts.",
         "dimensions": {
-            "strategic_thinking": "Strategic thinking — strategy consulting, business planning, CEO-level thinking, board prep, competitive analysis, M&A support, long-range planning",
-            "execution_ops": "Execution & ops — operational excellence, program management, process design, operating cadence, OKR/KPI management, cross-functional delivery",
-            "cross_functional": "Cross-functional leadership — cross-team coordination, stakeholder management across eng/product/sales/ops, breaking silos, driving alignment",
-            "communication": "Communication & presentation — executive communication, board decks, written clarity, ability to synthesize complex info for leadership (assessed from resume quality)",
-            "domain_fit": "Domain fit — B2B SaaS, CPaaS, CX tech, telecom experience. Nice-to-have: worked with founders/CEO directly",
-            "leadership_eq": "Leadership & EQ — people leadership, emotional intelligence, executive presence, managing up, navigating ambiguity, influence without authority",
-            "company_pedigree": "Company pedigree — brand value of companies worked at. FAANG/Big Tech=10, Unicorn=9, Global brand=8, Recognized mid-tier=7, Established niche=6, Small known=5, Unknown=3-4",
-            "leadership": "Leadership signals — direct team management, hiring, building functions/teams, driving org-level initiatives, managing managers, program ownership across departments",
+            "outbound_ownership": "Evidence of self-driven outbound prospecting: cold calling, account research before outreach, identifying decision-makers, multi-channel outreach (LinkedIn + Email + Calls), self-generated meetings. Strong signals include building own target account lists, creating messaging sequences, A/B testing outreach, and improving conversion rates. Penalize candidates who only handled inbound/MQLs or had no outbound exposure.",
+            "account_based_prospecting": "Evidence of account-based, research-heavy outreach targeting named enterprise accounts. Strong signals include named account targeting, multi-threading outreach within a single account (reaching multiple stakeholders), working closely with AEs on enterprise account strategy, and maintaining a quality-over-quantity mindset. This is the critical differentiator for the enterprise SDR motion.",
+            "qualification_depth": "Ability to qualify enterprise prospects with depth and rigor: discovery questioning, BANT/MEDDIC awareness, pain-point identification, understanding complex decision-making processes and buying committees, qualification before handoff to AEs. Strong signals include qualifying on budget/timeline/use case, disqualifying poor-fit leads, and collaborating with AEs on enterprise account strategy.",
+            "funnel_metrics": "Quantitative evidence of funnel thinking and metric-driven execution: call-to-meeting ratios, meeting-to-opportunity conversion, monthly targets, pipeline contribution. For enterprise SDRs, fewer but higher-quality meetings are expected. Look for pipeline value generated, not just meeting volume. Resume with zero metrics is a red flag.",
+            "technical_curiosity": "Familiarity with SaaS, APIs, automation tools, and CRM platforms relevant to Exotel's product suite (APIs, contact center, AI solutions). Strong signals include experience selling SaaS to enterprise buyers, using tools like Apollo/Sales Navigator/HubSpot, leveraging GenAI for research/personalization, and understanding how APIs or platforms work. Penalize pure non-tech B2B sales background.",
+            "industry_persona_awareness": "Understanding of enterprise buyer personas (CXOs, Founders, department heads) and ability to contextualize Exotel's value proposition by industry. Strong signals include persona-based messaging, understanding industry pain points (BFSI, D2C, FMCG), vertical-specific outreach, and customized messaging by industry. Penalize generic mass messaging approaches.",
+            "discipline_and_ownership": "Consistency in target achievement, self-driven prospecting, independent pipeline generation, and tenure stability in outbound-heavy roles. Red flags include frequent job switches (<1 year without performance context) and heavy dependence on marketing-generated leads.",
         },
         "weights": {
-            "strategic_thinking": 0.20,
-            "execution_ops": 0.20,
-            "cross_functional": 0.15,
-            "communication": 0.10,
-            "domain_fit": 0.10,
-            "leadership_eq": 0.15,
-            "company_pedigree": 0.10,
-            "leadership": 0.0,
+            "outbound_ownership": 0.20,
+            "account_based_prospecting": 0.25,
+            "qualification_depth": 0.20,
+            "funnel_metrics": 0.10,
+            "technical_curiosity": 0.10,
+            "industry_persona_awareness": 0.10,
+            "discipline_and_ownership": 0.05,
         },
-        "context": """Chief of Staff for CEO's Office at Exotel. 8-12 YOE preferred. Strategy & Ops / Consulting / BizOps / Product Ops background.
-Key responsibilities: CEO priorities, operating cadence, cross-functional programs, decision support, special projects.
-Nice-to-have: MBA Tier-1, B2B SaaS/CPaaS/CX domain, worked with founders/CEO.
-The role requires someone who can toggle between strategy and execution, manage up to the CEO while driving down through the org.""",
+        "context": """Exotel SDR — Enterprise segment. The enterprise SDR motion involves account-based prospecting, research-heavy outreach, and fewer but high-value meetings. The critical indicator is a quality-over-quantity mindset.
+
+Exotel sells APIs, contact center solutions, and AI products to large enterprise buyers. SDRs are expected to generate qualified opportunities with named accounts, not just volume meetings. Enterprise SDRs must multi-thread within accounts, work closely with AEs, and deeply understand buyer personas and pain points.
+
+PRIMARY SIGNALS (must-have): Outbound prospecting ownership, account-based targeting, qualification ability, target ownership.
+SECONDARY SIGNALS: SaaS/tech exposure, industry awareness, CRM usage (HubSpot/Salesforce), GenAI or automation tool usage.
+SUPPORTING SIGNALS: Multi-industry experience, persona-based messaging.
+
+HARD DISQUALIFIERS: No outbound exposure, no metrics mentioned, pure inbound or support roles.
+SOFT RED FLAGS: Only volume focus without qualification, no funnel awareness, extremely generic resume, spray-and-pray outreach approach.
+
+TIERING: Tier 1 (Strong Fit) — clear outbound ownership with named account targeting, metric-driven, consultative, tech-curious, multi-threading evidence. Tier 2 (Potential Fit) — outbound exposure but lacks enterprise account-based approach or metrics. Tier 3 (Low Fit) — primarily inbound, no metrics, no qualification depth, no enterprise prospecting evidence.""",
     },
 
-    # ── ENGINEERING MANAGER (GenAI) ──────────
-    "Engineering Manager (GenAI)": {
-        "description": "EM for GenAI product team",
+    # ── SDR: International ───────────────────────
+    "SDR — International": {
+        "description": "SDR for Exotel's international markets (US/MEA/SEA) — outbound prospecting across geographies with cross-timezone execution and region-adapted messaging.",
         "dimensions": {
-            "backend_depth": "Backend engineering depth — strong backend past, architecture involvement, system design",
-            "scale_complexity": "Scale & complexity — distributed systems, high throughput, production-grade systems",
-            "ownership": "Ownership & delivery — project delivery, sprint planning, scope-quality-time tradeoffs, stakeholder management",
-            "engineering_maturity": "Engineering maturity — code review practices, technical guidance, unblocking complex challenges, engineering process improvements",
-            "genai_expertise": "GenAI expertise — LangChain, LangGraph, RAG, agent workflows, LLM orchestration, production AI systems (not demos)",
-            "leadership": "Leadership — team management (ideally 4-6 engineers), mentoring, hiring, still technically credible. Red flag: managed 15+ directly (too senior), pure PM without eng depth",
-            "tech_stack_fit": "Tech stack fit — Python, LangChain/LangGraph, vector DBs, AWS, relevant AI/ML tools",
+            "outbound_ownership": "Evidence of self-driven outbound prospecting: cold calling, account research before outreach, identifying decision-makers, multi-channel outreach (LinkedIn + Email + Calls), self-generated meetings. Strong signals include building own target account lists, creating messaging sequences, A/B testing outreach, and improving conversion rates. Penalize candidates who only handled inbound/MQLs or had no outbound exposure.",
+            "international_market_experience": "Evidence of prospecting into international markets — US, MEA, SEA, or other non-domestic geographies. Strong signals include booking qualified meetings with international buyers, adapting messaging to regional nuances, working across time zones, and handling remote stakeholders. Penalize if only bulk cold emailing internationally with no ownership of qualification.",
+            "qualification_depth": "Ability to qualify international prospects with depth: discovery questioning, BANT/MEDDIC awareness, pain-point identification, understanding decision-making processes across different market contexts. Strong signals include qualifying on budget/timeline/use case, disqualifying poor-fit leads, and collaborating with AEs on international account strategy.",
+            "funnel_metrics": "Quantitative evidence of funnel thinking and metric-driven execution: call-to-meeting ratios, meeting-to-opportunity conversion, monthly targets, activity metrics, pipeline contribution. Look for specific numbers. International context may show different conversion benchmarks. Resume with zero metrics is a red flag.",
+            "technical_curiosity": "Familiarity with SaaS, APIs, automation tools, and CRM platforms relevant to Exotel's product suite (APIs, contact center, AI solutions). Strong signals include experience selling SaaS to international buyers, using tools like Apollo/Sales Navigator/HubSpot, leveraging GenAI for research/personalization, and understanding how APIs or platforms work. Penalize pure non-tech B2B sales background.",
+            "industry_persona_awareness": "Understanding of buyer personas (CXOs, Founders, department heads) across international markets and ability to contextualize Exotel's value proposition by region and industry. Strong signals include persona-based messaging, understanding regional pain points, vertical-specific outreach, and customized messaging by geography and industry. Penalize generic mass messaging.",
+            "discipline_and_ownership": "Consistency in target achievement, self-driven prospecting, independent pipeline generation, and ability to work autonomously across time zones. Red flags include frequent job switches (<1 year without performance context), heavy dependence on marketing-generated leads, and only bulk cold emailing internationally without qualification ownership.",
         },
         "weights": {
-            "backend_depth": 0.10,
-            "scale_complexity": 0.10,
-            "ownership": 0.15,
-            "engineering_maturity": 0.10,
-            "genai_expertise": 0.20,
-            "leadership": 0.25,
-            "tech_stack_fit": 0.10,
+            "outbound_ownership": 0.20,
+            "international_market_experience": 0.25,
+            "qualification_depth": 0.15,
+            "funnel_metrics": 0.15,
+            "technical_curiosity": 0.10,
+            "industry_persona_awareness": 0.10,
+            "discipline_and_ownership": 0.05,
         },
-        "context": """Exotel wants hands-on technical leaders — ideal profile is Lead Software Engineers in good product companies who've managed small teams while staying technically involved.
-Target: managed 4-6 engineers, still technically credible, architecture involvement.
-Red flags: pure delivery/project managers, no engineering depth, managed very large teams (15+ directly — suggests beyond hands-on level).
-GenAI product uses Python, LangChain, LangGraph, RAG pipelines, agent workflows, LLM orchestration.""",
+        "context": """Exotel SDR — International segment. The international SDR must prospect into US, MEA, and SEA markets, working across time zones and adapting messaging to regional nuances. This requires all core SDR competencies plus international market exposure.
+
+Exotel sells APIs, contact center solutions, and AI products. SDRs are expected to generate qualified opportunities with international buyers, not just volume meetings or bulk cold emails. International SDRs must demonstrate cultural adaptability, timezone discipline, and ability to handle remote stakeholders.
+
+PRIMARY SIGNALS (must-have): Outbound prospecting ownership, international market prospecting experience, qualification ability, target ownership.
+SECONDARY SIGNALS: SaaS/tech exposure, industry awareness, CRM usage (HubSpot/Salesforce), GenAI or automation tool usage, cross-timezone work experience.
+SUPPORTING SIGNALS: Multi-industry experience, regional messaging adaptation.
+
+HARD DISQUALIFIERS: No outbound exposure, no metrics mentioned, pure inbound or support roles.
+SOFT RED FLAGS: Only volume focus without qualification, no funnel awareness, extremely generic resume, only bulk cold emailing internationally with no qualification ownership.
+
+TIERING: Tier 1 (Strong Fit) — clear outbound ownership with international prospecting, metric-driven, consultative, tech-curious, region-adapted messaging. Tier 2 (Potential Fit) — outbound exposure but lacks international experience or metrics. Tier 3 (Low Fit) — primarily inbound, no metrics, no qualification depth, no international market evidence.""",
     },
 
-    # ── CX: SMB CSM ───────────────────────────
+    # ── CX: SMB CSM ──────────────────────────────
     "CX — SMB CSM": {
-        "description": "SMB Customer Success Manager — high-volume portfolio ownership",
+        "description": "SMB Customer Success Manager owning high-volume portfolios (~700-800 accounts) with scalable engagement, segmentation, and retention at Exotel.",
         "dimensions": {
-            "portfolio_scale": "Portfolio scale — has the candidate managed 50+ accounts? Look for: SMB portfolios, high-volume account ownership, pooled/segmented customer bases. Deprioritize: only enterprise (5-10 accounts), no multi-account evidence.",
-            "segmentation_structure": "Segmentation & structured thinking — customer tiering (top/mid/long-tail), engagement playbooks, prioritization frameworks, scalable engagement models. Weak: attempting 1:1 for all accounts, no structured approach.",
-            "scalability_automation": "Scalability & automation mindset — email campaigns, lifecycle workflows, self-serve enablement (FAQs, guides), automation workflows, scalable customer journeys. Weak: purely manual account handling.",
-            "retention_adoption": "Retention & adoption ownership — product adoption metrics, churn reduction, onboarding/activation ownership. Look for: 'reduced churn by X%', 'increased product usage'. Red flag: no mention of retention or adoption.",
-            "expansion": "Expansion (upsell/cross-sell/renewals) — revenue influence within accounts, identifying growth opportunities, renewal ownership. Weak: no commercial awareness.",
-            "technical_curiosity": "API & product understanding — basic API understanding, SaaS platform experience, ability to explain product workflows. Weak: no exposure to technical products.",
-            "communication_execution": "Communication & execution — clear outcome-driven communication, handling multiple stakeholders, structured thinking, ownership mindset.",
-            "leadership": "Leadership signals — team management, mentoring junior CSMs, building CS processes/playbooks, hiring involvement, regional/segment ownership",
+            "portfolio_scale": "Has the candidate managed high-volume account portfolios (50+ accounts minimum, ideally 100-500+)? Look for SMB or scaled customer environments, pooled or segmented customer bases. Deprioritize candidates with only enterprise accounts (5-10) or no evidence of multi-account ownership.",
+            "segmentation_and_structured_thinking": "Does the candidate demonstrate customer segmentation (high-value vs mid-tier vs long-tail), structured engagement models, prioritization frameworks, tiering strategies, and engagement playbooks? Penalize attempts at 1:1 engagement for all accounts or lack of any structured approach.",
+            "scalability_and_automation": "Does the candidate show an automation and scalable engagement mindset — email campaigns, lifecycle communication, playbooks, workflows, self-serve enablement (FAQs, help content, guides), scalable customer journeys? Penalize purely manual account handling at scale.",
+            "retention_and_adoption": "Does the candidate own product adoption, customer retention, and churn mitigation outcomes? Look for improved adoption metrics, reduced churn percentages, onboarding and activation ownership. Penalize no mention of retention or adoption KPIs.",
+            "expansion_ownership": "Does the candidate demonstrate upsell, cross-sell, or renewal ownership? Look for revenue influence within accounts, identifying growth opportunities, and commercial awareness. Penalize no commercial awareness.",
+            "api_and_product_understanding": "Does the candidate have basic API understanding, ability to understand product workflows, technical curiosity? Look for experience with APIs or SaaS platforms and ability to explain product usage. Penalize no exposure to technical products.",
+            "communication_and_execution": "Does the candidate communicate clearly at scale with structured thinking and an ownership mindset? Look for outcome-driven communication and handling multiple stakeholders effectively.",
         },
         "weights": {
             "portfolio_scale": 0.25,
-            "segmentation_structure": 0.20,
-            "scalability_automation": 0.10,
-            "retention_adoption": 0.20,
-            "expansion": 0.10,
-            "technical_curiosity": 0.05,
-            "communication_execution": 0.10,
-            "leadership": 0.0,
+            "segmentation_and_structured_thinking": 0.20,
+            "scalability_and_automation": 0.15,
+            "retention_and_adoption": 0.15,
+            "expansion_ownership": 0.10,
+            "api_and_product_understanding": 0.08,
+            "communication_and_execution": 0.07,
         },
-        "context": """Exotel SMB CSM is a high-volume, high-ownership role — NOT a relationship-only role.
-The SMB CSM owns ~700-800 accounts, drives product adoption/retention/expansion at scale, segments accounts and prioritizes effectively, uses structured engagement and automation.
-Requires structured thinking, prioritization, and scalable execution — not just relationship management.
-Experience: CSM 2-5 YOE (50+ accounts), Senior CSM 5-8 YOE (100+, strong KPI ownership, segmentation).
-Red flags: no multi-account ownership, pure support/onboarding-only role, only enterprise experience (low volume), no metrics, no expansion or retention ownership.""",
+        "context": """Exotel SMB CSM Evaluation Context:
+
+ROLE NATURE: This is a high-volume, high-ownership role — NOT a relationship-only role. The SMB CSM at Exotel owns ~700-800 accounts, drives product adoption, retention, and expansion at scale. They cannot provide high-touch support to all customers and must segment accounts and prioritize effectively using structured engagement and automation.
+
+WHAT EXOTEL OPTIMIZES FOR: Ability to manage high-volume account portfolios, structured thinking and segmentation capability, ownership of customer outcomes (adoption, churn, expansion), ability to drive engagement at scale (not just 1:1), commercial awareness (upsell, cross-sell, renewals), strong communication and problem-solving, basic API/product understanding.
+
+NOT MANDATORY: Enterprise account experience, telecom domain experience.
+
+EXPERIENCE EXPECTATIONS:
+- CSM (2-5 years): Handling 50+ accounts, adoption and retention exposure, some level of structured execution.
+- Senior CSM (5-8 years): Larger portfolios (100+ / scaled environments), strong KPI ownership, segmentation and process thinking, expansion contribution.
+
+CONFIDENCE BOOSTERS: Portfolio size (50+, 100+), segmentation/tiering, automation/playbooks/lifecycle, adoption/churn/retention metrics, upsell/cross-sell/renewals, API/SaaS/product usage, competitor company or similar industry domain.
+
+CONFIDENCE REDUCERS: Generic "handled customers" with no scale indicators, no metrics, enterprise-only exposure.
+
+HARD DISQUALIFIERS: No multi-account ownership, pure support role or onboarding-heavy role.
+
+SOFT RED FLAGS: Only enterprise account experience (low volume), no segmentation or structure, no metrics, no expansion or retention ownership.
+
+CLASSIFICATION:
+- Tier 1 (Strong Fit): High-volume ownership, structured segmentation, strong KPI ownership (adoption, churn, expansion).
+- Tier 2 (Potential Fit): Customer-facing but lacks scale or structured thinking.
+- Tier 3 (Low Fit): Low-volume account handling, no ownership, no metrics.""",
     },
 
-    # ── CX: MID-MARKET CSM ────────────────────
+    # ── CX: Mid-Market CSM ───────────────────────
     "CX — Mid-Market CSM": {
-        "description": "Mid-Market Customer Success Manager — balanced scale and depth",
+        "description": "Mid-Market Customer Success Manager balancing scale and depth across 20-100 accounts with structured account management, retention, and expansion at Exotel.",
         "dimensions": {
-            "portfolio_complexity": "Portfolio size & complexity — managed 20-100 accounts with recurring engagement, balanced multiple accounts. Enterprise experience (5-10 accounts) is acceptable if structured ownership is demonstrated. Weak: only SMB high-volume (500+, no depth), no clear account ownership.",
-            "account_management": "Account management & structured thinking — account plans/playbooks, regular cadence (QBRs, reviews), defined success metrics per account. Weak: reactive customer handling, no structured approach.",
-            "retention_adoption": "Retention & adoption ownership — product adoption, churn mitigation, onboarding/lifecycle management. Look for: improved usage/engagement, reduced churn. Weak: no measurable impact.",
-            "expansion": "Expansion ownership — upsell/cross-sell contribution, renewal ownership, revenue growth within accounts, identifying expansion opportunities. Weak: no commercial involvement.",
-            "stakeholder_management": "Stakeholder management — multi-threaded engagement, working with business + operational stakeholders, managing decision-makers. Weak: single point of contact only.",
-            "technical_product": "Technical/product understanding — SaaS/product understanding, basic API awareness, mapping product to use cases. Weak: no technical curiosity.",
-            "problem_solving": "Problem-solving & execution — driving outcomes, resolving customer issues end-to-end, cross-functional collaboration.",
-            "leadership": "Leadership signals — team management, mentoring junior CSMs, building CS processes/playbooks, hiring involvement, segment ownership",
+            "portfolio_size_and_complexity": "Has the candidate managed a meaningful number of accounts with moderate complexity (20-100 accounts)? Look for portfolio with recurring engagement, balancing multiple accounts. Enterprise experience (5-10 accounts) is acceptable if candidate demonstrates structured account management, retention/expansion ownership, and willingness to handle higher volume. Deprioritize candidates with only SMB high-volume exposure (500+ accounts, no depth) or no clear account ownership.",
+            "account_management_and_planning": "Does the candidate demonstrate structured account management — account plans, playbooks, regular engagement cadence (QBRs, reviews), defined success metrics per account, and prioritization across accounts? Penalize reactive customer handling or no structured approach.",
+            "retention_and_adoption": "Does the candidate own product adoption, customer retention, and churn mitigation? Look for improved usage/engagement, reduced churn, onboarding and lifecycle management. Penalize no measurable impact on these KPIs.",
+            "expansion_ownership": "Does the candidate demonstrate upsell/cross-sell contribution and renewal ownership? Mid-Market CSMs are expected to influence revenue — look for revenue growth within accounts and identifying expansion opportunities. Penalize no commercial involvement.",
+            "stakeholder_management": "Does the candidate work with multiple stakeholders — business and operational? Look for multi-threaded engagement and handling decision-makers. Penalize single point of contact only approach.",
+            "technical_product_understanding": "Does the candidate have SaaS/product understanding, basic API awareness, and ability to map product to customer use cases? Look for explaining product workflows and understanding integrations. Penalize no technical curiosity.",
+            "problem_solving_and_execution": "Does the candidate drive outcomes, resolve customer issues end-to-end, and coordinate with internal teams? Look for cross-functional collaboration and solving customer problems comprehensively.",
         },
         "weights": {
-            "portfolio_complexity": 0.20,
-            "account_management": 0.20,
-            "retention_adoption": 0.20,
-            "expansion": 0.15,
-            "stakeholder_management": 0.10,
-            "technical_product": 0.05,
-            "problem_solving": 0.10,
-            "leadership": 0.0,
+            "portfolio_size_and_complexity": 0.20,
+            "account_management_and_planning": 0.20,
+            "retention_and_adoption": 0.18,
+            "expansion_ownership": 0.15,
+            "stakeholder_management": 0.12,
+            "technical_product_understanding": 0.08,
+            "problem_solving_and_execution": 0.07,
         },
-        "context": """Exotel Mid-Market CSM is a balanced role between scale and depth.
-Owns ~20-100 accounts, drives adoption/retention/expansion, engages multiple stakeholders per account, requires structured account planning.
-Enterprise experience (5-10 accounts) is NOT a dealbreaker if candidate demonstrates: structured account management, retention/expansion ownership, ability to handle multiple accounts.
-Experience: CSM 2-6 YOE (20-100 accounts, adoption/retention), Senior CSM 6-10 YOE (larger portfolios, strong KPIs, stakeholder influence).
-Red flags: no account ownership, pure support roles, only SMB volume without structure, no metrics, no expansion involvement.""",
+        "context": """Exotel Mid-Market CSM Evaluation Context:
+
+ROLE NATURE: This is a balanced role between scale and depth. The Mid-Market CSM at Exotel owns a moderate portfolio (~20-100 accounts), drives adoption, retention, and expansion, engages with multiple stakeholders per account, requires structured account planning, and balances proactive engagement with scalable execution.
+
+WHAT EXOTEL OPTIMIZES FOR: Ability to manage mid-sized portfolios (20-100 accounts), structured account management and prioritization, strong retention and adoption ownership, expansion mindset (upsell, cross-sell, renewals), multi-stakeholder engagement, problem-solving and execution, basic technical/product understanding (APIs, SaaS workflows).
+
+NOT MANDATORY: Enterprise-level experience, telecom domain experience.
+
+IMPORTANT CONSIDERATION ON ENTERPRISE EXPERIENCE: Enterprise-only experience should NOT be penalized if strong ownership of accounts is demonstrated, clear retention/adoption/expansion impact is visible, and candidate shows ability or intent to handle multiple accounts. Enterprise experience is not a dealbreaker for Mid-Market roles, but lack of ability to manage multiple accounts may reduce confidence.
+
+EXPERIENCE EXPECTATIONS:
+- CSM (2-6 years): Managing 20-100 accounts, ownership of adoption and retention, exposure to expansion.
+- Senior CSM (6-10 years): Larger or more complex portfolios, strong KPI ownership, structured account management, better stakeholder influence.
+
+CONFIDENCE BOOSTERS: Portfolio size (20-100 accounts), account planning/QBRs, adoption/churn reduction, expansion/upsell/renewals, stakeholder management, SaaS/API exposure, competitor company or similar industry domain.
+
+CONFIDENCE REDUCERS: Only SMB volume (no structure), no metrics, generic descriptions.
+
+HARD DISQUALIFIERS: No account ownership, pure support roles.
+
+SOFT RED FLAGS: Only SMB volume experience, only enterprise (low-volume) experience, no metrics, no expansion involvement.
+
+CLASSIFICATION:
+- Tier 1 (Strong Fit): Balanced scale + depth, strong retention + expansion ownership.
+- Tier 2 (Potential Fit): Good customer exposure but lacks structure or metrics.
+- Tier 3 (Low Fit): Reactive, no ownership, no measurable impact.""",
     },
 
-    # ── CX: ENTERPRISE CSM ────────────────────
+    # ── CX: Enterprise CSM ───────────────────────
     "CX — Enterprise CSM": {
-        "description": "Enterprise Customer Success Manager — high-impact strategic ownership",
+        "description": "Enterprise Customer Success Manager owning high-value strategic accounts (5-20) with deep stakeholder influence, renewal/expansion ownership, and consultative engagement at Exotel.",
         "dimensions": {
-            "account_value": "Account value & complexity — managed 5-20 enterprise accounts, high ARR ownership, named enterprise accounts, long-term engagement. Weak: only SMB high-volume, no complexity or stakeholder depth.",
-            "strategic_management": "Strategic account management — account plans, QBRs/EBRs, defined success metrics, business outcome alignment, strategic roadmap discussions. Weak: reactive engagement, no structured planning.",
-            "renewals_retention": "Renewals & retention ownership — renewal ownership, multi-year retention, managing contract cycles. Look for: 'managed renewals worth $X', '95%+ retention'. Weak: no renewal ownership.",
-            "expansion": "Expansion (upsell/cross-sell) — large upsell/cross-sell deals, expansion strategy, revenue growth within accounts. Weak: no revenue influence.",
-            "stakeholder_cxo": "CXO-level stakeholder management — engagement with CTO/Product Heads/Business Leaders, multi-threaded relationships, influence across functions. Weak: single-threaded relationships.",
-            "consultative_approach": "Problem-solving & consultative approach — understanding customer business goals, mapping product to outcomes, business problem-solving, use-case driven engagement.",
-            "technical_understanding": "Technical/product understanding — APIs and integrations, technical workflows, comfort with product/engineering teams. Weak: no technical exposure.",
-            "leadership": "Leadership signals — CS team management, mentoring, hiring, building enterprise CS function, managing managers, defining CS strategy",
+            "account_value_and_complexity": "Has the candidate handled high-value, complex enterprise accounts (5-20)? Look for ownership of large or strategic customers, long-term account engagement, named enterprise accounts, high ARR ownership. Deprioritize candidates with only SMB high-volume accounts or no evidence of complexity/stakeholder depth.",
+            "strategic_account_management": "Does the candidate demonstrate strategic account management — account plans, long-term engagement strategy, business alignment, QBRs/EBRs, defined success metrics, business outcome alignment, and strategic roadmap discussions? Penalize reactive engagement or no structured planning.",
+            "renewals_and_retention": "Does the candidate own renewals, retention, and churn mitigation? Look for renewal ownership, multi-year retention, managing contract cycles, specific metrics like 'managed renewals worth $X' or 'maintained 95%+ retention'. Penalize no renewal ownership.",
+            "expansion_ownership": "Does the candidate drive significant revenue growth through upsell/cross-sell? Look for large upsell/cross-sell deals and expansion strategy. Enterprise CSMs are expected to drive substantial revenue growth within accounts. Penalize no revenue influence.",
+            "cxo_stakeholder_management": "Does the candidate engage CXO and senior stakeholders? Look for engagement with CTO, Product Heads, Business Leaders, multi-threaded relationships, and influence across functions. This is a key differentiator for enterprise CSMs. Penalize single-threaded relationships.",
+            "consultative_problem_solving": "Does the candidate solve business problems, not just product issues? Look for understanding customer business goals, mapping product to outcomes, use-case driven engagement. Enterprise CSMs must operate as strategic advisors, closer to consultative sales + program management.",
+            "technical_product_understanding": "Does the candidate understand APIs and integrations, discuss technical workflows, and work comfortably with product/engineering teams? Look for integration discussions and technical discovery. Penalize no technical exposure.",
         },
         "weights": {
-            "account_value": 0.20,
-            "strategic_management": 0.20,
-            "renewals_retention": 0.20,
-            "expansion": 0.15,
-            "stakeholder_cxo": 0.10,
-            "consultative_approach": 0.10,
-            "technical_understanding": 0.05,
-            "leadership": 0.0,
+            "account_value_and_complexity": 0.20,
+            "strategic_account_management": 0.18,
+            "renewals_and_retention": 0.18,
+            "expansion_ownership": 0.15,
+            "cxo_stakeholder_management": 0.15,
+            "consultative_problem_solving": 0.08,
+            "technical_product_understanding": 0.06,
         },
-        "context": """Exotel Enterprise CSM is a high-impact, strategic ownership role — closer to consultative sales + program management, NOT support or SMB CS.
-Owns ~5-20 high-value accounts, drives long-term retention and large renewals, influences expansion, engages CXOs/Product/Business leaders, navigates complex stakeholder environments, acts as strategic advisor.
-Experience: CSM 3-6 YOE (enterprise account ownership, renewal/retention, stakeholder management), Senior CSM 6-9 YOE (larger/strategic accounts, CXO influence, strong expansion).
-Red flags: no enterprise account ownership, pure support or SMB-only roles, no renewal ownership, no expansion involvement, weak stakeholder depth, no strategic thinking.""",
+        "context": """Exotel Enterprise CSM Evaluation Context:
+
+ROLE NATURE: This is a high-impact, strategic ownership role — fundamentally different from SMB/Mid-Market. The Enterprise CSM at Exotel owns a small portfolio of high-value accounts (typically 5-20), drives long-term retention and large renewals, influences expansion (upsell/cross-sell), engages CXOs, Product, and Business leaders, navigates complex stakeholder environments, and acts as a strategic advisor — not just a relationship manager. This role should feel closer to consultative sales + program management, not support or SMB CS.
+
+WHAT EXOTEL OPTIMIZES FOR: Ownership of high-value accounts, strategic account management, strong retention and renewal ownership, expansion mindset (upsell/cross-sell), CXO and multi-stakeholder engagement, problem-solving in complex environments, strong communication and influence, solid product/technical understanding (APIs, integrations).
+
+NOT MANDATORY: Telecom domain experience.
+
+EXPERIENCE EXPECTATIONS:
+- CSM (3-6 years): Enterprise account ownership, renewal and retention exposure, stakeholder management.
+- Senior CSM (6-9 years): Larger or more strategic accounts, strong renewal + expansion ownership, CXO influence, strategic thinking.
+
+CONFIDENCE BOOSTERS: Enterprise accounts (5-20), renewals/retention metrics, expansion (upsell, cross-sell), QBRs/account plans, CXO engagement, strategic discussions, SaaS/API exposure, competitor company or similar industry domain.
+
+CONFIDENCE REDUCERS: Only SMB volume experience, no renewal ownership, no strategic signals, generic relationship management.
+
+HARD DISQUALIFIERS: No enterprise account ownership, pure support or SMB-only roles.
+
+SOFT RED FLAGS: No renewal ownership, no expansion involvement, weak stakeholder depth, no strategic thinking.
+
+CLASSIFICATION:
+- Tier 1 (Strong Fit): Owns enterprise accounts, drives renewals + expansion, strong stakeholder influence.
+- Tier 2 (Potential Fit): Good customer exposure but lacks depth in renewals or strategy.
+- Tier 3 (Low Fit): No enterprise ownership, no strategic signals.""",
     },
 
-    # ── SUPPORT: L1 PRODUCT SUPPORT ───────────
+    # ── SUPPORT: L1 Product Support ──────────────
     "Support — L1 Product Support Engineer": {
-        "description": "L1 Product Support Engineer — technical troubleshooting & customer handling",
+        "description": "Entry-level ECC support engineer responsible for troubleshooting production issues across Linux, networking, and databases in Exotel's real-time communication platform.",
         "dimensions": {
-            "linux_fundamentals": "Linux fundamentals — commands (grep, awk, ps, top), log analysis, file system navigation, process-level understanding. This is a primary filter — no Linux exposure is a hard disqualifier.",
-            "networking_fundamentals": "Networking fundamentals — DNS, DHCP, OSI model, TCP/IP basics, basic connectivity troubleshooting. If networking is limited but Linux + DB are strong, candidate can still be Potential Fit.",
-            "database_querying": "Database querying — experience with any relational DB (PostgreSQL, MySQL, MariaDB, Oracle), SQL queries (joins, filters, aggregations), query-based debugging. No database knowledge is a hard disqualifier.",
-            "debugging_approach": "Debugging approach — step-by-step troubleshooting, logical thinking, ability to isolate issues. Look for: 'checked logs and identified...', 'resolved issue by...'. Weak: vague or generic explanations.",
-            "customer_communication": "Customer handling & communication — clarity of communication, ability to explain technical issues simply, client/stakeholder interaction. For freshers, strong communication can compensate for lack of experience.",
-            "ownership": "Ownership — end-to-end issue handling, closure responsibility, independent work. Weak: only assisting roles.",
-            "learning_ability": "Learning ability — curiosity, projects/internships, hands-on exposure. Important especially for freshers.",
-            "leadership": "Leadership signals — team lead experience, mentoring junior engineers, shift management, creating runbooks/SOPs, process improvements",
+            "linux_fundamentals": "Proficiency in Linux system fundamentals including command-line tools (grep, awk, ps, top), log analysis, file system navigation, and process-level understanding. Evaluate depth of hands-on Linux exposure versus superficial mentions.",
+            "networking_fundamentals": "Understanding of networking basics including DNS, DHCP, OSI model, TCP/IP, and basic connectivity troubleshooting. Note: weaker networking can be offset by strong Linux and database skills.",
+            "database_querying": "Ability to work with relational databases (PostgreSQL, MySQL, MariaDB, Oracle) including SQL queries with joins, filters, aggregations, and query-based debugging for issue investigation.",
+            "debugging_approach": "Evidence of structured, step-by-step troubleshooting methodology including log-based debugging, issue isolation, and logical thinking. Look for concrete examples like 'checked logs and identified...' or 'resolved issue by...'.",
+            "communication_and_customer_handling": "Clarity in communication, ability to explain technical issues simply, and evidence of client or stakeholder interaction. For freshers, strong communication can compensate for limited experience.",
+            "ownership_and_learning": "Evidence of end-to-end issue handling, closure responsibility, independent work, curiosity, hands-on projects or internships, and a learning mindset.",
         },
         "weights": {
             "linux_fundamentals": 0.25,
-            "networking_fundamentals": 0.10,
+            "networking_fundamentals": 0.12,
             "database_querying": 0.20,
             "debugging_approach": 0.20,
-            "customer_communication": 0.10,
-            "ownership": 0.10,
-            "learning_ability": 0.05,
-            "leadership": 0.0,
+            "communication_and_customer_handling": 0.13,
+            "ownership_and_learning": 0.10,
         },
-        "context": """Exotel L1 Support is NOT a ticket-routing role. The L1 Product Support Engineer troubleshoots issues across Linux, networking, and databases on production systems impacting real-time communication.
-Owns issues end-to-end within defined scope, communicates clearly with customers and internal teams, operates in an SLA-driven environment.
-Experience: Freshers (strong fundamentals + communication + learning mindset), 1-3 YOE (real troubleshooting, production systems, basic customer handling).
-Hard disqualifiers: no Linux exposure, no database querying ability.
-Soft red flags: no debugging examples, generic resume, poor communication signals.""",
+        "context": """Exotel L1 Product Support Engineer — ECC (Enterprise Contact Center) Support.
+
+This is NOT a ticket-routing role. L1 engineers at Exotel troubleshoot issues across Linux, networking, and databases on production systems impacting real-time communication. They own issues end-to-end within defined scope and operate in an SLA-driven environment.
+
+Experience expectation:
+- Freshers: Strong fundamentals, good communication, learning mindset are sufficient.
+- 1-3 years: Real troubleshooting experience, exposure to production systems, basic customer handling expected.
+
+Strong signals: grep, awk, logs, process management, SQL joins, DNS, TCP/IP, troubleshooting, RCA, hands-on projects, concrete debugging examples.
+Weak signals: "Basic knowledge of Linux/SQL" without examples, generic resume content, only theoretical knowledge.
+
+Hard red flags: No Linux exposure, no database knowledge.
+Soft red flags: No debugging examples, generic resume, poor communication indicators.
+
+Classification:
+- Tier 1 (Strong Fit): Strong fundamentals + debugging evidence + communication clarity.
+- Tier 2 (Potential Fit): Strong Linux/DB but gaps in networking or experience.
+- Tier 3 (Low Fit): Weak fundamentals across the board.""",
     },
 
-    # ── SUPPORT: L3 PRODUCT SUPPORT LEAD ──────
+    # ── SUPPORT: L3 Product Support ──────────────
     "Support — L3 Product Support Lead": {
-        "description": "L3 Product Support Lead — senior ownership, RCA, escalation handling",
+        "description": "Senior ECC support lead responsible for complex production RCA, customer escalation handling, cross-system debugging, and mentoring junior engineers at Exotel.",
         "dimensions": {
-            "linux_advanced": "Advanced Linux expertise — load average analysis, system bottleneck analysis, advanced grep/awk usage, deep log analysis, performance debugging.",
-            "database_advanced": "Advanced database debugging — experience with relational DBs (PostgreSQL, MySQL, MariaDB, Oracle), connection pool issues, replication lag debugging, query optimization, indexing.",
-            "networking": "Networking depth — DNS, TCP/IP, latency/debugging issues, network-related RCA.",
-            "rca_ownership": "RCA ownership — end-to-end root cause analysis, cross-system debugging, preventive solutions, long-term fixes. No RCA ownership is a hard disqualifier.",
-            "escalation_handling": "Escalation handling — high-severity incidents, customer escalations, communication under pressure.",
-            "mentorship_leadership": "Mentorship & team contribution — mentoring junior engineers, knowledge sharing, creating playbooks/runbooks.",
-            "cross_functional": "Ownership & collaboration — driving issues end-to-end, working with engineering/product, accountability beyond scope.",
-            "leadership": "Leadership signals — support team management, hiring, defining escalation processes, managing shifts/on-call, building support org structure",
+            "advanced_technical_depth": "Advanced expertise across Linux (load average analysis, system bottleneck identification, advanced awk/grep), databases (connection pool issues, replication lag debugging, query optimization, indexing), and networking (DNS, TCP/IP, latency debugging, network-related RCA). Evaluate for depth beyond basics.",
+            "rca_ownership": "Evidence of end-to-end root cause analysis ownership including cross-system debugging, identifying systemic issues, and implementing preventive long-term solutions rather than surface-level fixes.",
+            "escalation_and_incident_handling": "Experience handling high-severity incidents, managing customer escalations under pressure, and communicating effectively during critical situations.",
+            "mentorship_and_team_contribution": "Evidence of mentoring junior engineers (L1/L2), knowledge sharing, creating playbooks or runbooks, and contributing to team capability building.",
+            "structured_problem_solving": "Logical debugging approach to complex, multi-system problems. Ability to break down complex systems and methodically isolate root causes across layers.",
+            "cross_functional_collaboration": "Driving issues end-to-end across engineering, product, and other teams. Taking accountability beyond defined scope and influencing resolution across organizational boundaries.",
         },
         "weights": {
-            "linux_advanced": 0.20,
-            "database_advanced": 0.20,
-            "networking": 0.10,
-            "rca_ownership": 0.20,
-            "escalation_handling": 0.10,
-            "mentorship_leadership": 0.10,
-            "cross_functional": 0.10,
-            "leadership": 0.0,
+            "advanced_technical_depth": 0.30,
+            "rca_ownership": 0.25,
+            "escalation_and_incident_handling": 0.15,
+            "mentorship_and_team_contribution": 0.10,
+            "structured_problem_solving": 0.10,
+            "cross_functional_collaboration": 0.10,
         },
-        "context": """Exotel L3 Support Lead is a senior ownership role requiring deep technical expertise + ownership + leadership + customer handling.
-Handles complex production issues, performs end-to-end RCA, manages customer escalations, mentors L1/L2 engineers, works across systems (Linux, DB, networking, application), drives resolution across teams.
-Experience: 5+ years with advanced troubleshooting, RCA ownership, escalation handling, mentorship.
-Hard disqualifiers: no RCA ownership, no advanced technical depth.
-Soft red flags: no mentoring experience, only repetitive support work, only ticket handling without depth.""",
+        "context": """Exotel L3 Product Support Lead — ECC (Enterprise Contact Center) Support.
+
+This is a senior ownership role requiring deep technical expertise combined with leadership and customer management. The L3 lead handles the most complex production issues, performs end-to-end RCA, manages customer escalations, mentors L1/L2 engineers, and drives resolution across teams.
+
+Experience expectation: 5+ years with advanced troubleshooting, RCA ownership, escalation handling, and mentorship experience.
+
+Strong signals: load average analysis, awk (advanced), performance debugging, replication lag, indexing, slow query optimization, RCA, incident resolution, "owned", "resolved", mentoring, playbooks, runbooks.
+Weak signals: Only ticket handling without depth, no evidence of ownership or systemic thinking, only repetitive support work.
+
+Hard red flags: No RCA ownership evidence, no advanced technical depth (only basic-level knowledge).
+Soft red flags: No mentoring or leadership evidence, only repetitive support without progressive complexity.
+
+Classification:
+- Tier 1 (Strong Fit): Deep expertise + RCA ownership + escalation handling + mentorship evidence.
+- Tier 2 (Potential Fit): Strong technically but lacks leadership or full RCA depth.
+- Tier 3 (Low Fit): Limited depth and ownership.""",
+    },
+
+    # ── SUPPORT: L1 Platform Support ─────────────
+    "Support — L1 Platform Support Engineer": {
+        "description": "Entry-level platform/tech support engineer responsible for first-level debugging of production backend issues involving APIs, logs, Python, and backend systems at Exotel.",
+        "dimensions": {
+            "backend_and_python_fundamentals": "Basic Python understanding including scripts and small projects, familiarity with backend systems and request flow. Evaluate for hands-on coding evidence versus purely theoretical knowledge.",
+            "api_and_web_fundamentals": "Understanding of HTTP, REST APIs, JSON request/response handling, and basic web stack awareness (HTML, CSS, JS). Look for evidence of working with API-driven systems.",
+            "linux_and_debugging": "Basic Linux command usage, log reading (grep, basic commands), understanding of errors, and evidence of structured step-by-step debugging and log-based troubleshooting.",
+            "database_basics": "SQL fundamentals including joins and filters. Ability to query databases for investigation purposes.",
+            "communication_and_learning": "Clarity in explaining issues, ability to communicate with customers and internal teams, interest in backend systems, exposure to real-world problems, and evidence of learning curiosity.",
+        },
+        "weights": {
+            "backend_and_python_fundamentals": 0.30,
+            "api_and_web_fundamentals": 0.20,
+            "linux_and_debugging": 0.20,
+            "database_basics": 0.15,
+            "communication_and_learning": 0.15,
+        },
+        "context": """Exotel L1 Platform Support Engineer — AI/Platform Tech Support.
+
+This is an entry-level backend + production support role, NOT a ticket-routing role. The engineer handles first-level debugging of production issues, works with APIs, logs, and backend systems, supports L2/L3 in issue resolution, and learns system architecture and workflows.
+
+This role is backend-heavy and SRE-like, with emphasis on Python/Django and distributed systems exposure over time. Django depth and distributed systems experience are NOT mandatory at L1.
+
+Experience expectation: Freshers with strong fundamentals, debugging curiosity, and learning ability are acceptable.
+
+Strong signals: Python scripts/projects, API debugging, log analysis, SQL usage, hands-on projects, concrete debugging examples, "resolved", "debugged".
+Weak signals: "Basic knowledge" without examples, only theoretical knowledge, no hands-on evidence.
+
+Classification:
+- Tier 1 (Strong Fit): Python + debugging evidence + solid fundamentals.
+- Tier 2 (Potential Fit): Good basics but limited real-world exposure.
+- Tier 3 (Low Fit): Weak fundamentals across the board.""",
+    },
+
+    # ── SUPPORT: L2 Platform Support ─────────────
+    "Support — L2 Platform Support Engineer": {
+        "description": "Mid-level platform support engineer responsible for independent production debugging, RCA, backend system troubleshooting, and cross-team collaboration at Exotel.",
+        "dimensions": {
+            "backend_debugging": "Strong Python and backend understanding with evidence of debugging Python/Django systems, understanding request flow, and tracing issues through backend layers.",
+            "database_debugging": "SQL debugging ability including query debugging, performance awareness, and ability to trace data-related issues in production systems.",
+            "linux_and_system_debugging": "Linux troubleshooting including log analysis, system issue diagnosis, and process-level debugging in production environments.",
+            "rca_capability": "Evidence of root cause identification, end-to-end issue tracing, and ability to independently determine why issues occurred rather than just resolving symptoms.",
+            "system_awareness": "Understanding of APIs, basic distributed systems concepts, and exposure to cloud infrastructure (AWS basics). Ability to see how components interconnect.",
+            "collaboration_and_communication": "Evidence of working with engineering teams, reducing escalations through independent resolution, and clear communication of technical findings.",
+        },
+        "weights": {
+            "backend_debugging": 0.25,
+            "database_debugging": 0.18,
+            "linux_and_system_debugging": 0.17,
+            "rca_capability": 0.20,
+            "system_awareness": 0.12,
+            "collaboration_and_communication": 0.08,
+        },
+        "context": """Exotel L2 Platform Support Engineer — AI/Platform Tech Support.
+
+This is an independent production debugger role. The L2 engineer handles complex production issues, performs RCA, works across backend systems, collaborates with engineering, and actively reduces escalations through independent resolution.
+
+This role bridges L1 fundamentals and L3 ownership. Strong Python/Django skills and the ability to independently trace and resolve issues are critical differentiators from L1.
+
+Experience expectation: 2-4 years with real backend debugging experience, RCA exposure, and system-level understanding.
+
+Strong signals: Django, API debugging, log-based RCA, SQL debugging, performance awareness, process-level debugging, "root cause", "end-to-end tracing", cloud/AWS exposure.
+Weak signals: Surface-level debugging only, no evidence of independent issue resolution, no RCA depth.
+
+Classification:
+- Tier 1 (Strong Fit): Backend debugging + RCA capability + system understanding.
+- Tier 2 (Potential Fit): Strong backend skills but limited RCA depth.
+- Tier 3 (Low Fit): Surface-level debugging without independence.""",
+    },
+
+    # ── SUPPORT: L3 Platform Support ─────────────
+    "Support — L3 Platform Support Lead": {
+        "description": "Senior platform support lead owning mission-critical production issues, leading RCA and systemic improvements, building automation, mentoring L1/L2, and driving platform reliability at Exotel.",
+        "dimensions": {
+            "advanced_backend_expertise": "Strong Python and Django expertise, clean code practices, ability to write and review code. Evidence of working with distributed systems, AWS, Docker, Kubernetes. Deep understanding of backend architecture and request flow.",
+            "advanced_database_and_linux": "Advanced SQL debugging including query optimization and performance issue resolution. Deep Linux troubleshooting including advanced debugging and system performance analysis.",
+            "rca_and_system_ownership": "End-to-end RCA ownership with system-level debugging and preventive fixes. Evidence of driving long-term improvements, not just incident resolution. Identifying bottlenecks and suggesting architectural improvements.",
+            "automation_and_tooling": "Building internal tools, automation workflows, monitoring systems, scripts, dashboards, and alerting systems. CI/CD understanding, deployment management, and release workflow experience.",
+            "escalation_and_incident_management": "Handling mission-critical production issues, incident command experience, and ability to manage high-pressure situations with clear communication.",
+            "mentorship_and_cross_functional_leadership": "Mentoring L1/L2 engineers, reviewing code, setting best practices, collaborating with Engineering/Product/Delivery teams, and driving improvements across organizational boundaries.",
+        },
+        "weights": {
+            "advanced_backend_expertise": 0.25,
+            "advanced_database_and_linux": 0.18,
+            "rca_and_system_ownership": 0.22,
+            "automation_and_tooling": 0.12,
+            "escalation_and_incident_management": 0.13,
+            "mentorship_and_cross_functional_leadership": 0.10,
+        },
+        "context": """Exotel L3 Platform Support Lead — AI/Platform Tech Support.
+
+This is the highest escalation + ownership role, directly aligned with the senior platform support JD. The L3 lead owns mission-critical production issues, leads RCA and systemic improvements, drives platform reliability and performance, works with Engineering/Product/Delivery, mentors L1/L2, writes and reviews code (Python/Django), and builds automation and internal tooling.
+
+This role is backend-heavy and SRE-like, requiring deep Python/Django expertise combined with distributed systems knowledge, infrastructure skills, and leadership.
+
+Experience expectation: 5+ years with strong backend development/debugging, RCA ownership, automation, mentorship, and incident management experience.
+
+Strong signals: Python, Django, AWS, Docker, Kubernetes, RCA, performance tuning, latency optimization, CI/CD, monitoring, alerting, automation, scripting, code review, mentoring, architectural improvements, system design discussions.
+Weak signals: Only support without coding ability, no ownership evidence, no automation or tooling contributions.
+
+Hard red flags: No backend depth, no evidence of code-level work.
+Soft red flags: Strong technically but no leadership, mentoring, or cross-functional collaboration evidence.
+
+Classification:
+- Tier 1 (Strong Fit): Deep backend + system expertise + RCA ownership + leadership.
+- Tier 2 (Potential Fit): Strong technically but limited leadership or architecture depth.
+- Tier 3 (Low Fit): No depth, no ownership.""",
+    },
+
+    # ── PROFESSIONAL SERVICES ────────────────────
+    "Professional Services — Integration & Customisation Engineer (ECC)": {
+        "description": "Consultative engineer blending backend/frontend development, system customization, legacy codebase work, and client-facing delivery for Exotel's contact center platform.",
+        "dimensions": {
+            "technical_capability_and_breadth": "Evaluate full-stack engineering capability across backend and frontend. Backend: PHP is primary/preferred, plus familiarity with at least one additional language (Python, Go, Java). Frontend: JavaScript (React preferred), HTML/CSS understanding. System & architecture: REST APIs, HTTP, microservices, 3-tier architecture, Linux-based applications. Look for working versatility across layers, not perfection in every stack. Reduce confidence if profile is extremely narrow or single-layer only. Strong signals: multi-language familiarity, full-stack exposure, SQL/NoSQL usage, data modeling, caching, cloud exposure (AWS/GCP/Azure), observability tools (Grafana/Kibana), TCP/IP networking basics.",
+            "problem_solving_and_engineering_depth": "Assess strength in fundamentals: DSA, concurrency, multithreading, structured thinking. Look for evidence of debugging complex issues, performance improvements, root cause analysis, optimization work, and system-level challenges. Weak signal: only feature development without depth. Strong signals: mentions of debugging, RCA, performance tuning, concurrency handling, and measurable optimization outcomes.",
+            "ownership_and_delivery": "Critical differentiator. Evaluate end-to-end ownership of modules, responsibility for delivery cycles, production quality ownership. Strong signals: 'Owned module end-to-end', 'Handled deployment and stabilization', 'Improved system reliability/performance', shipped and deployed language. Weak signals: only task-based execution, no ownership language, no mention of delivery accountability. This dimension separates consultative engineers from task executors.",
+            "legacy_systems_and_customization": "ECC environments are rarely clean. Evaluate experience with legacy systems, forked or complex codebases, client-specific customizations. Strong signals: migration work, refactoring, building custom solutions for specific use cases, handling messy or evolving systems. Weak signals: only greenfield development, no exposure to inherited or forked code. Especially value candidates who have navigated ambiguity in poorly documented or non-standard systems.",
+            "stakeholder_collaboration": "Evaluate consultative ability: interaction with Product, Engineering, Infosec, Legal, Sales, or Clients. Assess requirement gathering, translating business needs into technical solutions. Strong signals: 'Worked with Product/Sales/Clients', 'Translated requirements into solutions'. Very strong: cross-functional collaboration spanning Infosec, Legal, etc. Weak signal: no stakeholder interaction, purely siloed work. The role demands a consultative engineer, not just a coder.",
+            "code_quality_and_engineering_discipline": "Evaluate adherence to engineering best practices: code reviews, testing practices (test planning, unit/integration tests), SDLC understanding, documentation. Strong signals: Jira/Confluence usage, code review participation, test planning, architecture diagrams, process documentation. Weak signals: no mention of quality, testing, or process discipline. Indicates maturity and readiness for enterprise-grade delivery.",
+            "leadership_and_team_contribution": "Even at 2-4 years experience, some leadership is expected. Evaluate mentoring juniors, unblocking teammates, driving solutions, contributing beyond individual tasks. Strong signals: 'Guided team members', 'Unblocked issues', proactive problem resolution for the team. Weak signals: pure individual contributor with zero team impact or collaboration evidence.",
+        },
+        "weights": {
+            "technical_capability_and_breadth": 0.25,
+            "problem_solving_and_engineering_depth": 0.15,
+            "ownership_and_delivery": 0.20,
+            "legacy_systems_and_customization": 0.15,
+            "stakeholder_collaboration": 0.10,
+            "code_quality_and_engineering_discipline": 0.08,
+            "leadership_and_team_contribution": 0.07,
+        },
+        "context": """Exotel Professional Services — Integration & Customisation Engineer (ECC) role.
+
+This is NOT a pure backend developer or support role. It is a blend of:
+- Backend + frontend engineering (PHP primary, React/JS frontend)
+- System customization and integrations for enterprise clients
+- Working with complex, legacy, and forked codebases in the ECC platform
+- Stakeholder collaboration (Product, Developers, Clients, Infosec)
+- End-to-end ownership of delivery and production quality
+
+The candidate must operate as a Consultative Engineer, not just a coder.
+
+WHAT EXOTEL OPTIMIZES FOR:
+- Strong backend + frontend capability (working proficiency, not perfection)
+- Ability to handle complex, non-clean systems (legacy, forked codebases)
+- Ownership of modules and delivery cycles
+- Structured problem-solving and debugging
+- Stakeholder collaboration and requirement translation
+- Code quality and engineering discipline
+- Ability to work in high-pressure, enterprise environments
+
+NOT MANDATORY: Perfect expertise in all technologies, prior ECC/telecom experience, GenAI exposure.
+
+SIGNAL-BASED VALIDATION — INCREASE CONFIDENCE:
+- Tech stack: PHP, Python/Go/Java, React, JavaScript, SQL, APIs
+- Ownership signals: Owned, delivered, deployed, end-to-end responsibility
+- Problem-solving signals: Debugging, RCA, optimization
+- Complexity signals: Legacy, migration, refactoring, customization
+- Collaboration signals: Product, Client, Infosec, cross-functional
+
+REDUCE CONFIDENCE WHEN DETECTING:
+- Generic phrases: "Worked on...", "Involved in..."
+- No measurable impact
+- No ownership language
+- No real-world complexity evidence
+
+HARD DISQUALIFIERS:
+- No backend experience whatsoever
+- No ability to work with APIs or systems
+
+SOFT RED FLAGS:
+- Extremely narrow skillset (single layer only)
+- Only greenfield work, never touched legacy/inherited code
+- No ownership of delivery
+- No stakeholder interaction
+
+TIER CLASSIFICATION:
+- Tier 1 (Strong Fit): Balanced tech + ownership + problem-solving + stakeholder collaboration
+- Tier 2 (Potential Fit): Technically capable but lacks ownership, complexity, or consultative signals
+- Tier 3 (Low Fit): Narrow skillset, no ownership, no real-world complexity""",
     },
 }
 
+
+# ─────────────────────────────────────────────
+# VERDICT THRESHOLDS & HELPERS
+# ─────────────────────────────────────────────
 
 VERDICT_THRESHOLDS = {
     "Strong Yes": 8.0,
@@ -698,7 +893,7 @@ JOB DESCRIPTION:
 SCORING DIMENSIONS (each 1-10):
 {dimensions_desc}
 {bonus_section}
-VERDICT THRESHOLDS: Strong Yes (≥8.0), Yes (6.5-7.9), Maybe (5.0-6.4), No (<5.0)
+VERDICT THRESHOLDS: Strong Yes (>=8.0), Yes (6.5-7.9), Maybe (5.0-6.4), No (<5.0)
 Total score = weighted sum of dimension scores (the app recomputes total_score and verdict from your dimension scores).
 
 RESUME (filename: {filename}):
@@ -778,7 +973,7 @@ ROLE CONTEXT:
 SCORING DIMENSIONS (each 1-10):
 {dimensions_desc}
 {bonus_section}
-VERDICT THRESHOLDS: Strong Yes (≥8.0), Yes (6.5-7.9), Maybe (5.0-6.4), No (<5.0)
+VERDICT THRESHOLDS: Strong Yes (>=8.0), Yes (6.5-7.9), Maybe (5.0-6.4), No (<5.0)
 Total score = weighted sum of dimension scores (the app recomputes total_score and verdict from your dimension scores).
 
 SCORING CALIBRATION (use the full 1-10 range — do NOT cluster all scores around 5-6):
