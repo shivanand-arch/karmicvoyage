@@ -318,58 +318,84 @@ _partial_eval_recoverable = (
     and bool(resumes)
     and len(_partial_eval_missing) > 0
 )
-if _partial_eval_recoverable:
+
+# Always-visible diagnostic when ANY partial eval state exists. Renders even
+# if `_partial_eval_recoverable` is False, so we can see WHY the Resume
+# banner isn't appearing without grep-ing Streamlit Cloud logs.
+_any_partial_state = bool(st.session_state.get("eval_results")) or bool(resumes)
+if _any_partial_state:
     _persisted_fw = st.session_state.get("eval_framework_name") or ""
     _persisted_jd = st.session_state.get("eval_jd_text") or ""
-    _needs_user_input = not (_persisted_fw and _persisted_jd)
 
-    col_a, col_b = st.columns([5, 1])
-    with col_a:
-        if _needs_user_input:
-            missing_bits = []
-            if not _persisted_fw:
-                missing_bits.append("framework")
-            if not _persisted_jd:
-                missing_bits.append("JD")
-            st.warning(
-                f"⏸️ Eval was incomplete — **{len(_partial_eval_evaluated)} of "
-                f"{len(resumes)}** done · **{len(_partial_eval_missing)}** remaining. "
-                f"Re-select the **{' + '.join(missing_bits)}** below, then click Resume."
-            )
-        else:
-            st.warning(
-                f"⏸️ Eval was incomplete — **{len(_partial_eval_evaluated)} of "
-                f"{len(resumes)}** done · **{len(_partial_eval_missing)}** remaining. "
-                "Resuming evaluates only the missing resumes (framework + JD "
-                "stay cached, so you don't re-pay for what's already done)."
-            )
-    with col_b:
-        if st.button(
-            f"▶ Resume {len(_partial_eval_missing)}",
-            key="resume_partial_eval",
-            type="primary",
-        ):
-            st.session_state["_resume_eval_pending"] = True
-            st.rerun()
+    if _partial_eval_recoverable:
+        _needs_user_input = not (_persisted_fw and _persisted_jd)
+        col_a, col_b = st.columns([5, 1])
+        with col_a:
+            if _needs_user_input:
+                missing_bits = []
+                if not _persisted_fw:
+                    missing_bits.append("framework")
+                if not _persisted_jd:
+                    missing_bits.append("JD")
+                st.warning(
+                    f"⏸️ Eval was incomplete — **{len(_partial_eval_evaluated)} of "
+                    f"{len(resumes)}** done · **{len(_partial_eval_missing)}** remaining. "
+                    f"Re-select the **{' + '.join(missing_bits)}** below, then click Resume."
+                )
+            else:
+                st.warning(
+                    f"⏸️ Eval was incomplete — **{len(_partial_eval_evaluated)} of "
+                    f"{len(resumes)}** done · **{len(_partial_eval_missing)}** remaining. "
+                    "Resuming evaluates only the missing resumes (framework + JD "
+                    "stay cached, so you don't re-pay for what's already done)."
+                )
+        with col_b:
+            if st.button(
+                f"▶ Resume {len(_partial_eval_missing)}",
+                key="resume_partial_eval",
+                type="primary",
+            ):
+                st.session_state["_resume_eval_pending"] = True
+                st.rerun()
 
-    # Diagnostic for when something looks off — quick way to see what's
-    # actually in session_state without grep-ing logs.
-    with st.expander("🔍 Resume state (debug)", expanded=False):
-        _ev_sample = sorted(_partial_eval_evaluated)[:2] if _partial_eval_evaluated else []
-        _pr_sample = sorted(resumes.keys())[:2] if resumes else []
+    # Diagnostic always renders when partial state exists — open by default
+    # if the Resume banner DIDN'T fire so the user can immediately see why.
+    _ev_sample = sorted(_partial_eval_evaluated)[:3] if _partial_eval_evaluated else []
+    _pr_sample = sorted(resumes.keys())[:3] if resumes else []
+    _evaluated_in_pulled = sum(1 for e in _partial_eval_evaluated if e in resumes)
+    _evaluated_not_in_pulled = sum(1 for e in _partial_eval_evaluated if e not in resumes)
+    with st.expander(
+        "🔍 Resume state (debug)",
+        expanded=not _partial_eval_recoverable,
+    ):
         st.json({
+            "_partial_eval_recoverable": _partial_eval_recoverable,
             "eval_results_count": len(st.session_state.get("eval_results") or []),
             "pulled_resumes_count": len(resumes),
+            "evaluated_set_size": len(_partial_eval_evaluated),
+            "missing_count": len(_partial_eval_missing),
+            "evaluated_keys_in_pulled": _evaluated_in_pulled,
+            "evaluated_keys_NOT_in_pulled": _evaluated_not_in_pulled,
             "eval_framework_name": _persisted_fw or "(missing)",
             "eval_jd_text_length": len(_persisted_jd),
-            "missing_count": len(_partial_eval_missing),
             "evaluated_files_sample": _ev_sample,
             "pulled_files_sample": _pr_sample,
-            "key_format_match": bool(
-                _ev_sample and _pr_sample
-                and any(e in resumes for e in _ev_sample)
-            ),
         })
+        if not _partial_eval_recoverable:
+            reasons = []
+            if not st.session_state.get("eval_results"):
+                reasons.append("`eval_results` is empty")
+            if not resumes:
+                reasons.append("`pulled_resumes` is empty")
+            if len(_partial_eval_missing) == 0 and resumes and st.session_state.get("eval_results"):
+                reasons.append(
+                    "every pulled filename is already in evaluated set "
+                    "(filenames may match — eval likely complete OR key formats diverge — "
+                    "compare `evaluated_files_sample` vs `pulled_files_sample` above)"
+                )
+            st.error(
+                "Resume banner suppressed because: " + "; ".join(reasons or ["unknown"])
+            )
 
 # Pop the pending flag once and feed it into the eval block below
 _is_resume_mode = bool(st.session_state.pop("_resume_eval_pending", False))
