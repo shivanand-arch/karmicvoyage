@@ -829,6 +829,91 @@ TIER CLASSIFICATION:
 - Tier 2 (Potential Fit): Technically capable but lacks ownership, complexity, or consultative signals
 - Tier 3 (Low Fit): Narrow skillset, no ownership, no real-world complexity""",
     },
+
+    # ── FINANCE: Sr. Executive Accounts Payable ──
+    "Finance — Sr. Executive Accounts Payable": {
+        "description": "Execution-driven AP owner running end-to-end Procure-to-Pay for an entity at Exotel — invoice processing, GST/TDS compliance, payments, reconciliations, and vendor lifecycle in a high-volume, SLA-driven environment.",
+        "dimensions": {
+            "p2p_ownership": "End-to-end Procure-to-Pay ownership — invoice receipt → validation → posting → payment → reconciliation. Look for entity-level or business-unit-level AP ownership, not partial/fragmented exposure. Strong: 'Handled complete AP cycle', 'Managed invoices to payment closure', 'Owned AP for X entity'. Weak: only invoice booking, only payments, only support work without lifecycle ownership. This is the PRIMARY filter — no full-cycle ownership = auto-deprioritize.",
+            "gst_tds_compliance": "Practical Indian tax compliance in AP — GST validation on vendor invoices, TDS deduction and applicability rules, handling tax discrepancies, audit alignment. NON-NEGOTIABLE for Exotel. Strong: TDS calculations and section-level applicability, GST input credit validation, resolving tax mismatches with vendors. Weak: only theoretical knowledge, certification without hands-on application. Hard disqualifier: no GST or TDS practical exposure.",
+            "reconciliation_and_3way_matching": "Vendor reconciliation and 3-way matching (PO – Invoice – GRN) capability. Look for ownership of monthly vendor recons, identification and resolution of mismatches with vendors and procurement, balance confirmations, ageing analysis. Strong: 'Reconciled vendor balances monthly', 'Resolved PO-GRN-invoice mismatches with procurement', discrepancy resolution evidence. Weak: no reconciliation work, no exposure to 3-way match.",
+            "payment_execution_and_banking": "Payment cycle execution — automatic payment runs, manual payments, bank postings, clearings, payment file generation, banking portal usage. Look for hands-on responsibility for outflow execution, not just initiating requests. Strong: 'Executed weekly payment runs', 'Owned bank posting and clearing', exposure to payment authorization workflows. Weak: no payment execution, only payment recommendation without execution.",
+            "volume_and_sla_discipline": "Ability to operate at high volume under SLAs — ~200-300+ invoices/month, week-end and month-end closing rigor, TAT/KPI ownership. Strong signals: explicit volume figures, SLA achievement, month-end close ownership, KPI metrics like turnaround days or accuracy %. Weak signals: low-volume environment with no scale evidence, no timeline ownership, no closing-cycle exposure.",
+            "vendor_and_query_management": "Vendor lifecycle management — vendor master creation/maintenance, mailbox operations, query handling via email, follow-ups on outstanding balances and disputes. Strong: 'Managed AP mailbox', 'Handled vendor queries end-to-end', 'Followed up on outstanding payments'. Weak: no direct vendor interaction, only internal-facing AP work.",
+            "erp_and_tool_proficiency": "ERP and tooling proficiency — Microsoft Business Central preferred, Tally acceptable, other structured ERPs (SAP, Oracle, NetSuite) acceptable. Strong Excel skills (VLOOKUP, pivots, recons) expected. Strong: hands-on ERP usage in production, automation/macro usage, structured ERP migration exposure. Weak: only manual processing, only spreadsheet-based AP without ERP, theoretical ERP knowledge from training.",
+            "quality_controls_and_process_improvement": "Accuracy, audit readiness, and continuous improvement mindset — quality checks on transactions, compliance with company policies, documentation/archival discipline, process improvement initiatives, error-reduction projects, efficiency gains. Strong: 'Reduced invoice processing TAT by X%', 'Implemented checklist that cut errors', audit readiness ownership. Weak: pure execution with no improvement thinking, no quality controls evidence.",
+        },
+        "weights": {
+            "p2p_ownership": 0.25,
+            "gst_tds_compliance": 0.20,
+            "reconciliation_and_3way_matching": 0.15,
+            "payment_execution_and_banking": 0.10,
+            "volume_and_sla_discipline": 0.10,
+            "vendor_and_query_management": 0.08,
+            "erp_and_tool_proficiency": 0.07,
+            "quality_controls_and_process_improvement": 0.05,
+        },
+        "context": """Exotel Senior Executive — Accounts Payable (Finance) Evaluation Context.
+
+ROLE NATURE: This is a high-ownership, execution-driven role — NOT a transactional or data-entry function. The Senior Executive – AP at Exotel owns end-to-end Procure-to-Pay (P2P) for assigned entities, handles invoice processing, tax validation, payments, and reconciliations, ensures GST & TDS compliance in all transactions, executes payment cycles (automatic + manual), bank postings and clearings, manages vendor lifecycle (creation → reconciliation → closure), handles employee expenses and travel reimbursements, and operates in a high-volume (~300 invoices/month), SLA-driven environment.
+
+The role requires ownership, compliance depth, execution discipline, and operational sharpness.
+
+EXPERIENCE EXPECTATIONS:
+- Minimum: 4+ years in Accounts Payable / Finance Operations
+- Ideal range: 4–6 years
+- Strong if: independent ownership of AP for an entity/BU, structured organizations (SaaS, startups, shared services, mid-large companies)
+- Concern if: <3 years without strong ownership, fragmented or non-AP-focused experience
+
+WHAT EXOTEL OPTIMIZES FOR:
+- End-to-end P2P ownership
+- Strong GST & TDS application knowledge (practical, not theoretical)
+- Vendor reconciliation & 3-way matching capability (PO–Invoice–GRN)
+- Payment execution expertise (auto + manual runs, bank postings)
+- High-volume processing ability (~200-300+ invoices/month)
+- ERP proficiency (Business Central preferred; Tally acceptable; SAP/Oracle/NetSuite acceptable)
+- Vendor and query management (mailbox ops, follow-ups)
+- SLA/TAT ownership and accuracy
+- Process discipline and continuous improvement mindset
+
+NOT ACCEPTABLE:
+- Partial AP exposure (only one part of the cycle — only booking, only payments, only support)
+- No Indian taxation exposure
+
+SIGNAL-BASED VALIDATION — INCREASE CONFIDENCE:
+- Core AP signals: P2P, Accounts Payable, invoice processing, vendor reconciliation, 3-way match (PO–Invoice–GRN)
+- Compliance signals: GST, TDS, tax discrepancy resolution
+- Execution signals: payment run, bank posting, clearing, weekly/monthly payment cycles
+- Operations signals: vendor management, SLA, TAT, KPIs, month-end closing
+- Tools: Business Central, Tally, SAP, Oracle, NetSuite, Excel (advanced)
+- Additional: travel & expense / reimbursements, mailbox management, vendor queries
+
+REDUCE CONFIDENCE WHEN DETECTING:
+- "Data entry" framing
+- Generic "accounts support" with no specifics
+- No compliance or reconciliation work
+- No ownership language
+
+HARD DISQUALIFIERS:
+- No GST or TDS knowledge
+- No end-to-end P2P exposure
+- No reconciliation experience
+
+SOFT RED FLAGS:
+- Only one part of AP cycle
+- No payment handling
+- Low volume exposure
+- No ERP usage
+- No vendor interaction
+
+TIER CLASSIFICATION:
+- Tier 1 (Strong AP Fit): 4+ years + full P2P ownership + GST/TDS + reconciliation + payments + volume + ERP
+- Tier 2 (Potential Fit): Good AP exposure but missing one of — payment handling, volume scale, compliance depth, full ownership
+- Tier 3 (Low Fit): Partial exposure, no ownership, no compliance knowledge
+
+If the candidate only "processes invoices" → reject.
+If the candidate "owns P2P with compliance, payments, reconciliation, and vendor management" → strong fit.""",
+    },
 }
 
 
