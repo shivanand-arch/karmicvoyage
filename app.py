@@ -94,6 +94,17 @@ with st.sidebar:
         api_key = st.secrets.get("ANTHROPIC_API_KEY", api_key)
     if api_key:
         st.success("API key configured", icon="🔑")
+        if st.button("Test API key", key="test_api_key", help="Sends 1 token to verify auth & billing"):
+            try:
+                _client = anthropic.Anthropic(api_key=api_key)
+                _client.messages.create(
+                    model="claude-haiku-4-5-20251001",
+                    max_tokens=1,
+                    messages=[{"role": "user", "content": "ok"}],
+                )
+                st.success("API key works ✓")
+            except Exception as _e:
+                st.error(f"API key test failed: {type(_e).__name__}: {str(_e)[:300]}")
     else:
         st.error("API key not configured. Set ANTHROPIC_API_KEY in Streamlit secrets.")
 
@@ -538,6 +549,25 @@ if st.button(
     st.session_state["eval_jd_text"] = jd_text
     st.session_state["eval_model"] = model_choice
     st.session_state["eval_api_key"] = api_key
+
+    # If many resumes errored, surface the first concrete error so the user can act on it
+    if errors > 0:
+        first_err = next(
+            (r for r in all_results if r.get("current_role") in ("API error", "Parse error", "Error")),
+            None,
+        )
+        err_msg = ""
+        if first_err:
+            concerns = first_err.get("key_concerns") or []
+            err_msg = concerns[0] if concerns else first_err.get("evidence_summary", "")
+        if errors == total:
+            st.error(
+                f"⚠️ All {errors} resumes failed. First error: **{err_msg}**\n\n"
+                "Common causes: invalid/disabled API key, billing/credit issue, rate limit. "
+                "Click 'Test API key' in the sidebar to verify."
+            )
+        else:
+            st.warning(f"{errors}/{total} resumes errored. First error: **{err_msg}**")
 
     st.success(f"✅ Evaluation complete! {len(all_results)} candidates ranked.")
 
