@@ -1032,7 +1032,13 @@ Respond with ONLY valid JSON (no markdown, no explanation):
 
 
 def build_evaluation_prompt_split(framework_key: str, jd_text: str, resume_text: str, filename: str) -> tuple:
-    """Build system + user message pair for evaluation. Returns (system_text, user_text)."""
+    """Build a 3-part split for prompt caching.
+
+    Returns (system_text, jd_block, resume_block):
+      - system_text: framework-stable rubric — cache across all batches
+      - jd_block:    JD only — cache within one batch
+      - resume_block: per-resume text + JSON template — never cached
+    """
     fw = FRAMEWORKS[framework_key]
 
     dimensions_desc = "\n".join(
@@ -1074,7 +1080,12 @@ If evidence is missing for a dimension, score 1-3. Do not assume competence with
 
 Respond with ONLY valid JSON (no markdown, no explanation)."""
 
-    # Build the JSON template
+    jd_block = f"""Evaluate this resume against the job description below.
+
+JOB DESCRIPTION:
+{jd_text}"""
+
+    # Build the JSON template (filename-specific, so part of the per-resume block)
     score_fields = ", ".join(f'"{k}": 0.0' for k in fw["dimensions"])
     json_template = f"""\n{{\n  "name": "Full Name",\n  "file": "{filename}",\n  "current_role": "Current Title @ Company",\n  "yoe": 0,\n  "scores": {{\n    {score_fields}\n  }},"""
 
@@ -1085,18 +1096,13 @@ Respond with ONLY valid JSON (no markdown, no explanation)."""
 
     json_template += """\n  "total_score": 0.00,\n  "verdict": "Maybe",\n  "key_strengths": ["strength1", "strength2"],\n  "key_concerns": ["concern1", "concern2"],\n  "evidence_summary": "2-3 sentence summary with specific resume evidence"\n}"""
 
-    user_text = f"""Evaluate this resume against the job description below.
-
-JOB DESCRIPTION:
-{jd_text}
-
-RESUME (filename: {filename}):
+    resume_block = f"""RESUME (filename: {filename}):
 {resume_text[:3500]}
 
 Extract the candidate's full name, current role/company, and estimated YOE. Score each dimension with specific evidence. Return JSON in this format:
 {json_template}"""
 
-    return system_text, user_text
+    return system_text, jd_block, resume_block
 
 
 def get_framework_names() -> list:
