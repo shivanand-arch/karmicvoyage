@@ -12,7 +12,7 @@ import streamlit as st
 import anthropic
 
 from frameworks import (
-    FRAMEWORKS, get_framework_names, build_evaluation_prompt,
+    FRAMEWORKS, get_framework_names, build_evaluation_prompt_split,
     calculate_total, get_verdict,
 )
 from resume_processor import (
@@ -378,11 +378,17 @@ st.markdown("---")
 def evaluate_single_resume(api_key, model, framework_key, jd_text, filename, resume_text, custom_notes=""):
     """Evaluate a single resume via Claude API. Returns parsed result dict.
     Creates its own Anthropic client per call for thread safety.
+
+    Uses prompt caching: the framework rubric (system) and JD are marked with
+    cache_control so they are billed at ~10% on reads. Per-resume content
+    (resume text + JSON template) stays uncached.
     """
     client = anthropic.Anthropic(api_key=api_key)
-    prompt = build_evaluation_prompt(framework_key, jd_text, resume_text, filename)
+    system_text, jd_block, resume_block = build_evaluation_prompt_split(
+        framework_key, jd_text, resume_text, filename
+    )
     if custom_notes:
-        prompt += f"\n\nADDITIONAL EVALUATION INSTRUCTIONS FROM HIRING MANAGER:\n{custom_notes}"
+        resume_block += f"\n\nADDITIONAL EVALUATION INSTRUCTIONS FROM HIRING MANAGER:\n{custom_notes}"
     fw = FRAMEWORKS[framework_key]
 
     for attempt in range(MAX_RETRIES + 1):
@@ -391,7 +397,29 @@ def evaluate_single_resume(api_key, model, framework_key, jd_text, filename, res
                 model=model,
                 max_tokens=2000,
                 temperature=0.0,
-                messages=[{"role": "user", "content": prompt}],
+                system=[
+                    {
+                        "type": "text",
+                        "text": system_text,
+                        "cache_control": {"type": "ephemeral"},
+                    }
+                ],
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": jd_block,
+                                "cache_control": {"type": "ephemeral"},
+                            },
+                            {
+                                "type": "text",
+                                "text": resume_block,
+                            },
+                        ],
+                    }
+                ],
             )
             text = response.content[0].text.strip()
 
