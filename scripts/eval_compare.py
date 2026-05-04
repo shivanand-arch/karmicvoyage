@@ -133,7 +133,7 @@ def _load_resumes(resumes_dir: Path, limit: int) -> Iterable[tuple[str, str]]:
     files = files[:limit]
     for p in files:
         try:
-            text = extract_text_from_bytes(p.read_bytes(), p.name)
+            text = extract_text_from_bytes(p.name, p.read_bytes())
         except Exception as e:
             print(f"  ! skip {p.name}: {e}", file=sys.stderr)
             continue

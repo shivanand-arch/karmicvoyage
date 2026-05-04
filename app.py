@@ -35,6 +35,11 @@ from trakstar_client import (
 
 MAX_CONCURRENT = 5  # parallel API calls
 EVAL_PERSIST_PATH = os.environ.get("EVAL_PERSIST_PATH", "/tmp/exotel_eval_state.json")
+PULL_PERSIST_PATH = os.environ.get("PULL_PERSIST_PATH", "/tmp/exotel_pull_state.json")
+# Trakstar downloads are sequential and can run 5-20 minutes for 300-400
+# candidates. Checkpoint to disk every N items so a tab/socket reconnect
+# (or container reschedule) doesn't lose the in-progress download.
+PULL_CHECKPOINT_EVERY = 10
 
 logging.basicConfig(
     level=logging.INFO,
@@ -84,6 +89,51 @@ def _clear_eval_state() -> None:
         st.session_state.pop(k, None)
     try:
         os.remove(EVAL_PERSIST_PATH)
+    except FileNotFoundError:
+        pass
+
+
+# ─────────────────────────────────────────────
+# PULL PERSISTENCE (survives mid-pull reconnects — Trakstar batch can run 20min)
+# ─────────────────────────────────────────────
+
+_PULL_PERSIST_KEYS = ("pulled_resumes",)
+
+
+def _persist_pull_state() -> None:
+    """Snapshot pulled_resumes to disk so a long Trakstar pull survives reconnects."""
+    if not st.session_state.get("pulled_resumes"):
+        return
+    try:
+        payload = {k: st.session_state.get(k) for k in _PULL_PERSIST_KEYS}
+        payload["saved_at"] = dt.datetime.utcnow().isoformat() + "Z"
+        with open(PULL_PERSIST_PATH, "w") as f:
+            json.dump(payload, f)
+    except Exception as e:
+        logger.warning("pull persist failed: %s", e)
+
+
+def _restore_pull_state() -> None:
+    """Rehydrate pulled_resumes from disk if session is empty (tab reconnect path)."""
+    if st.session_state.get("pulled_resumes"):
+        return
+    try:
+        with open(PULL_PERSIST_PATH) as f:
+            payload = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return
+    for k in _PULL_PERSIST_KEYS:
+        if k in payload and payload[k] is not None:
+            st.session_state[k] = payload[k]
+    st.session_state["_pull_restored_from"] = payload.get("saved_at")
+
+
+def _clear_pull_state() -> None:
+    """Drop in-memory + on-disk pull state (used when starting a fresh pull)."""
+    for k in (*_PULL_PERSIST_KEYS, "_pull_restored_from"):
+        st.session_state.pop(k, None)
+    try:
+        os.remove(PULL_PERSIST_PATH)
     except FileNotFoundError:
         pass
 
@@ -236,6 +286,21 @@ if st.session_state.get("_eval_restored_from"):
 # Persist resumes across Streamlit reruns (critical for Trakstar pull)
 if "pulled_resumes" not in st.session_state:
     st.session_state["pulled_resumes"] = {}
+
+# Rehydrate any persisted pull state — saves a 5-20min Trakstar batch from
+# being wiped by a tab close, websocket flap, or container reschedule.
+_restore_pull_state()
+if st.session_state.get("_pull_restored_from"):
+    saved_at = st.session_state["_pull_restored_from"]
+    n = len(st.session_state.get("pulled_resumes") or {})
+    col_a, col_b = st.columns([5, 1])
+    with col_a:
+        st.info(f"Restored {n} pulled resumes from a previous session (saved {saved_at}).")
+    with col_b:
+        if st.button("Discard", key="discard_pull_restored"):
+            _clear_pull_state()
+            st.rerun()
+
 resumes = dict(st.session_state["pulled_resumes"])
 failed_extract = []
 
@@ -402,6 +467,10 @@ with col2:
                         st.info(f"**{len(tk_cands)}** candidates ready (out of {len(tk_all_cands)} total)")
 
                         if st.button(f"Pull {len(tk_cands)} Resumes from Trakstar", key="tk_pull"):
+                            # Fresh pull — drop any stale persisted pull so the in-loop
+                            # checkpoints don't merge with a previous batch's data.
+                            _clear_pull_state()
+                            resumes = {}
                             progress = st.progress(0)
                             status = st.empty()
                             downloaded = 0
@@ -429,9 +498,17 @@ with col2:
                                 except Exception:
                                     skipped += 1
 
+                                # Checkpoint to session_state + disk every N items so
+                                # a websocket disconnect or container restart doesn't
+                                # nuke the in-progress pull (was hitting users at 300+).
+                                if (i + 1) % PULL_CHECKPOINT_EVERY == 0:
+                                    st.session_state["pulled_resumes"] = dict(resumes)
+                                    _persist_pull_state()
+
                             progress.progress(1.0)
                             status.empty()
                             st.session_state["pulled_resumes"] = dict(resumes)
+                            _persist_pull_state()
                             st.success(f"Pulled **{downloaded}** resumes ({skipped} skipped — no resume or unreadable)")
 
                             if resumes:
