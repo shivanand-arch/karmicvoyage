@@ -94,6 +94,17 @@ with st.sidebar:
         api_key = st.secrets.get("ANTHROPIC_API_KEY", api_key)
     if api_key:
         st.success("API key configured", icon="🔑")
+        if st.button("Test API key", key="test_api_key", help="Sends 1 token to verify auth & billing"):
+            try:
+                _client = anthropic.Anthropic(api_key=api_key)
+                _client.messages.create(
+                    model="claude-haiku-4-5-20251001",
+                    max_tokens=1,
+                    messages=[{"role": "user", "content": "ok"}],
+                )
+                st.success("API key works ✓")
+            except Exception as _e:
+                st.error(f"API key test failed: {type(_e).__name__}: {str(_e)[:300]}")
     else:
         st.error("API key not configured. Set ANTHROPIC_API_KEY in Streamlit secrets.")
 
@@ -421,6 +432,16 @@ def evaluate_single_resume(api_key, model, framework_key, jd_text, filename, res
                     }
                 ],
             )
+            usage = getattr(response, "usage", None)
+            if usage is not None:
+                print(
+                    f"[cache] {filename}: "
+                    f"input={getattr(usage, 'input_tokens', 0)} "
+                    f"cache_write={getattr(usage, 'cache_creation_input_tokens', 0)} "
+                    f"cache_read={getattr(usage, 'cache_read_input_tokens', 0)} "
+                    f"output={getattr(usage, 'output_tokens', 0)}",
+                    flush=True,
+                )
             text = response.content[0].text.strip()
 
             # Clean potential markdown wrapping
@@ -517,14 +538,29 @@ if st.button(
     completed = 0
     errors = 0
 
-    # Evaluate in parallel
+    # Cache warming: run the first resume synchronously so the cache prefix
+    # (system + JD) is written once. Without this, the first wave of parallel
+    # workers all see a cold cache and may each pay the cache-write penalty.
+    items = list(resumes.items())
+    warm_fname, warm_text = items[0]
+    status_text.text(f"Warming cache on first resume ({warm_fname})...")
+    warm_result = evaluate_single_resume(
+        api_key, model_choice, framework_name, jd_text, warm_fname, warm_text
+    )
+    all_results.append(warm_result)
+    completed += 1
+    if warm_result.get("current_role") in ("Parse error", "API error"):
+        errors += 1
+    progress_bar.progress(completed / total)
+
+    # Evaluate the remaining resumes in parallel — they hit the cache
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_parallel) as executor:
         future_to_file = {
             executor.submit(
                 evaluate_single_resume,
                 api_key, model_choice, framework_name, jd_text, fname, text
             ): fname
-            for fname, text in resumes.items()
+            for fname, text in items[1:]
         }
 
         for future in concurrent.futures.as_completed(future_to_file):
@@ -566,6 +602,24 @@ if st.button(
     st.session_state["eval_jd_text"] = jd_text
     st.session_state["eval_model"] = model_choice
     st.session_state["eval_api_key"] = api_key
+
+    if errors > 0:
+        first_err = next(
+            (r for r in all_results if r.get("current_role") in ("API error", "Parse error", "Error")),
+            None,
+        )
+        err_msg = ""
+        if first_err:
+            concerns = first_err.get("key_concerns") or []
+            err_msg = concerns[0] if concerns else first_err.get("evidence_summary", "")
+        if errors == total:
+            st.error(
+                f"⚠️ All {errors} resumes failed. First error: **{err_msg}**\n\n"
+                "Common causes: invalid/disabled API key, billing/credit issue, rate limit. "
+                "Click 'Test API key' in the sidebar to verify."
+            )
+        else:
+            st.warning(f"{errors}/{total} resumes errored. First error: **{err_msg}**")
 
     st.success(f"✅ Evaluation complete! {len(all_results)} candidates ranked.")
 
