@@ -304,6 +304,43 @@ if st.session_state.get("_pull_restored_from"):
 resumes = dict(st.session_state["pulled_resumes"])
 failed_extract = []
 
+# Detect partial eval: same pulled_resumes + some (but not all) evaluated.
+# Surface a "Resume" button so the user pays only for the missing items
+# instead of re-running everything they already paid for.
+_partial_eval_evaluated = {
+    r.get("file") for r in (st.session_state.get("eval_results") or []) if r.get("file")
+}
+_partial_eval_missing = [
+    fname for fname in resumes.keys() if fname not in _partial_eval_evaluated
+]
+_partial_eval_recoverable = (
+    bool(st.session_state.get("eval_results"))
+    and bool(resumes)
+    and bool(st.session_state.get("eval_framework_name"))
+    and bool(st.session_state.get("eval_jd_text"))
+    and len(_partial_eval_missing) > 0
+)
+if _partial_eval_recoverable:
+    col_a, col_b = st.columns([5, 1])
+    with col_a:
+        st.warning(
+            f"⏸️ Eval was incomplete — **{len(_partial_eval_evaluated)} of "
+            f"{len(resumes)}** done · **{len(_partial_eval_missing)}** remaining. "
+            "Resuming evaluates only the missing resumes (the framework + JD "
+            "stay cached, so you don't re-pay for what's already done)."
+        )
+    with col_b:
+        if st.button(
+            f"▶ Resume {len(_partial_eval_missing)}",
+            key="resume_partial_eval",
+            type="primary",
+        ):
+            st.session_state["_resume_eval_pending"] = True
+            st.rerun()
+
+# Pop the pending flag once and feed it into the eval block below
+_is_resume_mode = bool(st.session_state.pop("_resume_eval_pending", False))
+
 col1, col2 = st.columns(2)
 
 with col1:
@@ -552,30 +589,60 @@ if len(resumes) == 0:
 if ready_checks:
     st.warning("**Cannot evaluate yet:** " + " · ".join(ready_checks))
 
-if st.button(
+_run_button_clicked = st.button(
     "🚀 Evaluate & Rank Resumes",
     type="primary",
     disabled=len(ready_checks) > 0,
     use_container_width=True,
-):
+)
+
+if _run_button_clicked or _is_resume_mode:
+    # In resume mode, pull eval context from the persisted state and trim
+    # `resumes` to only the unevaluated files. The cached prefix (framework +
+    # JD) is unchanged, so resume keeps the same cache shape as the original run.
+    if _is_resume_mode:
+        framework_name = st.session_state.get("eval_framework_name") or framework_name
+        framework = FRAMEWORKS.get(framework_name) if framework_name else framework
+        jd_text = st.session_state.get("eval_jd_text") or jd_text
+        full_resumes_snapshot = dict(resumes)
+        _already_evaluated = {
+            r.get("file") for r in (st.session_state.get("eval_results") or []) if r.get("file")
+        }
+        resumes = {k: v for k, v in resumes.items() if k not in _already_evaluated}
+        if not resumes:
+            st.success("Nothing to resume — all resumes already evaluated.")
+            st.stop()
+    else:
+        full_resumes_snapshot = dict(resumes)
+
     if not api_key:
         st.error("Please enter your Anthropic API key in the sidebar")
         st.stop()
     if not jd_text:
         st.error("Please provide a Job Description")
         st.stop()
+    if not framework_name:
+        st.error("Please select an evaluation framework")
+        st.stop()
     if not len(resumes) > 0:
         st.error("Please provide resumes (upload a ZIP or pull from Trakstar)")
         st.stop()
 
-    # Starting a new run — clear any previously persisted state
-    _clear_eval_state()
+    # Starting a fresh run — clear any previously persisted state.
+    # In resume mode we KEEP the existing 180 results and append to them.
+    if not _is_resume_mode:
+        _clear_eval_state()
 
-    st.subheader("Evaluating...")
+    st.subheader(
+        f"Resuming — {len(resumes)} remaining..."
+        if _is_resume_mode
+        else "Evaluating..."
+    )
     progress_bar = st.progress(0)
     status_text = st.empty()
 
-    all_results = []
+    # Resume mode starts with the previously-saved results; fresh mode starts empty
+    all_results = list(st.session_state.get("eval_results") or []) if _is_resume_mode else []
     total = len(resumes)
     completed = 0
     errors = 0
@@ -584,7 +651,8 @@ if st.button(
         """Snapshot to session_state + disk so a tab/socket flap doesn't lose progress."""
         st.session_state["eval_results"] = list(all_results)
         st.session_state["eval_framework_name"] = framework_name
-        st.session_state["eval_resumes"] = dict(resumes)
+        # eval_resumes is the FULL set so re-evaluate-with-criteria still works after resume
+        st.session_state["eval_resumes"] = dict(full_resumes_snapshot)
         st.session_state["eval_jd_text"] = jd_text
         st.session_state["eval_model"] = model_choice
         st.session_state["eval_api_key"] = api_key
