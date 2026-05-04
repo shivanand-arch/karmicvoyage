@@ -6,7 +6,9 @@ Powered by Claude API with Exotel's evaluation frameworks baked in.
 
 import os
 import json
-import time
+import logging
+import datetime as dt
+from collections import Counter
 import concurrent.futures
 import streamlit as st
 import anthropic
@@ -15,6 +17,7 @@ from frameworks import (
     FRAMEWORKS, get_framework_names, build_evaluation_prompt_split,
     calculate_total, get_verdict,
 )
+from eval_engine import evaluate_single_resume, categorize_error as _categorize_error
 from resume_processor import (
     extract_resumes_from_zip, extract_text_from_uploaded_file, extract_text_from_bytes,
 )
@@ -31,7 +34,60 @@ from trakstar_client import (
 # ─────────────────────────────────────────────
 
 MAX_CONCURRENT = 5  # parallel API calls
-MAX_RETRIES = 2
+EVAL_PERSIST_PATH = os.environ.get("EVAL_PERSIST_PATH", "/tmp/exotel_eval_state.json")
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s %(message)s",
+)
+logger = logging.getLogger("exotel.resume_screener")
+
+
+# ─────────────────────────────────────────────
+# EVAL PERSISTENCE (survives Streamlit tab reconnects)
+# ─────────────────────────────────────────────
+
+_PERSIST_KEYS = ("eval_results", "eval_framework_name", "eval_jd_text", "eval_model")
+
+
+def _persist_eval_state() -> None:
+    """Snapshot eval state to disk so a tab/socket reconnect doesn't nuke a 10-min run."""
+    if not st.session_state.get("eval_results"):
+        return
+    try:
+        payload = {k: st.session_state.get(k) for k in _PERSIST_KEYS}
+        payload["saved_at"] = dt.datetime.utcnow().isoformat() + "Z"
+        with open(EVAL_PERSIST_PATH, "w") as f:
+            json.dump(payload, f)
+    except Exception as e:
+        logger.warning("persist failed: %s", e)
+
+
+def _restore_eval_state() -> None:
+    """Rehydrate session_state from disk if session is empty (tab reconnect path)."""
+    if st.session_state.get("eval_results"):
+        return
+    try:
+        with open(EVAL_PERSIST_PATH) as f:
+            payload = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return
+    for k in _PERSIST_KEYS:
+        if k in payload and payload[k] is not None:
+            st.session_state[k] = payload[k]
+    st.session_state["_eval_restored_from"] = payload.get("saved_at")
+
+
+def _clear_eval_state() -> None:
+    """Drop in-memory + on-disk eval state (used when starting a new run)."""
+    for k in (*_PERSIST_KEYS, "_eval_restored_from"):
+        st.session_state.pop(k, None)
+    try:
+        os.remove(EVAL_PERSIST_PATH)
+    except FileNotFoundError:
+        pass
+
+
 
 st.set_page_config(
     page_title="Exotel Resume Screener",
@@ -163,6 +219,19 @@ TRAKSTAR_SUBDOMAIN = _get_secret("TRAKSTAR_SUBDOMAIN", "exotel")
 
 st.title("📋 Exotel Resume Screener")
 st.caption("Upload a JD + resume ZIP → Get AI-powered ranked Excel output")
+
+# Rehydrate any persisted eval state so a tab/socket reconnect doesn't lose a 10-min run
+_restore_eval_state()
+if st.session_state.get("_eval_restored_from"):
+    saved_at = st.session_state["_eval_restored_from"]
+    n = len(st.session_state.get("eval_results") or [])
+    col_a, col_b = st.columns([5, 1])
+    with col_a:
+        st.info(f"Restored {n} results from a previous session (saved {saved_at}).")
+    with col_b:
+        if st.button("Discard", key="discard_restored"):
+            _clear_eval_state()
+            st.rerun()
 
 # Persist resumes across Streamlit reruns (critical for Trakstar pull)
 if "pulled_resumes" not in st.session_state:
@@ -386,113 +455,6 @@ st.markdown("---")
 # EVALUATION ENGINE
 # ─────────────────────────────────────────────
 
-def evaluate_single_resume(api_key, model, framework_key, jd_text, filename, resume_text, custom_notes=""):
-    """Evaluate a single resume via Claude API. Returns parsed result dict.
-    Creates its own Anthropic client per call for thread safety.
-
-    Uses prompt caching: the framework rubric (system) and JD are marked with
-    cache_control so they are billed at ~10% on reads. Per-resume content
-    (resume text + JSON template) stays uncached.
-    """
-    client = anthropic.Anthropic(api_key=api_key)
-    system_text, jd_block, resume_block = build_evaluation_prompt_split(
-        framework_key, jd_text, resume_text, filename
-    )
-    if custom_notes:
-        resume_block += f"\n\nADDITIONAL EVALUATION INSTRUCTIONS FROM HIRING MANAGER:\n{custom_notes}"
-    fw = FRAMEWORKS[framework_key]
-
-    for attempt in range(MAX_RETRIES + 1):
-        try:
-            response = client.messages.create(
-                model=model,
-                max_tokens=2000,
-                temperature=0.0,
-                system=[
-                    {
-                        "type": "text",
-                        "text": system_text,
-                        "cache_control": {"type": "ephemeral"},
-                    }
-                ],
-                messages=[
-                    {
-                        "role": "user",
-                        "content": [
-                            {
-                                "type": "text",
-                                "text": jd_block,
-                                "cache_control": {"type": "ephemeral"},
-                            },
-                            {
-                                "type": "text",
-                                "text": resume_block,
-                            },
-                        ],
-                    }
-                ],
-            )
-            usage = getattr(response, "usage", None)
-            if usage is not None:
-                print(
-                    f"[cache] {filename}: "
-                    f"input={getattr(usage, 'input_tokens', 0)} "
-                    f"cache_write={getattr(usage, 'cache_creation_input_tokens', 0)} "
-                    f"cache_read={getattr(usage, 'cache_read_input_tokens', 0)} "
-                    f"output={getattr(usage, 'output_tokens', 0)}",
-                    flush=True,
-                )
-            text = response.content[0].text.strip()
-
-            # Clean potential markdown wrapping
-            if text.startswith("```"):
-                text = text.split("\n", 1)[1] if "\n" in text else text[3:]
-                if text.endswith("```"):
-                    text = text[:-3]
-                text = text.strip()
-
-            result = json.loads(text)
-
-            # Recalculate total with correct weights for consistency
-            scores = result.get("scores", {})
-            result["total_score"] = calculate_total(scores, fw["weights"])
-            result["verdict"] = get_verdict(result["total_score"])
-            result["file"] = filename
-
-            return result
-
-        except json.JSONDecodeError:
-            if attempt < MAX_RETRIES:
-                time.sleep(1)
-                continue
-            return {
-                "name": filename.replace(".pdf", "").replace("_", " "),
-                "file": filename,
-                "current_role": "Parse error",
-                "yoe": 0,
-                "scores": {k: 0 for k in fw["dimensions"]},
-                "total_score": 0,
-                "verdict": "No",
-                "key_strengths": [],
-                "key_concerns": ["AI evaluation failed to parse"],
-                "evidence_summary": "Evaluation failed after retries",
-            }
-        except Exception as e:
-            if attempt < MAX_RETRIES:
-                time.sleep(2)
-                continue
-            return {
-                "name": filename.replace(".pdf", "").replace("_", " "),
-                "file": filename,
-                "current_role": "API error",
-                "yoe": 0,
-                "scores": {k: 0 for k in fw["dimensions"]},
-                "total_score": 0,
-                "verdict": "No",
-                "key_strengths": [],
-                "key_concerns": [f"API error: {str(e)[:100]}"],
-                "evidence_summary": f"Evaluation failed: {str(e)[:100]}",
-            }
 
 
 # ─────────────────────────────────────────────
@@ -529,6 +491,9 @@ if st.button(
         st.error("Please provide resumes (upload a ZIP or pull from Trakstar)")
         st.stop()
 
+    # Starting a new run — clear any previously persisted state
+    _clear_eval_state()
+
     st.subheader("Evaluating...")
     progress_bar = st.progress(0)
     status_text = st.empty()
@@ -537,6 +502,16 @@ if st.button(
     total = len(resumes)
     completed = 0
     errors = 0
+
+    def _checkpoint() -> None:
+        """Snapshot to session_state + disk so a tab/socket flap doesn't lose progress."""
+        st.session_state["eval_results"] = list(all_results)
+        st.session_state["eval_framework_name"] = framework_name
+        st.session_state["eval_resumes"] = dict(resumes)
+        st.session_state["eval_jd_text"] = jd_text
+        st.session_state["eval_model"] = model_choice
+        st.session_state["eval_api_key"] = api_key
+        _persist_eval_state()
 
     # Cache warming: run the first resume synchronously so the cache prefix
     # (system + JD) is written once. Without this, the first wave of parallel
@@ -552,6 +527,7 @@ if st.button(
     if warm_result.get("current_role") in ("Parse error", "API error"):
         errors += 1
     progress_bar.progress(completed / total)
+    _checkpoint()
 
     # Evaluate the remaining resumes in parallel — they hit the cache
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_parallel) as executor:
@@ -591,35 +567,31 @@ if st.button(
                 f"Evaluated {completed}/{total} resumes "
                 f"({errors} errors)"
             )
+            _checkpoint()
 
     # Sort by score
     all_results.sort(key=lambda x: x.get("total_score", 0), reverse=True)
-
-    # Store results + context in session state for post-evaluation refinement
-    st.session_state["eval_results"] = all_results
-    st.session_state["eval_framework_name"] = framework_name
-    st.session_state["eval_resumes"] = dict(resumes)
-    st.session_state["eval_jd_text"] = jd_text
-    st.session_state["eval_model"] = model_choice
-    st.session_state["eval_api_key"] = api_key
+    _checkpoint()
 
     if errors > 0:
-        first_err = next(
-            (r for r in all_results if r.get("current_role") in ("API error", "Parse error", "Error")),
-            None,
-        )
-        err_msg = ""
-        if first_err:
-            concerns = first_err.get("key_concerns") or []
-            err_msg = concerns[0] if concerns else first_err.get("evidence_summary", "")
+        error_msgs = [
+            (r.get("key_concerns") or [""])[0]
+            for r in all_results
+            if r.get("current_role") in ("API error", "Parse error", "Error")
+        ]
+        buckets = Counter(_categorize_error(m) for m in error_msgs)
+        breakdown = ", ".join(f"{k}={v}" for k, v in buckets.most_common())
+        sample = next((m for m in error_msgs if m), "")
         if errors == total:
             st.error(
-                f"⚠️ All {errors} resumes failed. First error: **{err_msg}**\n\n"
-                "Common causes: invalid/disabled API key, billing/credit issue, rate limit. "
-                "Click 'Test API key' in the sidebar to verify."
+                f"⚠️ All {errors} resumes failed — {breakdown}\n\n"
+                f"Sample: **{sample}**\n\n"
+                "Click 'Test API key' in the sidebar to verify auth/billing."
             )
         else:
-            st.warning(f"{errors}/{total} resumes errored. First error: **{err_msg}**")
+            st.warning(
+                f"{errors}/{total} resumes errored — {breakdown}\n\nSample: **{sample}**"
+            )
 
     st.success(f"✅ Evaluation complete! {len(all_results)} candidates ranked.")
 
