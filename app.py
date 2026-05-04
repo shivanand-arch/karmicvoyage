@@ -350,7 +350,7 @@ with col1:
     jd_text = ""
     if jd_file:
         try:
-            jd_text = extract_text_from_uploaded_file(jd_file)
+            jd_text = extract_text_from_uploaded_file(jd_file, api_key=api_key)
         except Exception as e:
             st.error(f"Failed to extract JD text: {e}")
             jd_text = ""
@@ -379,7 +379,7 @@ with col2:
 
         if resume_zip:
             with st.spinner("Extracting resumes..."):
-                resumes, failed_extract = extract_resumes_from_zip(resume_zip)
+                resumes, failed_extract = extract_resumes_from_zip(resume_zip, api_key=api_key)
             st.session_state["pulled_resumes"] = dict(resumes)
             st.success(f"Extracted {len(resumes)} resumes")
             if failed_extract:
@@ -486,7 +486,7 @@ with col2:
                                     if fname and data:
                                         safe_name = "".join(ch for ch in cand_name if ch not in r'\/:*?"<>|')
                                         display_name = f"{safe_name} - {fname}"
-                                        text = extract_text_from_bytes(fname, data)
+                                        text = extract_text_from_bytes(fname, data, api_key=api_key)
                                         if len(text.strip()) > 20:
                                             resumes[display_name] = text
                                             downloaded += 1
